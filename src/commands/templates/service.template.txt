@@ -1,0 +1,10 @@
+<?php
+
+namespace {packageName}\http\controllers{nameSpace};
+
+use interactivesolutions\honeycombcore\http\controllers\HCBaseController;
+
+class {serviceName} extends HCBaseController
+{
+
+}
