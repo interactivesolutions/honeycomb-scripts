@@ -54,6 +54,11 @@ class PrepareProject extends HCCommand
                 "destination" => 'app/Http/Console/Kernel.php',
                 "templateDestination" => __DIR__ . '/templates/app.console.kernel.template.txt',
             ]);
+
+            $this->createFileFromTemplate([
+                "destination" => 'app/HoneyComb/config.json',
+                "templateDestination" => __DIR__ . '/templates/config.template.txt',
+            ]);
         }
     }
 }
