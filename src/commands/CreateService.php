@@ -8,6 +8,11 @@ use interactivesolutions\honeycombcore\commands\HCCommand;
 class CreateService extends HCCommand
 {
     /**
+     * Configuration path
+     */
+    const CONFIG_PATH = 'app/HoneyComb/config.json';
+
+    /**
      * The name and signature of the console command.
      *
      * @var string
