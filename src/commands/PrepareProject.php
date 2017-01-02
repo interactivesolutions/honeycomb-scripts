@@ -56,7 +56,7 @@ class PrepareProject extends HCCommand
             ]);
 
             $this->createFileFromTemplate([
-                "destination" => CreateService::CONFIG_PATH,
+                "destination" => 'app/HoneyComb/config.json',
                 "templateDestination" => __DIR__ . '/templates/config.template.txt',
             ]);
         }

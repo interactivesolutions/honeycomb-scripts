@@ -2,21 +2,21 @@
 
 Route::group(['prefix' => 'admin', 'middleware' => ['web', 'auth']],    function () {
 
-    Route::get('{serviceURL}', ['as' => 'admin.{serviceNameDotted}', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{serviceName}@adminView']);
+    Route::get('{serviceName}', ['as' => 'admin.{serviceNameDotted}', 'middleware' => ['acl:{acl_name}_list'], 'uses' => '{controllerNamespace}@adminView']);
 
     Route::group(['prefix' => 'api'], function () {
 
-        Route::get(     '{serviceURL}',                ['as' => 'admin.api.{serviceNameDotted}',               'middleware' => ['acl:{acl_prefix}_list'],            'uses' => '{serviceName}@listData']);
-        Route::get(     '{serviceURL}/search',         ['as' => 'admin.api.{serviceNameDotted}.search',        'middleware' => ['acl:{acl_prefix}_list'],            'uses' => '{serviceName}@search']);
-        Route::get(     '{serviceURL}/{id}',           ['as' => 'admin.api.{serviceNameDotted}.single',        'middleware' => ['acl:{acl_prefix}_list'],            'uses' => '{serviceName}@single']);
-        Route::post(    '{serviceURL}/{id}/duplicate', ['as' => 'admin.api.{serviceNameDotted}.duplicate',     'middleware' => ['acl:{acl_prefix}_update'],          'uses' => '{serviceName}@duplicate']);
-        Route::post(    '{serviceURL}/restore',        ['as' => 'admin.api.{serviceNameDotted}.restore',       'middleware' => ['acl:{acl_prefix}_update'],          'uses' => '{serviceName}@restore']);
-        Route::post(    '{serviceURL}/merge',          ['as' => 'admin.api.{serviceNameDotted}.merge',         'middleware' => ['acl:{acl_prefix}_update'],          'uses' => '{serviceName}@merge']);
-        Route::post(    '{serviceURL}',                [                                                       'middleware' => ['acl:{acl_prefix}_create'],          'uses' => '{serviceName}@create']);
-        Route::put(     '{serviceURL}/{id}',           [                                                       'middleware' => ['acl:{acl_prefix}_update'],          'uses' => '{serviceName}@update']);
-        Route::delete(  '{serviceURL}/{id}',           [                                                       'middleware' => ['acl:{acl_prefix}_delete'],          'uses' => '{serviceName}@delete']);
-        Route::delete(  '{serviceURL}',                [                                                       'middleware' => ['acl:{acl_prefix}_delete'],          'uses' => '{serviceName}@delete']);
-        Route::delete(  '{serviceURL}/{id}/force',     ['as' => 'admin.api.{serviceNameDotted}.force',         'middleware' => ['acl:{acl_prefix}_force_delete'],    'uses' => '{serviceName}@forceDelete']);
-        Route::delete(  '{serviceURL}/force',          ['as' => 'admin.api.{serviceNameDotted}.force.multi',   'middleware' => ['acl:{acl_prefix}_force_delete'],    'uses' => '{serviceName}@forceDelete']);
+        Route::get(     '{serviceName}',                ['as' => 'admin.api.{serviceNameDotted}',               'middleware' => ['acl:{acl_name}_list'],            'uses' => '{controllerNamespace}@listData']);
+        Route::get(     '{serviceName}/search',         ['as' => 'admin.api.{serviceNameDotted}.search',        'middleware' => ['acl:{acl_name}_list'],            'uses' => '{controllerNamespace}@search']);
+        Route::get(     '{serviceName}/{id}',           ['as' => 'admin.api.{serviceNameDotted}.single',        'middleware' => ['acl:{acl_name}_list'],            'uses' => '{controllerNamespace}@single']);
+        Route::post(    '{serviceName}/{id}/duplicate', ['as' => 'admin.api.{serviceNameDotted}.duplicate',     'middleware' => ['acl:{acl_name}_update'],          'uses' => '{controllerNamespace}@duplicate']);
+        Route::post(    '{serviceName}/restore',        ['as' => 'admin.api.{serviceNameDotted}.restore',       'middleware' => ['acl:{acl_name}_update'],          'uses' => '{controllerNamespace}@restore']);
+        Route::post(    '{serviceName}/merge',          ['as' => 'admin.api.{serviceNameDotted}.merge',         'middleware' => ['acl:{acl_name}_update'],          'uses' => '{controllerNamespace}@merge']);
+        Route::post(    '{serviceName}',                [                                                       'middleware' => ['acl:{acl_name}_create'],          'uses' => '{controllerNamespace}@create']);
+        Route::put(     '{serviceName}/{id}',           [                                                       'middleware' => ['acl:{acl_name}_update'],          'uses' => '{controllerNamespace}@update']);
+        Route::delete(  '{serviceName}/{id}',           [                                                       'middleware' => ['acl:{acl_name}_delete'],          'uses' => '{controllerNamespace}@delete']);
+        Route::delete(  '{serviceName}',                [                                                       'middleware' => ['acl:{acl_name}_delete'],          'uses' => '{controllerNamespace}@delete']);
+        Route::delete(  '{serviceName}/{id}/force',     ['as' => 'admin.api.{serviceNameDotted}.force',         'middleware' => ['acl:{acl_name}_force_delete'],    'uses' => '{controllerNamespace}@forceDelete']);
+        Route::delete(  '{serviceName}/force',          ['as' => 'admin.api.{serviceNameDotted}.force.multi',   'middleware' => ['acl:{acl_name}_force_delete'],    'uses' => '{controllerNamespace}@forceDelete']);
     });
 });

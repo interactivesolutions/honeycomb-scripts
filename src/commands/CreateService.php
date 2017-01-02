@@ -8,11 +8,6 @@ use interactivesolutions\honeycombcore\commands\HCCommand;
 class CreateService extends HCCommand
 {
     /**
-     * Configuration path
-     */
-    const CONFIG_PATH = 'app/HoneyComb/config.json';
-
-    /**
      * The name and signature of the console command.
      *
      * @var string
@@ -86,13 +81,6 @@ class CreateService extends HCCommand
      * @var
      */
     private $routesDirectory;
-
-    /**
-     * ACL prefix
-     *
-     * @var
-     */
-    private $acl_prefix;
 
 
     /**
@@ -184,7 +172,6 @@ class CreateService extends HCCommand
 
         $this->routesDestination = $this->packageName . '/routes/' . 'routes.' . $this->serviceRouteName . '.php';
 
-        $this->acl_prefix = $this->getACLPrefix();
     }
 
     /**
@@ -192,46 +179,12 @@ class CreateService extends HCCommand
      */
     private function createService()
     {
-        //$this->createController();
-        //$this->createRoutes();
-        $this->updateConfiguration();
+        $this->createController();
+        $this->createRoutes();
 
-        //$this->call('generate:routes');
+        $this->call('generate:routes');
     }
 
-    /**
-     * Updating configuration
-     */
-    private function updateConfiguration()
-    {
-        $config = (array)$this->file->get(CreateService::CONFIG_PATH);
-
-        $nameSpace = $this->nameSpace;
-
-        if ($nameSpace != '')
-            $nameSpace .= '\\';
-
-        $servicePermissions = [
-            "name" => "admin." . $this->serviceRouteName,
-            "controller" => 'app\Http\Controllers\\' . $nameSpace . $this->serviceName,
-            "actions" =>
-            [
-                $this->acl_prefix . "_list",
-                $this->acl_prefix . "_create",
-                $this->acl_prefix . "_update",
-                $this->acl_prefix . "_delete",
-                $this->acl_prefix . "_force_delete",
-            ]
-        ];
-
-        $config['acl'][] = $servicePermissions;
-
-        $this->file->put(CreateService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
-    }
-
-    /**
-     * Creating controller
-     */
     private function createController()
     {
         $this->createDirectory($this->controllerDirectory);
@@ -262,10 +215,10 @@ class CreateService extends HCCommand
             "templateDestination" => __DIR__ . '/templates/routes.template.txt',
             "content" =>
                 [
-                    "serviceURL" => $this->serviceURL,
+                    "serviceName" => $this->serviceURL,
                     "serviceNameDotted" => $this->serviceRouteName,
-                    "acl_prefix" => $this->acl_prefix,
-                    "serviceName" => $this->serviceName
+                    "acl_name" => $this->getACLPrefix(),
+                    "controllerNamespace" => $this->serviceName
                 ]
           ]);
 
