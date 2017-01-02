@@ -87,6 +87,12 @@ class CreateService extends HCCommand
      */
     private $routesDirectory;
 
+    /**
+     * ACL prefix
+     *
+     * @var
+     */
+    private $acl_prefix;
 
     /**
      * Execute the console command.
@@ -177,6 +183,7 @@ class CreateService extends HCCommand
 
         $this->routesDestination = $this->packageName . '/routes/' . 'routes.' . $this->serviceRouteName . '.php';
 
+        $this->acl_prefix = $this->getACLPrefix();
     }
 
     /**
@@ -220,10 +227,10 @@ class CreateService extends HCCommand
             "templateDestination" => __DIR__ . '/templates/routes.template.txt',
             "content" =>
                 [
-                    "serviceName" => $this->serviceURL,
+                    "serviceURL" => $this->serviceURL,
                     "serviceNameDotted" => $this->serviceRouteName,
-                    "acl_name" => $this->getACLPrefix(),
-                    "controllerNamespace" => $this->serviceName
+                    "acl_prefix" => $this->getACLPrefix(),
+                    "serviceName" => $this->serviceName
                 ]
           ]);
 
