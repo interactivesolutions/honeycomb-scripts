@@ -190,7 +190,7 @@ class CreateService extends HCCommand
         $this->createDirectory($this->controllerDirectory);
         $this->createFileFromTemplate([
             "destination" => $this->controllerDirectory . '/' . $this->serviceName . '.php',
-            "templateDestination" => __DIR__ . '/templates/service.template.txt',
+            "templateDestination" => __DIR__ . '/templates/controller.template.txt',
             "content" =>
                 [
                     "packageName" => $this->packageName,
