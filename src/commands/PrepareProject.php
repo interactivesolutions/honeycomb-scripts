@@ -42,11 +42,13 @@ class PrepareProject extends HCCommand
             $this->deleteDirectory('app/Http/Controllers', true);
             $this->deleteDirectory('app/Http/Console', true);
             $this->deleteDirectory('app/routes', true);
+            $this->deleteDirectory('app/HoneyComb', true);
             $this->deleteDirectory('routes', true);
 
             $this->createDirectory('app/Http/Controllers');
             $this->createDirectory('app/Http/Console');
             $this->createDirectory('app/routes');
+            $this->createDirectory('app/HoneyComb');
 
             $this->createFileFromTemplate([
                 "destination" => 'app/Http/Console/Kernel.php',
