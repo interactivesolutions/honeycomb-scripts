@@ -273,6 +273,7 @@ class CreateService extends HCCommand
                     "nameSpace"      => $this->nameSpace,
                     "controllerName" => $this->controllerName,
                     "packageName"    => $this->packageName,
+                    "acl_prefix"     => $this->acl_prefix,
                 ],
         ]);
 
