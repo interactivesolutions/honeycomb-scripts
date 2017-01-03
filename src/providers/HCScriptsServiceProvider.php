@@ -19,7 +19,7 @@ class HCScriptsServiceProvider extends ServiceProvider
         CreateEnvFile::class,
         CreateService::class,
         PrepareProject::class,
-        GenerateRoutes::class
+        GenerateRoutes::class,
     ];
 
     /**
@@ -44,7 +44,9 @@ class HCScriptsServiceProvider extends ServiceProvider
         {
             $this->app->register(\Way\Generators\GeneratorsServiceProvider::class);
             $this->app->register(\Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class);
-        }$this->registerHelpers();
+        }
+
+        $this->registerHelpers();
     }
 
     /**
@@ -54,9 +56,8 @@ class HCScriptsServiceProvider extends ServiceProvider
     {
         $filePath = __DIR__ . '/../helpers/helpers.php';
 
-        if( \File::isFile($filePath) ) {
+        if (\File::isFile($filePath))
             require_once $filePath;
-        }
     }
 }
 
