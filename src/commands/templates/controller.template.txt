@@ -36,7 +36,7 @@ class {controllerName} extends HCBaseController
         if ($this->user->can('{acl_prefix}_search'))
             $config['actions'][] = 'search';
 
-        return view('coreui::admin.content.list', ['config' => $config]);
+        return view('HCCoreUI::admin.content.list', ['config' => $config]);
     }
 
     /**
