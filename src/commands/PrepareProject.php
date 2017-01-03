@@ -42,8 +42,9 @@ class PrepareProject extends HCCommand
             // deleting files and folders
             $this->deleteDirectory('app/Http/Controllers', true);
             $this->deleteDirectory('app/Http/Console', true);
-            $this->deleteDirectory('app/routes', true);
             $this->deleteDirectory('app/HoneyComb', true);
+            $this->deleteDirectory('app/Models', true);
+            $this->deleteDirectory('app/Routes', true);
             $this->deleteDirectory('routes', true);
 
             $this->file->delete('app/Providers/RouteServiceProvider.php');
@@ -51,7 +52,8 @@ class PrepareProject extends HCCommand
             // creating files and folders
             $this->createDirectory('app/Http/Controllers');
             $this->createDirectory('app/Http/Console');
-            $this->createDirectory('app/routes');
+            $this->createDirectory('app/Models');
+            $this->createDirectory('app/Routes');
             $this->createDirectory('app/HoneyComb');
 
             $this->createFileFromTemplate([
