@@ -108,6 +108,13 @@ class CreateService extends HCCommand
     private $createdFiles = [];
 
     /**
+     * Translations location
+     *
+     * @var
+     */
+    private $translationsLocation;
+
+    /**
      * Execute the console command.
      *
      * @return mixed
@@ -172,6 +179,10 @@ class CreateService extends HCCommand
     private function gatherData()
     {
         $this->packageName = $this->ask('Enter package name (vendor/package) or leave empty for project level ', 'app');
+
+        if ($this->packageName == 'app')
+            $this->translationsLocation = $this->packageName;
+
         $this->serviceURL = $this->ask('Enter of the service url admin/<----');
         $this->controllerName = $this->ask('Enter service name');
     }
@@ -270,10 +281,13 @@ class CreateService extends HCCommand
             "templateDestination" => __DIR__ . '/templates/controller.template.txt',
             "content"             =>
                 [
-                    "nameSpace"      => $this->nameSpace,
-                    "controllerName" => $this->controllerName,
-                    "packageName"    => $this->packageName,
-                    "acl_prefix"     => $this->acl_prefix,
+                    "nameSpace"            => $this->nameSpace,
+                    "controllerName"       => $this->controllerName,
+                    "packageName"          => $this->packageName,
+                    "acl_prefix"           => $this->acl_prefix,
+                    "translationsLocation" => $this->translationsLocation,
+                    "serviceNameDotted"    => $this->stringWithDash($this->packageName . '-' . $this->serviceRouteName),
+                    "controllerNameDotted" => $this->serviceRouteName,
                 ],
         ]);
 
@@ -295,7 +309,7 @@ class CreateService extends HCCommand
                 [
                     "serviceURL"           => $this->serviceURL,
                     "controllerNameDotted" => $this->serviceRouteName,
-                    "acl_prefix"           => $this->getACLPrefix(),
+                    "acl_prefix"           => $this->acl_prefix,
                     "controllerName"       => $this->controllerName,
                 ],
         ]);
