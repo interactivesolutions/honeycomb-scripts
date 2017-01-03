@@ -52,7 +52,7 @@ class CreateService extends HCCommand
      *
      * @var
      */
-    private $serviceName;
+    private $controllerName;
 
     /**
      * Service route name
@@ -120,7 +120,7 @@ class CreateService extends HCCommand
         $this->createService();
 
         return;
-        
+
         dd($this->packageName, $this->packageName . '/http/controllers/' . $this->nameSpace);
 
         $tableList = explode(',', $this->argument('names'));
@@ -173,7 +173,7 @@ class CreateService extends HCCommand
     {
         $this->packageName = $this->ask('Enter package name (vendor/package) or leave empty for project level ', 'app');
         $this->serviceURL = $this->ask('Enter of the service url admin/<----');
-        $this->serviceName = $this->ask('Enter service name');
+        $this->controllerName = $this->ask('Enter service name');
     }
 
     /**
@@ -188,7 +188,7 @@ class CreateService extends HCCommand
         $this->nameSpace = implode('\\', $this->nameSpace);
 
         //adding controller to service name
-        $this->serviceName .= 'Controller';
+        $this->controllerName .= 'Controller';
 
         $this->serviceRouteName = $this->getServiceRouteNameDotted();
 
@@ -220,7 +220,7 @@ class CreateService extends HCCommand
         $config = json_decode($this->file->get(CreateService::CONFIG_PATH));
         $servicePermissions = [
             "name"       => "admin." . $this->serviceRouteName,
-            "controller" => $this->nameSpace . '\\' . $this->serviceName,
+            "controller" => $this->nameSpace . '\\' . $this->controllerName,
             "actions"    =>
                 [
                     $this->acl_prefix . "_list",
@@ -245,7 +245,7 @@ class CreateService extends HCCommand
                 } else
                 {
                     $this->error('Can not override existing configuration. Aborting...');
-                    $this->file->delete($this->controllerDirectory . '/' . $this->serviceName . '.php');
+                    $this->file->delete($this->controllerDirectory . '/' . $this->controllerName . '.php');
                     $this->comment('Deleting controller');
 
                     return null;
@@ -266,16 +266,17 @@ class CreateService extends HCCommand
     {
         $this->createDirectory($this->controllerDirectory);
         $this->createFileFromTemplate([
-            "destination"         => $this->controllerDirectory . '/' . $this->serviceName . '.php',
+            "destination"         => $this->controllerDirectory . '/' . $this->controllerName . '.php',
             "templateDestination" => __DIR__ . '/templates/controller.template.txt',
             "content"             =>
                 [
-                    "nameSpace"   => $this->nameSpace,
-                    "serviceName" => $this->serviceName,
+                    "nameSpace"      => $this->nameSpace,
+                    "controllerName" => $this->controllerName,
+                    "packageName"    => $this->packageName,
                 ],
         ]);
 
-        $this->createdFiles[] = $this->controllerDirectory . '/' . $this->serviceName . '.php';
+        $this->createdFiles[] = $this->controllerDirectory . '/' . $this->controllerName . '.php';
     }
 
     /**
@@ -291,10 +292,10 @@ class CreateService extends HCCommand
             "templateDestination" => __DIR__ . '/templates/routes.template.txt',
             "content"             =>
                 [
-                    "serviceURL"        => $this->serviceURL,
-                    "serviceNameDotted" => $this->serviceRouteName,
-                    "acl_prefix"        => $this->getACLPrefix(),
-                    "serviceName"       => $this->serviceName,
+                    "serviceURL"           => $this->serviceURL,
+                    "controllerNameDotted" => $this->serviceRouteName,
+                    "acl_prefix"           => $this->getACLPrefix(),
+                    "controllerName"       => $this->controllerName,
                 ],
         ]);
 
@@ -306,9 +307,9 @@ class CreateService extends HCCommand
      *
      * @return string
      */
-    private function getServiceNameAsPath()
+    private function getcontrollerNameAsPath()
     {
-        return $this->stringToLower($this->serviceName);
+        return $this->stringToLower($this->controllerName);
     }
 
     /**
@@ -336,13 +337,13 @@ class CreateService extends HCCommand
      *
      * @return mixed|string
      */
-    private function getAclServiceName()
+    private function getAclcontrollerName()
     {
-        $serviceName = explode('/', $this->serviceName);
-        $serviceName = array_pop($serviceName);
-        $serviceName = $this->stringWithUnderscore($serviceName);
+        $controllerName = explode('/', $this->controllerName);
+        $controllerName = array_pop($controllerName);
+        $controllerName = $this->stringWithUnderscore($controllerName);
 
-        return $serviceName;
+        return $controllerName;
     }
 
     /**
@@ -387,7 +388,7 @@ class CreateService extends HCCommand
      */
     private function makeFileName($fileType, $withExtension = false)
     {
-        $name = $this->serviceName;
+        $name = $this->controllerName;
         $name .= $fileType;
 
         if ($withExtension)
@@ -419,7 +420,7 @@ class CreateService extends HCCommand
      */
     private function readOriginalFiles()
     {
-        if ($this->file->exists($this->controllerDirectory . '/' . $this->serviceName . '.php'))
+        if ($this->file->exists($this->controllerDirectory . '/' . $this->controllerName . '.php'))
             $this->abort('Controller exists! Aborting...');
 
         if (!$this->file->exists(CreateService::CONFIG_PATH))
