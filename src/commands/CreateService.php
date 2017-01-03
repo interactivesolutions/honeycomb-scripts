@@ -115,6 +115,13 @@ class CreateService extends HCCommand
     private $translationsLocation;
 
     /**
+     * Models directory
+     *
+     * @var
+     */
+    private $modelsDirectory;
+
+    /**
      * Execute the console command.
      *
      * @return mixed
@@ -125,52 +132,6 @@ class CreateService extends HCCommand
         $this->optimizeData();
         $this->readOriginalFiles();
         $this->createService();
-
-        return;
-
-        dd($this->packageName, $this->packageName . '/http/controllers/' . $this->nameSpace);
-
-        $tableList = explode(',', $this->argument('names'));
-
-        foreach ($tableList as $tableName)
-        {
-            $columns = DB::getSchemaBuilder()->getColumnListing($tableName);
-
-            if (!count($columns))
-            {
-                $this->error("Table not found: " . $tableName . ". Continuing...");
-                continue;
-            }
-
-            $columns = $this->filterByValues($columns);
-
-            $this->modelsData[$tableName] = [
-                'modelName' => $this->ask('Enter model name for "' . $tableName . '" table'),
-                'columns'   => $columns,
-            ];
-        }
-
-
-        foreach ($this->modelsData as $tableName => $model)
-        {
-            $tpl = $this->file->get($this->getTpl('ocmodel'));
-
-            $tpl = str_replace('{modelNamespace}', $this->getModelRootNamespace(), $tpl);
-            $tpl = str_replace('{modelName}', $this->getModelName($model['modelName']), $tpl);
-            $tpl = str_replace('{modelTable}', $tableName, $tpl);
-            $tpl = str_replace('{modelFillable}', $this->getModelFillableFields($model['columns']), $tpl);
-
-            $path = $this->getModelFilePath($model['modelName']);
-
-            $this->createFiles($path, $tpl);
-
-            $this->comment('Model ' . $model['modelName'] . ' created..');
-        }
-
-        if ($this->confirm("Create Migrations?", 'yes'))
-        {
-            $this->call('migrate:generate', array_keys($this->modelsData));
-        }
     }
 
     /**
@@ -185,6 +146,41 @@ class CreateService extends HCCommand
 
         $this->serviceURL = $this->ask('Enter of the service url admin/<----');
         $this->controllerName = $this->ask('Enter service name');
+
+        $this->gatherTablesData();
+    }
+
+    /**
+     * Gathering information about DB tables
+     */
+    private function gatherTablesData()
+    {
+        $repeat = true;
+
+        while($repeat)
+        {
+            $tableName = $this->ask('Enter main DataBase table name');
+
+            $columns = DB::getSchemaBuilder()->getColumnListing($tableName);
+
+            if (!count($columns))
+            {
+                $this->error("Table not found: " . $tableName . ". ");
+                $repeat = $this->ask("Reenter table name?", false);
+
+                if (!$repeat)
+                    $this->abort('Aborting...');
+            }
+            else
+                $repeat = false;
+        }
+
+        $columns = $this->filterByValues($columns);
+
+        $this->modelsData[$tableName] = [
+            'modelName'     => $this->ask('Enter model name for "' . $tableName . '" table'),
+            'modelFillable' => $columns,
+        ];
     }
 
     /**
@@ -205,6 +201,7 @@ class CreateService extends HCCommand
 
         $this->controllerDirectory = str_replace('\\', '/', $this->nameSpace);
         $this->routesDirectory = $this->packageName . '/routes/';
+        $this->modelsDirectory =  str_replace('/Http/Controllers', '/Models', $this->controllerDirectory);
 
         $this->routesDestination = $this->routesDirectory . 'routes.' . $this->serviceRouteName . '.php';
 
@@ -216,6 +213,7 @@ class CreateService extends HCCommand
      */
     private function createService()
     {
+        $this->createModels();
         $this->createController();
         $this->createRoutes();
         $this->updateConfiguration();
@@ -464,5 +462,42 @@ class CreateService extends HCCommand
             $this->file->delete($value);
             $this->comment('Deleted: ' . $value);
         }
+    }
+
+    /**
+     * Creating models
+     */
+    private function createModels()
+    {
+        foreach ($this->modelsData as $tableName => $model)
+        {
+            $this->createFileFromTemplate([
+                "destination"         => $this->modelsDirectory . '/' . $model['modelName'] . '.php',
+                "templateDestination" => __DIR__ . '/templates/model.template.txt',
+                "content"             =>
+                    [
+                        "modelNamespace" => str_replace('Http\Controllers', 'Models', $this->nameSpace),
+                        "modelName"      => $model['modelName'],
+                        "modelFillable"  => $this->getModelFillableFields($model['modelFillable']),
+                        "modelTable"     => $tableName,
+                    ],
+            ]);
+
+            $this->createdFiles[] = $this->modelsDirectory . '/' . $model['modelName'] . '.php';
+        }
+
+        /*if ($this->confirm("Create Migrations?", 'yes'))
+            $this->call('migrate:generate', array_keys($this->modelsData));*/
+    }
+
+    /**
+     * Get models fillable fields
+     *
+     * @param $columns
+     * @return string
+     */
+    private function getModelFillableFields($columns)
+    {
+        return '[\'' . implode('\',\'', $columns) . '\']';
     }
 }
