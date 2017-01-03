@@ -1,10 +1,59 @@
 <?php
 
-namespace {packageName}\http\controllers{nameSpace};
+namespace {nameSpace};
 
 use interactivesolutions\honeycombcore\http\controllers\HCBaseController;
 
 class {serviceName} extends HCBaseController
 {
 
+    /**
+     * Returning configured admin view
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function adminView ()
+    {
+        dd('Something');
+
+        $config = [
+            'title'       => trans('{packageName}::{langFile}.page_title'),
+            'listURL'     => route('admin.api.{serviceName}'),
+            'newFormUrl'  => route('admin.api.form-manager', ['{packageName}-new']),
+            'editFormUrl' => route('admin.api.form-manager', ['{packageName}-edit']),
+            'imagesUrl'   => route('resource.get', ['/']),
+            'headers'     => $this->getListHeader(),
+        ];
+
+        $user = auth()->user();
+
+        if( $user->can('{acl_name}_create') )
+            $config['actions'][] = 'new';
+
+        if( $user->can('{acl_name}_update') )
+            $config['actions'][] = 'update';
+
+        if( $user->can('{acl_name}_delete') ) {
+            $config['actions'][] = 'delete';
+            $config['actions'][] = 'restore';
+        }
+
+        if( $user->can('{acl_name}_search') ) {
+            $config['actions'][] = 'search';
+        }
+
+        return view('coreui::admin.content.list', ['config' => $config]);
+    }
+
+    /**
+     * Creating Admin List Header based on Main Table
+     *
+     * @return array
+     */
+    public function getAdminListHeader()
+    {
+        return [
+            {adminListHeader}
+        ];
+    }
 }
