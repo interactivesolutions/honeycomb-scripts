@@ -316,16 +316,6 @@ class CreateService extends HCCommand
     }
 
     /**
-     * Get service name as path for generating url
-     *
-     * @return string
-     */
-    private function getcontrollerNameAsPath()
-    {
-        return $this->stringToLower($this->controllerName);
-    }
-
-    /**
      * Get dotted service name
      *
      * @return mixed
@@ -343,71 +333,6 @@ class CreateService extends HCCommand
     private function getACLPrefix()
     {
         return $this->packageName . '_' . $this->stringWithUnderscore($this->serviceRouteName);
-    }
-
-    /**
-     * Get acl service name in lower case and underscore
-     *
-     * @return mixed|string
-     */
-    private function getAclcontrollerName()
-    {
-        $controllerName = explode('/', $this->controllerName);
-        $controllerName = array_pop($controllerName);
-        $controllerName = $this->stringWithUnderscore($controllerName);
-
-        return $controllerName;
-    }
-
-    /**
-     * Get controller namespace made by it's path
-     *
-     * @return string
-     */
-    private function getControllerNameSpace()
-    {
-        $path = $this->getControllerPath();
-
-        return $this->makeNamespaceFromPath($path);
-    }
-
-    /**
-     * Get controller path
-     *
-     * @return string
-     */
-    private function getControllerPath()
-    {
-        return $this->controllerDir . $this->getControllerName(true);
-    }
-
-    /**
-     * Get controller name
-     *
-     * @param bool $withExtension
-     * @return string
-     */
-    private function getControllerName($withExtension = false)
-    {
-        return $this->makeFileName('Controller', $withExtension);
-    }
-
-    /**
-     * Make file name by adding type or extension
-     *
-     * @param $fileType
-     * @param bool $withExtension
-     * @return string
-     */
-    private function makeFileName($fileType, $withExtension = false)
-    {
-        $name = $this->controllerName;
-        $name .= $fileType;
-
-        if ($withExtension)
-            $name .= '.php';
-
-        return $name;
     }
 
     /**
