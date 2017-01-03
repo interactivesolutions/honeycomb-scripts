@@ -59,6 +59,8 @@ class PrepareProject extends HCCommand
                 "destination" => CreateService::CONFIG_PATH,
                 "templateDestination" => __DIR__ . '/templates/config.template.txt',
             ]);
+
+            $this->file->put(GenerateRoutes::ROUTES_PATH, '');
         }
     }
 }
