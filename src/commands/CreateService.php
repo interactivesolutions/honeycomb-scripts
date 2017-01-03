@@ -411,8 +411,8 @@ class CreateService extends HCCommand
             $this->createdFiles[] = $this->modelsDirectory . '/' . $model['modelName'] . '.php';
         }
 
-        /*if ($this->confirm("Create Migrations?", 'yes'))
-            $this->call('migrate:generate', array_keys($this->modelsData));*/
+        if ($this->confirm("Create Migrations?", 'yes'))
+            $this->call('migrate:generate', ["tables" => implode("','", array_keys($this->modelsData))]);
     }
 
     /**
