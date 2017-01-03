@@ -6,6 +6,8 @@ use interactivesolutions\honeycombcore\commands\HCCommand;
 
 class GenerateRoutes extends HCCommand
 {
+    const ROUTES_PATH = 'app/HoneyComb/routes.php';
+
     /**
      * The name and signature of the console command.
      *
@@ -37,8 +39,8 @@ class GenerateRoutes extends HCCommand
             $finalContent .= str_replace('<?php', '', $this->file->get((string)$file)) . "\r\n";
         }
 
-        $this->file->put('app/routes.honeycomb.php', $finalContent);
+        $this->file->put(GenerateRoutes::ROUTES_PATH, $finalContent);
 
-        $this->comment('app/routes.honeycomb.php file generated');
+        $this->comment(GenerateRoutes::ROUTES_PATH . ' file generated');
     }
 }

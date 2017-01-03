@@ -1,0 +1,17 @@
+{
+    "formData":
+    [
+    ],
+    "adminMenu":
+    [
+    ],
+    "acl":
+    {
+        "permissions" :
+        [
+        ],
+        "roles-actions" :
+        [
+        ]
+    }
+}

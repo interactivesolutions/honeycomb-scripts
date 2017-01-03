@@ -8,6 +8,11 @@ use interactivesolutions\honeycombcore\commands\HCCommand;
 class CreateService extends HCCommand
 {
     /**
+     * Configuration path
+     */
+    const CONFIG_PATH = 'app/HoneyComb/config.json';
+
+    /**
      * The name and signature of the console command.
      *
      * @var string
@@ -82,6 +87,25 @@ class CreateService extends HCCommand
      */
     private $routesDirectory;
 
+    /**
+     * ACL prefix
+     *
+     * @var
+     */
+    private $acl_prefix;
+
+    /**
+     * Original files
+     * @var
+     */
+    private $originalFiles = [];
+
+    /**
+     * Files which were created during this command
+     *
+     * @var array
+     */
+    private $createdFiles = [];
 
     /**
      * Execute the console command.
@@ -92,18 +116,21 @@ class CreateService extends HCCommand
     {
         $this->gatherData();
         $this->optimizeData();
+        $this->readOriginalFiles();
         $this->createService();
 
         return;
+        
         dd($this->packageName, $this->packageName . '/http/controllers/' . $this->nameSpace);
 
         $tableList = explode(',', $this->argument('names'));
 
-        foreach($tableList as $tableName)
+        foreach ($tableList as $tableName)
         {
             $columns = DB::getSchemaBuilder()->getColumnListing($tableName);
 
-            if( ! count($columns) ) {
+            if (!count($columns))
+            {
                 $this->error("Table not found: " . $tableName . ". Continuing...");
                 continue;
             }
@@ -117,7 +144,7 @@ class CreateService extends HCCommand
         }
 
 
-        foreach ( $this->modelsData as $tableName => $model )
+        foreach ($this->modelsData as $tableName => $model)
         {
             $tpl = $this->file->get($this->getTpl('ocmodel'));
 
@@ -155,11 +182,9 @@ class CreateService extends HCCommand
     private function optimizeData()
     {
         // creating name space from service URL
-        $this->nameSpace = '\\' . str_replace('-', '', $this->serviceURL);
-        $this->nameSpace = str_replace('/', '\\', $this->nameSpace);
-        $this->nameSpace = explode('\\', $this->nameSpace);
+        $this->nameSpace = str_replace('/', '\\', $this->packageName . '\Http\Controllers\\' . str_replace('-', '', $this->serviceURL));
+        $this->nameSpace = array_filter(explode('\\', $this->nameSpace));
         array_pop($this->nameSpace);
-        $this->nameSpace = array_filter($this->nameSpace);
         $this->nameSpace = implode('\\', $this->nameSpace);
 
         //adding controller to service name
@@ -167,11 +192,12 @@ class CreateService extends HCCommand
 
         $this->serviceRouteName = $this->getServiceRouteNameDotted();
 
-        $this->controllerDirectory = $this->packageName . '/http/controllers/' . $this->nameSpace;
+        $this->controllerDirectory = str_replace('\\', '/', $this->nameSpace);
         $this->routesDirectory = $this->packageName . '/routes/';
 
-        $this->routesDestination = $this->packageName . '/routes/' . 'routes.' . $this->serviceRouteName . '.php';
+        $this->routesDestination = $this->routesDirectory . 'routes.' . $this->serviceRouteName . '.php';
 
+        $this->acl_prefix = $this->getACLPrefix();
     }
 
     /**
@@ -181,25 +207,75 @@ class CreateService extends HCCommand
     {
         $this->createController();
         $this->createRoutes();
+        $this->updateConfiguration();
 
         $this->call('generate:routes');
     }
 
+    /**
+     * Updating configuration
+     */
+    private function updateConfiguration()
+    {
+        $config = json_decode($this->file->get(CreateService::CONFIG_PATH));
+        $servicePermissions = [
+            "name"       => "admin." . $this->serviceRouteName,
+            "controller" => $this->nameSpace . '\\' . $this->serviceName,
+            "actions"    =>
+                [
+                    $this->acl_prefix . "_list",
+                    $this->acl_prefix . "_create",
+                    $this->acl_prefix . "_update",
+                    $this->acl_prefix . "_delete",
+                    $this->acl_prefix . "_force_delete",
+                ],
+        ];
+
+        $contentChanged = false;
+
+        foreach ($config->acl->permissions as &$value)
+        {
+            if ($value->name == "admin." . $this->serviceRouteName)
+            {
+                if ($this->confirm('Duplicate ACL found ' . "admin." . $this->serviceRouteName . ' Confirm override', 'no'))
+                {
+                    $contentChanged = true;
+                    $value = $servicePermissions;
+                    break;
+                } else
+                {
+                    $this->error('Can not override existing configuration. Aborting...');
+                    $this->file->delete($this->controllerDirectory . '/' . $this->serviceName . '.php');
+                    $this->comment('Deleting controller');
+
+                    return null;
+                }
+            }
+        }
+
+        if (!$contentChanged)
+            $config->acl->permissions = array_merge($config->acl->permissions, [$servicePermissions]);
+
+        $this->file->put(CreateService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * Creating controller
+     */
     private function createController()
     {
         $this->createDirectory($this->controllerDirectory);
         $this->createFileFromTemplate([
-            "destination" => $this->controllerDirectory . '/' . $this->serviceName . '.php',
-            "templateDestination" => __DIR__ . '/templates/service.template.txt',
-            "content" =>
+            "destination"         => $this->controllerDirectory . '/' . $this->serviceName . '.php',
+            "templateDestination" => __DIR__ . '/templates/controller.template.txt',
+            "content"             =>
                 [
-                    "packageName" => $this->packageName,
-                    "nameSpace" => $this->nameSpace,
-                    "serviceName" => $this->serviceName
-                ]
+                    "nameSpace"   => $this->nameSpace,
+                    "serviceName" => $this->serviceName,
+                ],
         ]);
 
-        $this->comment('Service created.');
+        $this->createdFiles[] = $this->controllerDirectory . '/' . $this->serviceName . '.php';
     }
 
     /**
@@ -211,18 +287,18 @@ class CreateService extends HCCommand
     {
         $this->createDirectory($this->routesDirectory);
         $this->createFileFromTemplate([
-            "destination" => $this->routesDestination,
+            "destination"         => $this->routesDestination,
             "templateDestination" => __DIR__ . '/templates/routes.template.txt',
-            "content" =>
+            "content"             =>
                 [
-                    "serviceName" => $this->serviceURL,
+                    "serviceURL"        => $this->serviceURL,
                     "serviceNameDotted" => $this->serviceRouteName,
-                    "acl_name" => $this->getACLPrefix(),
-                    "controllerNamespace" => $this->serviceName
-                ]
-          ]);
+                    "acl_prefix"        => $this->getACLPrefix(),
+                    "serviceName"       => $this->serviceName,
+                ],
+        ]);
 
-        $this->comment('Route created.');
+        $this->createdFiles[] = $this->routesDestination;
     }
 
     /**
@@ -314,7 +390,7 @@ class CreateService extends HCCommand
         $name = $this->serviceName;
         $name .= $fileType;
 
-        if( $withExtension )
+        if ($withExtension)
             $name .= '.php';
 
         return $name;
@@ -331,12 +407,46 @@ class CreateService extends HCCommand
     {
         $newArray = [];
 
-        foreach ( $columns as $key => $column ) {
-            if( ! in_array($column, $notAllowed) ) {
+        foreach ($columns as $key => $column)
+            if (!in_array($column, $notAllowed))
                 $newArray[] = $column;
-            }
-        }
 
         return $newArray;
+    }
+
+    /**
+     * Reading original files
+     */
+    private function readOriginalFiles()
+    {
+        if ($this->file->exists($this->controllerDirectory . '/' . $this->serviceName . '.php'))
+            $this->abort('Controller exists! Aborting...');
+
+        if (!$this->file->exists(CreateService::CONFIG_PATH))
+            $this->abort('Configuration file not found.');
+        else
+            $this->originalFiles[] = ["path" => CreateService::CONFIG_PATH, "content" => $this->file->get(CreateService::CONFIG_PATH)];
+
+        if ($this->file->exists($this->routesDestination))
+            $this->originalFiles[] = ["path" => $this->routesDestination, "content" => $this->file->get($this->routesDestination)];
+    }
+
+    /**
+     * Restoring changed files after the abort
+     * Deleting create files
+     */
+    protected function executeAfterAbort()
+    {
+        foreach ($this->originalFiles as $value)
+        {
+            $this->file->put($value['path'], $value['content']);
+            $this->comment('Restored: ' . $value['path']);
+        }
+
+        foreach ($this->createdFiles as $value)
+        {
+            $this->file->delete($value);
+            $this->comment('Deleted: ' . $value);
+        }
     }
 }
