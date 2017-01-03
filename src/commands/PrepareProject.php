@@ -39,25 +39,38 @@ class PrepareProject extends HCCommand
 
         if ($confirm)
         {
+            // deleting files and folders
             $this->deleteDirectory('app/Http/Controllers', true);
             $this->deleteDirectory('app/Http/Console', true);
             $this->deleteDirectory('app/routes', true);
             $this->deleteDirectory('app/HoneyComb', true);
             $this->deleteDirectory('routes', true);
 
+            $this->file->delete('app/Providers/RouteServiceProvider.php');
+
+            // creating files and folders
             $this->createDirectory('app/Http/Controllers');
             $this->createDirectory('app/Http/Console');
             $this->createDirectory('app/routes');
             $this->createDirectory('app/HoneyComb');
 
             $this->createFileFromTemplate([
-                "destination" => 'app/Http/Console/Kernel.php',
+                "destination"         => 'app/Http/Console/Kernel.php',
                 "templateDestination" => __DIR__ . '/templates/app.console.kernel.template.txt',
             ]);
 
             $this->createFileFromTemplate([
-                "destination" => CreateService::CONFIG_PATH,
+                "destination"         => CreateService::CONFIG_PATH,
                 "templateDestination" => __DIR__ . '/templates/config.template.txt',
+            ]);
+
+            $this->createFileFromTemplate([
+                "destination"         => "app/Providers/RouteServiceProvider.php",
+                "templateDestination" => __DIR__ . '/templates/route.serviceprovider.template.txt',
+                "content"             =>
+                [
+                    "routesBasePath" => GenerateRoutes::ROUTES_PATH,
+                ],
             ]);
 
             $this->file->put(GenerateRoutes::ROUTES_PATH, '');
