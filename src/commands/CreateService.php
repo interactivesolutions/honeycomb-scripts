@@ -122,6 +122,13 @@ class CreateService extends HCCommand
     private $modelsDirectory;
 
     /**
+     * Model auto fill properties
+     *
+     * @var array
+     */
+    private $autoFill = ['count', 'created_at', 'updated_at', 'deleted_at'];
+
+    /**
      * Execute the console command.
      *
      * @return mixed
@@ -408,12 +415,12 @@ class CreateService extends HCCommand
      */
     private function getColumnsFillable($columns)
     {
-        $autoFill = ['count', 'created_at', 'updated_at', 'deleted_at'];
+
         $names = [];
 
         foreach ($columns as $column)
         {
-            if (!in_array($column->Field, $autoFill))
+            if (!in_array($column->Field, $this->autoFill))
                 array_push($names, $column->Field);
         }
 
@@ -433,12 +440,13 @@ class CreateService extends HCCommand
         $tpl = $this->file->get(__DIR__ . '/templates/helpers/admin.list.header.template.txt');
 
         $mainModel = head($this->modelsData);
+        $ignoreFields = array_merge($this->autoFill, ['id']);
 
         if (array_key_exists('columnsData', $mainModel) && !empty($mainModel['columnsData']))
         {
             foreach ($mainModel['columnsData'] as $columnInfo)
             {
-                if ($columnInfo->Field == 'id')
+                if (in_array($columnInfo->Field, $ignoreFields))
                     continue;
 
                 $field = str_replace('{key}', $columnInfo->Field, $tpl);
