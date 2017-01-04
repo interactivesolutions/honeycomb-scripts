@@ -165,14 +165,7 @@ class MakeHCService extends HCCommand
     private function checkPackage ()
     {
         if (!$this->file->exists('packages/' . $this->packageName))
-        {
-            $create = $this->confirm('Package not found. Create?', 'y');
-
-            if (!$create)
-                $this->abort('Can not continue without package');
-
-            $this->call('make:hcpackage');
-        }
+            $this->abort('Package not existing, please create a repository and launch "php artisan make:hcpackage" command');
     }
 
     /**
