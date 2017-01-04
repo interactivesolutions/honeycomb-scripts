@@ -139,13 +139,13 @@ class CreateService extends HCCommand
      */
     private function gatherData()
     {
-        $this->packageName = $this->ask('Enter package name (vendor/package) or leave empty for project level ', 'app');
+         $this->packageName = $this->ask('Enter package name (vendor/package) or leave empty for project level ', 'app');
 
-        if ($this->packageName == 'app')
-            $this->translationsLocation = $this->packageName;
+         if ($this->packageName == 'app')
+             $this->translationsLocation = $this->packageName;
 
-        $this->serviceURL = $this->ask('Enter of the service url admin/<----');
-        $this->controllerName = $this->ask('Enter service name');
+         $this->serviceURL = $this->ask('Enter of the service url admin/<----');
+         $this->controllerName = $this->ask('Enter service name');
 
         $this->gatherTablesData();
     }
@@ -157,29 +157,31 @@ class CreateService extends HCCommand
     {
         $repeat = true;
 
-        while($repeat)
+        while ($repeat)
         {
-            $tableName = $this->ask('Enter main DataBase table name');
+            $tableName = $this->ask('Enter DataBase table name');
 
             $columns = DB::getSchemaBuilder()->getColumnListing($tableName);
 
             if (!count($columns))
             {
                 $this->error("Table not found: " . $tableName . ". ");
-                $repeat = $this->ask("Reenter table name?", false);
+                $repeat = $this->ask("Reenter table name?", 'Y/n');
 
-                if (!$repeat)
+                if (strtolower($repeat) != 'y' || strtolower($repeat) != 'yes')
                     $this->abort('Aborting...');
-            }
-            else
+                else
+                    continue;
+            } else
+            {
                 $repeat = false;
+                $columns = DB::select(DB::raw('SHOW COLUMNS FROM ' . $tableName));
+            }
         }
 
-        $columns = $this->filterByValues($columns);
-
         $this->modelsData[$tableName] = [
-            'modelName'     => $this->ask('Enter model name for "' . $tableName . '" table'),
-            'modelFillable' => $columns,
+            'modelName'   => $this->ask('Enter model name for "' . $tableName . '" table'),
+            'columnsData' => $this->extractColumnData($columns),
         ];
     }
 
@@ -201,7 +203,7 @@ class CreateService extends HCCommand
 
         $this->controllerDirectory = str_replace('\\', '/', $this->nameSpace);
         $this->routesDirectory = $this->packageName . '/routes/';
-        $this->modelsDirectory =  str_replace('/Http/Controllers', '/Models', $this->controllerDirectory);
+        $this->modelsDirectory = str_replace('/Http/Controllers', '/Models', $this->controllerDirectory);
 
         $this->routesDestination = $this->routesDirectory . 'routes.' . $this->serviceRouteName . '.php';
 
@@ -286,6 +288,7 @@ class CreateService extends HCCommand
                     "translationsLocation" => $this->translationsLocation,
                     "serviceNameDotted"    => $this->stringWithDash($this->packageName . '-' . $this->serviceRouteName),
                     "controllerNameDotted" => $this->serviceRouteName,
+                    "adminListHeader"      => $this->getAdminListHeader(),
                 ],
         ]);
 
@@ -336,24 +339,6 @@ class CreateService extends HCCommand
     }
 
     /**
-     * Filter array by values
-     *
-     * @param $columns
-     * @param $notAllowed
-     * @return mixed
-     */
-    protected function filterByValues($columns, array $notAllowed = ['count', 'created_at', 'updated_at', 'deleted_at'])
-    {
-        $newArray = [];
-
-        foreach ($columns as $key => $column)
-            if (!in_array($column, $notAllowed))
-                $newArray[] = $column;
-
-        return $newArray;
-    }
-
-    /**
      * Reading original files
      */
     private function readOriginalFiles()
@@ -401,10 +386,10 @@ class CreateService extends HCCommand
                 "templateDestination" => __DIR__ . '/templates/model.template.txt',
                 "content"             =>
                     [
-                        "modelNamespace" => str_replace('Http\Controllers', 'Models', $this->nameSpace),
-                        "modelName"      => $model['modelName'],
-                        "modelFillable"  => $this->getModelFillableFields($model['modelFillable']),
-                        "modelTable"     => $tableName,
+                        "modelNamespace"  => str_replace('Http\Controllers', 'Models', $this->nameSpace),
+                        "modelName"       => $model['modelName'],
+                        "columnsFillable" => $this->getColumnsFillable($model['columnsData']),
+                        "modelTable"      => $tableName,
                     ],
             ]);
 
@@ -421,8 +406,71 @@ class CreateService extends HCCommand
      * @param $columns
      * @return string
      */
-    private function getModelFillableFields($columns)
+    private function getColumnsFillable($columns)
     {
-        return '[\'' . implode('\',\'', $columns) . '\']';
+        $autoFill = ['count', 'created_at', 'updated_at', 'deleted_at'];
+        $names = [];
+
+        foreach ($columns as $column)
+        {
+            if (!in_array($column->Field, $autoFill))
+                array_push($names, $column->Field);
+        }
+
+        return '[\'' . implode('\',\'', $names) . '\']';
+    }
+
+    /**
+     * Get list header from model data
+     *
+     * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    private function getAdminListHeader()
+    {
+        $output = "";
+
+        $tpl = $this->file->get(__DIR__ . '/templates/helpers/admin.list.header.template.txt');
+
+        $mainModel = head($this->modelsData);
+
+        if (array_key_exists('columnsData', $mainModel) && !empty($mainModel['columnsData']))
+        {
+            foreach ($mainModel['columnsData'] as $columnInfo)
+            {
+                if ($columnInfo->Field == 'id')
+                    continue;
+
+                $field = str_replace('{key}', $columnInfo->Field, $tpl);
+                $field = str_replace('{translationsLocation}', $this->translationsLocation, $field);
+
+                $output .= $field;
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Extracting type information
+     *
+     * @param $columns
+     * @internal param $type
+     */
+    private function extractColumnData($columns)
+    {
+        foreach ($columns as &$column)
+        {
+            $beginning = strpos($column->Type, '(');
+            $end = strpos($column->Type, ')');
+
+            if ($beginning)
+            {
+                $column->Length = substr($column->Type, $beginning + 1, $end - $beginning - 1);
+                $column->Type = substr($column->Type, 0, $beginning);
+            }
+        }
+
+        return $columns;
     }
 }

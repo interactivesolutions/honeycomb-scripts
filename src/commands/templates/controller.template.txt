@@ -46,6 +46,8 @@ class {controllerName} extends HCBaseController
      */
     public function getAdminListHeader()
     {
-        return [];
+        return [
+            {adminListHeader}
+        ];
     }
 }
