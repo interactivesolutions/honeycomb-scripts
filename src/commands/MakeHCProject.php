@@ -4,7 +4,7 @@ namespace interactivesolutions\honeycombscripts\commands;
 
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
-class PrepareProject extends HCCommand
+class MakeHCProject extends HCCommand
 {
     /**
      * The name and signature of the console command.
@@ -62,7 +62,7 @@ class PrepareProject extends HCCommand
             ]);
 
             $this->createFileFromTemplate([
-                "destination"         => CreateService::CONFIG_PATH,
+                "destination"         => MakeHCService::CONFIG_PATH,
                 "templateDestination" => __DIR__ . '/templates/config.template.txt',
             ]);
 

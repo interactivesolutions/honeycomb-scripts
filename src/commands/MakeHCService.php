@@ -5,7 +5,7 @@ namespace interactivesolutions\honeycombscripts\commands;
 use DB;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
-class CreateService extends HCCommand
+class MakeHCService extends HCCommand
 {
     /**
      * Configuration path
@@ -146,15 +146,33 @@ class CreateService extends HCCommand
      */
     private function gatherData()
     {
-         $this->packageName = $this->ask('Enter package name (vendor/package) or leave empty for project level ', 'app');
+         $this->packageName = $this->ask('Enter package directory (vendor/package) or leave empty for project level ', 'app');
 
          if ($this->packageName == 'app')
              $this->translationsLocation = $this->packageName;
+         else
+             $this->checkPackage();
 
          $this->serviceURL = $this->ask('Enter of the service url admin/<----');
-         $this->controllerName = $this->ask('Enter service name');
+         $this->controllerName = $this->ask('Enter ________Controller name');
 
         $this->gatherTablesData();
+    }
+
+    /**
+     * Checking package existence
+     */
+    private function checkPackage ()
+    {
+        if (!$this->file->exists('packages/' . $this->packageName))
+        {
+            $create = $this->confirm('Package not found. Create?', 'y');
+
+            if (!$create)
+                $this->abort('Can not continue without package');
+
+            $this->call('make:hcpackage');
+        }
     }
 
     /**
@@ -173,9 +191,9 @@ class CreateService extends HCCommand
             if (!count($columns))
             {
                 $this->error("Table not found: " . $tableName . ". ");
-                $repeat = $this->ask("Reenter table name?", 'Y/n');
+                $repeat = $this->confirm("Reenter table name?");
 
-                if (strtolower($repeat) != 'y' || strtolower($repeat) != 'yes')
+                if (!$repeat)
                     $this->abort('Aborting...');
                 else
                     continue;
@@ -235,7 +253,7 @@ class CreateService extends HCCommand
      */
     private function updateConfiguration()
     {
-        $config = json_decode($this->file->get(CreateService::CONFIG_PATH));
+        $config = json_decode($this->file->get(MakeHCService::CONFIG_PATH));
         $servicePermissions = [
             "name"       => "admin." . $this->serviceRouteName,
             "controller" => $this->nameSpace . '\\' . $this->controllerName,
@@ -274,7 +292,7 @@ class CreateService extends HCCommand
         if (!$contentChanged)
             $config->acl->permissions = array_merge($config->acl->permissions, [$servicePermissions]);
 
-        $this->file->put(CreateService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
+        $this->file->put(MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -353,10 +371,10 @@ class CreateService extends HCCommand
         if ($this->file->exists($this->controllerDirectory . '/' . $this->controllerName . '.php'))
             $this->abort('Controller exists! Aborting...');
 
-        if (!$this->file->exists(CreateService::CONFIG_PATH))
+        if (!$this->file->exists(MakeHCService::CONFIG_PATH))
             $this->abort('Configuration file not found.');
         else
-            $this->originalFiles[] = ["path" => CreateService::CONFIG_PATH, "content" => $this->file->get(CreateService::CONFIG_PATH)];
+            $this->originalFiles[] = ["path" => MakeHCService::CONFIG_PATH, "content" => $this->file->get(MakeHCService::CONFIG_PATH)];
 
         if ($this->file->exists($this->routesDestination))
             $this->originalFiles[] = ["path" => $this->routesDestination, "content" => $this->file->get($this->routesDestination)];

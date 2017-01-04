@@ -4,9 +4,9 @@ namespace interactivesolutions\honeycombscripts\providers;
 
 use Illuminate\Support\ServiceProvider;
 use interactivesolutions\honeycombscripts\commands\CreateEnvFile;
-use interactivesolutions\honeycombscripts\commands\CreateService;
+use interactivesolutions\honeycombscripts\commands\MakeHCService;
 use interactivesolutions\honeycombscripts\commands\GenerateRoutes;
-use interactivesolutions\honeycombscripts\commands\PrepareProject;
+use interactivesolutions\honeycombscripts\commands\MakeHCProject;
 
 class HCScriptsServiceProvider extends ServiceProvider
 {
@@ -17,8 +17,8 @@ class HCScriptsServiceProvider extends ServiceProvider
      */
     protected $commands = [
         CreateEnvFile::class,
-        CreateService::class,
-        PrepareProject::class,
+        MakeHCService::class,
+        MakeHCProject::class,
         GenerateRoutes::class,
     ];
 
