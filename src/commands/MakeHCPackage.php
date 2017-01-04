@@ -2,6 +2,7 @@
 
 namespace interactivesolutions\honeycombscripts\commands;
 
+use Illuminate\Support\Facades\App;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
 class MakeHCPackage extends HCCommand
@@ -105,11 +106,18 @@ class MakeHCPackage extends HCCommand
             ],
         ]);
 
-
+        $this->comment('');
         $this->comment('********************************************************');
 
-        if (env('APP_ENV' == 'local'))
-            $this->comment('Please add to composer.json under "psr-4": ' . $composerNameSpace . ':' . $packageDirectory . '/src/');
+        if (App::environment() == 'local')
+        {
+            $this->comment('Please add to composer.json under "psr-4":');
+            $this->info('"' . $composerNameSpace . '":"' . $packageDirectory . '/src/"');
+            $this->comment('');
+        }
+
+        $this->comment('Please add to config/app.php under "providers":');
+        $this->info($nameSpace . '\Providers\\' . $packageName . 'ServiceProvider::class');
 
         $this->comment('********************************************************');
 
