@@ -104,5 +104,15 @@ class MakeHCPackage extends HCCommand
                 "nameSpaceGeneral" => $nameSpace,
             ],
         ]);
+
+
+        $this->comment('********************************************************');
+
+        if (env('APP_ENV' == 'local'))
+            $this->comment('Please add to composer.json under "psr-4": ' . $composerNameSpace . ':' . $packageDirectory . '/src/');
+
+        $this->comment('********************************************************');
+
+
     }
 }
