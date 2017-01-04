@@ -154,7 +154,7 @@ class MakeHCService extends HCCommand
              $this->checkPackage();
 
          $this->serviceURL = $this->ask('Enter of the service url admin/<----');
-         $this->controllerName = $this->ask('Enter ________Controller name');
+         $this->controllerName = $this->ask('Enter SERVICE name');
 
         $this->gatherTablesData();
     }
