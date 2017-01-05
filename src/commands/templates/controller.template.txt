@@ -1,4 +1,4 @@
-<?php namespace {nameSpace};
+<?php namespace {namespace};
 
 use interactivesolutions\honeycombcore\http\controllers\HCBaseController;
 
