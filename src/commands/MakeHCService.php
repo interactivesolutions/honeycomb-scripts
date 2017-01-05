@@ -139,7 +139,13 @@ class MakeHCService extends HCCommand
      * Translation file name
      * @var
      */
-    private $translationFile;
+    private $translationFilePrefix;
+
+    /**
+     * Full package directory
+     * @var
+     */
+    private $fullPackageDirectory;
 
     /**
      * Execute the console command.
@@ -165,14 +171,15 @@ class MakeHCService extends HCCommand
             $this->translationsLocation = $this->packageDirectory;
         else
         {
-            $this->translationsLocation = json_decode($this->file->get('packages/' . $this->packageDirectory . '/src/app/HoneyComb/config.json'))->general->serviceProviderNameSpace;
+            $this->fullPackageDirectory = 'packages/' . $this->packageDirectory;
+            $this->translationsLocation = json_decode($this->file->get($this->fullPackageDirectory . '/src/app/HoneyComb/config.json'))->general->serviceProviderNameSpace;
             $this->packageService = true;
             $this->checkPackage();
         }
 
         $this->serviceURL = $this->ask('Enter of the service url admin/<----');
         $this->controllerName = $this->ask('Enter SERVICE name');
-        $this->translationFile = $this->stringWithUnderscore($this->serviceURL);
+        $this->translationFilePrefix = $this->stringWithUnderscore($this->serviceURL);
 
         $this->gatherTablesData();
     }
@@ -182,7 +189,7 @@ class MakeHCService extends HCCommand
      */
     private function checkPackage()
     {
-        if (!$this->file->exists('packages/' . $this->packageDirectory))
+        if (!$this->file->exists($this->fullPackageDirectory))
             $this->abort('Package not existing, please create a repository and launch "php artisan make:hcpackage" command');
     }
 
@@ -232,6 +239,8 @@ class MakeHCService extends HCCommand
         array_pop($this->namespace);
         $this->namespace = implode('\\', $this->namespace);
 
+        $this->rootDirectory = '';
+
         $this->controllerDirectory = str_replace('\\', '/', $this->namespace);
         $this->modelsDirectory = str_replace('/Http/Controllers', '/Models', $this->controllerDirectory);
         $this->routesDirectory = $this->packageDirectory . '/Routes';
@@ -243,7 +252,8 @@ class MakeHCService extends HCCommand
             $this->controllerDirectory = 'packages/' . str_replace('/Http/Controllers', '/src/app/Http/Controllers', $this->controllerDirectory);
             $this->modelsDirectory = 'packages/' . str_replace('/Models', '/src/app/Models', $this->modelsDirectory);
             $this->routesDirectory = 'packages/' . str_replace('/Routes', '/src/app/Routes', $this->routesDirectory);
-            $this->translationsLocation .=  '::' . $this->translationFile;
+            $this->translationsLocation .= '::' . $this->translationFilePrefix;
+            $this->packageDirectory = $this->packageDirectory . '/src/app';
         }
 
         //adding controller to service name
@@ -261,6 +271,7 @@ class MakeHCService extends HCCommand
      */
     private function createService()
     {
+        $this->createTranslations();
         $this->createModels();
         $this->createController();
         $this->createRoutes();
@@ -519,5 +530,50 @@ class MakeHCService extends HCCommand
         }
 
         return $columns;
+    }
+
+    /**
+     * Creating translation file
+     */
+    private function createTranslations()
+    {
+        //TODO connect interactivesolutions/honeycomb-languages package
+        $this->createDirectory($this->fullPackageDirectory . '/src/resources/lang/en');
+        $this->createFileFromTemplate([
+            "destination"         => $this->fullPackageDirectory . '/src/resources/lang/en/' . $this->translationFilePrefix . '.php',
+            "templateDestination" => __DIR__ . '/templates/translations.template.txt',
+            "content"             =>
+                [
+                    "translations" => $this->gatherTranslations(),
+                ],
+        ]);
+    }
+
+    /**
+     * Gathering available translations
+     *
+     * @return string
+     */
+    private function gatherTranslations()
+    {
+        $output = '';
+
+        if (!empty($this->modelsData))
+        {
+
+            $tpl = $this->file->get(__DIR__ . '/templates/helpers/translations.template.txt');
+
+            foreach ($this->modelsData as $tableName => $model)
+                if (array_key_exists('columnsData', $model) && !empty($model['columnsData']))
+                    foreach ($model['columnsData'] as $column)
+                    {
+                        $line = str_replace('{key}', $column->Field, $tpl);
+                        $line = str_replace('{value}', str_replace("_", " ", ucfirst($column->Field)), $line);
+
+                        $output .= $line;
+                    }
+        }
+
+        return $output;
     }
 }
