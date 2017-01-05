@@ -35,9 +35,7 @@ class MakeHCPackage extends HCCommand
         $directoryList = [];
 
         foreach ($this->file->directories('packages') as $directory)
-        {
             $directoryList = array_merge($directoryList, $this->file->directories($directory));
-        }
 
         $packageDirectory = $this->choice('Please select package directory', $directoryList);
         $packageOfficialName = str_replace('packages/', '', $packageDirectory);
@@ -85,6 +83,10 @@ class MakeHCPackage extends HCCommand
         $this->createFileFromTemplate([
             "destination"         => $packageDirectory . '/src/app/HoneyComb/config.json',
             "templateDestination" => __DIR__ . '/templates/config.template.txt',
+            "content" =>
+            [
+                "serviceProviderNameSpace" => $packageName
+            ]
         ]);
 
         $this->createFileFromTemplate([
