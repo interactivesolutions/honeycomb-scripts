@@ -38,14 +38,14 @@ class MakeHCService extends HCCommand
      *
      * @var
      */
-    private $nameSpace;
+    private $namespace;
 
     /**
      * Package name where service will be stored
      *
      * @var
      */
-    private $packageName;
+    private $packageDirectory;
 
     /**
      * Service name
@@ -129,6 +129,19 @@ class MakeHCService extends HCCommand
     private $autoFill = ['count', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
+     * Defines if the service will be for package or for application
+     *
+     * @var bool
+     */
+    private $packageService = false;
+
+    /**
+     * Translation file name
+     * @var
+     */
+    private $translationFile;
+
+    /**
      * Execute the console command.
      *
      * @return mixed
@@ -146,15 +159,20 @@ class MakeHCService extends HCCommand
      */
     private function gatherData()
     {
-         $this->packageName = $this->ask('Enter package directory (vendor/package) or leave empty for project level ', 'app');
+        $this->packageDirectory = $this->ask('Enter package directory (vendor/package) or leave empty for project level ', 'app');
 
-         if ($this->packageName == 'app')
-             $this->translationsLocation = $this->packageName;
-         else
-             $this->checkPackage();
+        if ($this->packageDirectory == 'app')
+            $this->translationsLocation = $this->packageDirectory;
+        else
+        {
+            $this->translationsLocation = json_decode($this->file->get('packages/' . $this->packageDirectory . '/src/app/HoneyComb/config.json'))->general->serviceProviderNameSpace;
+            $this->packageService = true;
+            $this->checkPackage();
+        }
 
-         $this->serviceURL = $this->ask('Enter of the service url admin/<----');
-         $this->controllerName = $this->ask('Enter SERVICE name');
+        $this->serviceURL = $this->ask('Enter of the service url admin/<----');
+        $this->controllerName = $this->ask('Enter SERVICE name');
+        $this->translationFile = $this->stringWithUnderscore($this->serviceURL);
 
         $this->gatherTablesData();
     }
@@ -162,9 +180,9 @@ class MakeHCService extends HCCommand
     /**
      * Checking package existence
      */
-    private function checkPackage ()
+    private function checkPackage()
     {
-        if (!$this->file->exists('packages/' . $this->packageName))
+        if (!$this->file->exists('packages/' . $this->packageDirectory))
             $this->abort('Package not existing, please create a repository and launch "php artisan make:hcpackage" command');
     }
 
@@ -209,21 +227,31 @@ class MakeHCService extends HCCommand
     private function optimizeData()
     {
         // creating name space from service URL
-        $this->nameSpace = str_replace('/', '\\', $this->packageName . '\Http\Controllers\\' . str_replace('-', '', $this->serviceURL));
-        $this->nameSpace = array_filter(explode('\\', $this->nameSpace));
-        array_pop($this->nameSpace);
-        $this->nameSpace = implode('\\', $this->nameSpace);
+        $this->namespace = str_replace('/', '\\', $this->packageDirectory . '\Http\Controllers\\' . str_replace('-', '', $this->serviceURL));
+        $this->namespace = array_filter(explode('\\', $this->namespace));
+        array_pop($this->namespace);
+        $this->namespace = implode('\\', $this->namespace);
+
+        $this->controllerDirectory = str_replace('\\', '/', $this->namespace);
+        $this->modelsDirectory = str_replace('/Http/Controllers', '/Models', $this->controllerDirectory);
+        $this->routesDirectory = $this->packageDirectory . '/Routes';
+
+        $this->namespace = str_replace('-', '', $this->namespace);
+
+        if ($this->packageService)
+        {
+            $this->controllerDirectory = 'packages/' . str_replace('/Http/Controllers', '/src/app/Http/Controllers', $this->controllerDirectory);
+            $this->modelsDirectory = 'packages/' . str_replace('/Models', '/src/app/Models', $this->modelsDirectory);
+            $this->routesDirectory = 'packages/' . str_replace('/Routes', '/src/app/Routes', $this->routesDirectory);
+            $this->translationsLocation .=  '::' . $this->translationFile;
+        }
 
         //adding controller to service name
         $this->controllerName .= 'Controller';
 
         $this->serviceRouteName = $this->getServiceRouteNameDotted();
 
-        $this->controllerDirectory = str_replace('\\', '/', $this->nameSpace);
-        $this->routesDirectory = $this->packageName . '/routes/';
-        $this->modelsDirectory = str_replace('/Http/Controllers', '/Models', $this->controllerDirectory);
-
-        $this->routesDestination = $this->routesDirectory . 'routes.' . $this->serviceRouteName . '.php';
+        $this->routesDestination = $this->routesDirectory . '/routes.' . $this->serviceRouteName . '.php';
 
         $this->acl_prefix = $this->getACLPrefix();
     }
@@ -249,7 +277,7 @@ class MakeHCService extends HCCommand
         $config = json_decode($this->file->get(MakeHCService::CONFIG_PATH));
         $servicePermissions = [
             "name"       => "admin." . $this->serviceRouteName,
-            "controller" => $this->nameSpace . '\\' . $this->controllerName,
+            "controller" => $this->namespace . '\\' . $this->controllerName,
             "actions"    =>
                 [
                     $this->acl_prefix . "_list",
@@ -299,12 +327,11 @@ class MakeHCService extends HCCommand
             "templateDestination" => __DIR__ . '/templates/controller.template.txt',
             "content"             =>
                 [
-                    "nameSpace"            => $this->nameSpace,
+                    "namespace"            => $this->namespace,
                     "controllerName"       => $this->controllerName,
-                    "packageName"          => $this->packageName,
                     "acl_prefix"           => $this->acl_prefix,
                     "translationsLocation" => $this->translationsLocation,
-                    "serviceNameDotted"    => $this->stringWithDash($this->packageName . '-' . $this->serviceRouteName),
+                    "serviceNameDotted"    => $this->stringWithDash($this->packageDirectory . '-' . $this->serviceRouteName),
                     "controllerNameDotted" => $this->serviceRouteName,
                     "adminListHeader"      => $this->getAdminListHeader(),
                 ],
@@ -353,7 +380,7 @@ class MakeHCService extends HCCommand
      */
     private function getACLPrefix()
     {
-        return $this->packageName . '_' . $this->stringWithUnderscore($this->serviceRouteName);
+        return $this->stringWithUnderscore($this->packageDirectory . '_' . $this->serviceRouteName);
     }
 
     /**
@@ -399,12 +426,13 @@ class MakeHCService extends HCCommand
     {
         foreach ($this->modelsData as $tableName => $model)
         {
+            $this->createDirectory($this->modelsDirectory);
             $this->createFileFromTemplate([
                 "destination"         => $this->modelsDirectory . '/' . $model['modelName'] . '.php',
                 "templateDestination" => __DIR__ . '/templates/model.template.txt',
                 "content"             =>
                     [
-                        "modelNamespace"  => str_replace('Http\Controllers', 'Models', $this->nameSpace),
+                        "modelnamespace"  => str_replace('Http\Controllers', 'Models', $this->namespace),
                         "modelName"       => $model['modelName'],
                         "columnsFillable" => $this->getColumnsFillable($model['columnsData']),
                         "modelTable"      => $tableName,
