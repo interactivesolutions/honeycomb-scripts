@@ -199,33 +199,43 @@ class MakeHCService extends HCCommand
     private function gatherTablesData()
     {
         $repeat = true;
+        $oneMore = true;
 
-        while ($repeat)
+        while($oneMore)
         {
-            $tableName = $this->ask('Enter DataBase table name');
-
-            $columns = DB::getSchemaBuilder()->getColumnListing($tableName);
-
-            if (!count($columns))
+            while ($repeat)
             {
-                $this->error("Table not found: " . $tableName . ". ");
-                $repeat = $this->confirm("Reenter table name?");
+                $tableName = $this->ask('Enter DataBase table name');
 
-                if (!$repeat)
-                    $this->abort('Aborting...');
-                else
-                    continue;
-            } else
-            {
-                $repeat = false;
-                $columns = DB::select(DB::raw('SHOW COLUMNS FROM ' . $tableName));
+                $columns = DB::getSchemaBuilder()->getColumnListing($tableName);
+
+                if (!count($columns))
+                {
+                    $this->error("Table not found: " . $tableName . ". ");
+                    $repeat = $this->confirm("Reenter table name?");
+
+                    if (!$repeat)
+                        $this->abort('Aborting...');
+                    else
+                        continue;
+                } else
+                {
+                    $repeat = false;
+                    $columns = DB::select(DB::raw('SHOW COLUMNS FROM ' . $tableName));
+                }
             }
+
+            $this->modelsData[$tableName] = [
+                'modelName'   => $this->ask('Enter model name for "' . $tableName . '" table'),
+                'columnsData' => $this->extractColumnData($columns),
+            ];
+
+            $oneMore = $this->confirm('Add more models information?');
+
+            if ($oneMore)
+                $repeat = true;
         }
 
-        $this->modelsData[$tableName] = [
-            'modelName'   => $this->ask('Enter model name for "' . $tableName . '" table'),
-            'columnsData' => $this->extractColumnData($columns),
-        ];
     }
 
     /**
