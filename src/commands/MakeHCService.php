@@ -251,10 +251,17 @@ class MakeHCService extends HCCommand
         array_pop($this->namespace);
         $this->namespace = implode('\\', $this->namespace);
 
-        $this->controllerDirectory = str_replace('\\', '/', $this->rootPackageDirectory) . '/Http/Controllers';
-        $this->modelsDirectory = str_replace('/Http/Controllers', '/Models', $this->controllerDirectory);
-        $this->routesDirectory = $this->rootPackageDirectory . '/Routes';
+        $this->controllerDirectory = str_replace('\\', '/', $this->rootPackageDirectory) . '/Http/Controllers' . '/' . str_replace('-', '/', $this->serviceURL);
+        $this->controllerDirectory = array_filter(explode('/', $this->controllerDirectory));
+        array_pop($this->controllerDirectory);
+        $this->controllerDirectory = implode('/', $this->controllerDirectory);
 
+        $this->modelsDirectory = str_replace('/Http/Controllers', '/Models', $this->controllerDirectory) . '/' . str_replace('-', '/', $this->serviceURL);
+        $this->modelsDirectory = array_filter(explode('/', $this->modelsDirectory));
+        array_pop($this->modelsDirectory);
+        $this->modelsDirectory = implode('/', $this->modelsDirectory);
+
+        $this->routesDirectory = $this->rootPackageDirectory . '/Routes';
         $this->namespace = str_replace('-', '', $this->namespace);
 
         if ($this->packageService)
@@ -269,7 +276,7 @@ class MakeHCService extends HCCommand
 
         $this->serviceRouteName = $this->getServiceRouteNameDotted();
 
-        $this->routesDestination = $this->routesDirectory . '/Routes.' . $this->serviceRouteName . '.php';
+        $this->routesDestination = $this->routesDirectory . '/routes.' . $this->serviceRouteName . '.php';
 
         $this->acl_prefix = $this->getACLPrefix();
     }

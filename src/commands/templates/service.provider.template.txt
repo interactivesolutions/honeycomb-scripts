@@ -62,7 +62,7 @@ class {packageName}ServiceProvider extends ServiceProvider
 
         // Publishing assets
         $this->publishes([
-            __DIR__ . '/../assets' => public_path('honeycomb'),
+            __DIR__ . '/../public' => public_path('honeycomb'),
         ], 'public');
     }
 
