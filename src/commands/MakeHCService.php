@@ -10,7 +10,7 @@ class MakeHCService extends HCCommand
     /**
      * Configuration path
      */
-    const CONFIG_PATH = 'app/HoneyComb/config.json';
+    const CONFIG_PATH = 'HoneyComb/config.json';
 
     /**
      * The name and signature of the console command.
@@ -145,7 +145,7 @@ class MakeHCService extends HCCommand
      * Full package directory
      * @var
      */
-    private $fullPackageDirectory;
+    private $rootPackageDirectory;
 
     /**
      * Execute the console command.
@@ -166,20 +166,22 @@ class MakeHCService extends HCCommand
     private function gatherData()
     {
         $this->packageDirectory = $this->ask('Enter package directory (vendor/package) or leave empty for project level ', 'app');
-
-        if ($this->packageDirectory == 'app')
-            $this->translationsLocation = $this->packageDirectory;
-        else
-        {
-            $this->fullPackageDirectory = 'packages/' . $this->packageDirectory;
-            $this->translationsLocation = json_decode($this->file->get($this->fullPackageDirectory . '/src/app/HoneyComb/config.json'))->general->serviceProviderNameSpace;
-            $this->packageService = true;
-            $this->checkPackage();
-        }
-
         $this->serviceURL = $this->ask('Enter of the service url admin/<----');
         $this->controllerName = $this->ask('Enter SERVICE name');
         $this->translationFilePrefix = $this->stringWithUnderscore($this->serviceURL);
+
+        if ($this->packageDirectory == 'app')
+        {
+            $this->rootPackageDirectory = '/';
+            $this->translationsLocation = $this->packageDirectory . '.' . $this->translationFilePrefix;
+        }
+        else
+        {
+            $this->rootPackageDirectory = 'packages/' . $this->packageDirectory . '/src';
+            $this->translationsLocation = json_decode($this->file->get($this->rootPackageDirectory . '/app/HoneyComb/config.json'))->general->serviceProviderNameSpace . "::" . $this->translationFilePrefix;
+            $this->packageService = true;
+            $this->checkPackage();
+        }
 
         $this->gatherTablesData();
     }
@@ -189,7 +191,7 @@ class MakeHCService extends HCCommand
      */
     private function checkPackage()
     {
-        if (!$this->file->exists($this->fullPackageDirectory))
+        if (!$this->file->exists($this->rootPackageDirectory))
             $this->abort('Package not existing, please create a repository and launch "php artisan make:hcpackage" command');
     }
 
@@ -249,21 +251,17 @@ class MakeHCService extends HCCommand
         array_pop($this->namespace);
         $this->namespace = implode('\\', $this->namespace);
 
-        $this->rootDirectory = '';
-
-        $this->controllerDirectory = str_replace('\\', '/', $this->namespace);
+        $this->controllerDirectory = str_replace('\\', '/', $this->rootPackageDirectory) . '/Http/Controllers';
         $this->modelsDirectory = str_replace('/Http/Controllers', '/Models', $this->controllerDirectory);
-        $this->routesDirectory = $this->packageDirectory . '/Routes';
+        $this->routesDirectory = $this->rootPackageDirectory . '/Routes';
 
         $this->namespace = str_replace('-', '', $this->namespace);
 
         if ($this->packageService)
         {
-            $this->controllerDirectory = 'packages/' . str_replace('/Http/Controllers', '/src/app/Http/Controllers', $this->controllerDirectory);
-            $this->modelsDirectory = 'packages/' . str_replace('/Models', '/src/app/Models', $this->modelsDirectory);
-            $this->routesDirectory = 'packages/' . str_replace('/Routes', '/src/app/Routes', $this->routesDirectory);
-            $this->translationsLocation .= '::' . $this->translationFilePrefix;
-            $this->packageDirectory = $this->packageDirectory . '/src/app';
+            $this->controllerDirectory = str_replace('/Http/Controllers', '/app/Http/Controllers', $this->controllerDirectory);
+            $this->modelsDirectory = str_replace('/Models', '/app/Models', $this->modelsDirectory);
+            $this->routesDirectory = str_replace('/Routes', '/app/Routes', $this->routesDirectory);
         }
 
         //adding controller to service name
@@ -271,7 +269,7 @@ class MakeHCService extends HCCommand
 
         $this->serviceRouteName = $this->getServiceRouteNameDotted();
 
-        $this->routesDestination = $this->routesDirectory . '/routes.' . $this->serviceRouteName . '.php';
+        $this->routesDestination = $this->routesDirectory . '/Routes.' . $this->serviceRouteName . '.php';
 
         $this->acl_prefix = $this->getACLPrefix();
     }
@@ -295,7 +293,7 @@ class MakeHCService extends HCCommand
      */
     private function updateConfiguration()
     {
-        $config = json_decode($this->file->get(MakeHCService::CONFIG_PATH));
+        $config = json_decode($this->file->get($this->rootPackageDirectory . '/app/' . MakeHCService::CONFIG_PATH));
         $servicePermissions = [
             "name"       => "admin." . $this->serviceRouteName,
             "controller" => $this->namespace . '\\' . $this->controllerName,
@@ -334,7 +332,7 @@ class MakeHCService extends HCCommand
         if (!$contentChanged)
             $config->acl->permissions = array_merge($config->acl->permissions, [$servicePermissions]);
 
-        $this->file->put(MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
+        $this->file->put($this->rootPackageDirectory . '/app/' . MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -412,10 +410,10 @@ class MakeHCService extends HCCommand
         if ($this->file->exists($this->controllerDirectory . '/' . $this->controllerName . '.php'))
             $this->abort('Controller exists! Aborting...');
 
-        if (!$this->file->exists(MakeHCService::CONFIG_PATH))
+        if (!$this->file->exists($this->rootPackageDirectory . '/app/' . MakeHCService::CONFIG_PATH))
             $this->abort('Configuration file not found.');
         else
-            $this->originalFiles[] = ["path" => MakeHCService::CONFIG_PATH, "content" => $this->file->get(MakeHCService::CONFIG_PATH)];
+            $this->originalFiles[] = ["path" => $this->rootPackageDirectory . '/app/' . MakeHCService::CONFIG_PATH, "content" => $this->file->get($this->rootPackageDirectory . '/app/' . MakeHCService::CONFIG_PATH)];
 
         if ($this->file->exists($this->routesDestination))
             $this->originalFiles[] = ["path" => $this->routesDestination, "content" => $this->file->get($this->routesDestination)];
@@ -464,7 +462,7 @@ class MakeHCService extends HCCommand
         }
 
         if ($this->confirm("Create Migrations?", 'yes'))
-            $this->call('migrate:generate', ["tables" => implode("','", array_keys($this->modelsData))]);
+            $this->call('migrate:generate', ["--path" => $this->rootPackageDirectory . '/database/migrations', "tables" => implode("','", array_keys($this->modelsData))]);
     }
 
     /**
@@ -548,9 +546,9 @@ class MakeHCService extends HCCommand
     private function createTranslations()
     {
         //TODO connect interactivesolutions/honeycomb-languages package
-        $this->createDirectory($this->fullPackageDirectory . '/src/resources/lang/en');
+        $this->createDirectory($this->rootPackageDirectory . '/resources/lang/en');
         $this->createFileFromTemplate([
-            "destination"         => $this->fullPackageDirectory . '/src/resources/lang/en/' . $this->translationFilePrefix . '.php',
+            "destination"         => $this->rootPackageDirectory . '/resources/lang/en/' . $this->translationFilePrefix . '.php',
             "templateDestination" => __DIR__ . '/templates/translations.template.txt',
             "content"             =>
                 [
