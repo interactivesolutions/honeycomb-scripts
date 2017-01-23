@@ -3,6 +3,7 @@
 namespace interactivesolutions\honeycombscripts\commands;
 
 use DB;
+use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
 class MakeHCService extends HCCommand
@@ -10,7 +11,7 @@ class MakeHCService extends HCCommand
     /**
      * Configuration path
      */
-    const CONFIG_PATH = 'HoneyComb/config.json';
+    const CONFIG_PATH = 'honeycomb/config.json';
 
     /**
      * The name and signature of the console command.
@@ -27,99 +28,16 @@ class MakeHCService extends HCCommand
     protected $description = 'Creating full admin service';
 
     /**
-     * Models data holder
-     *
-     * @var array
+     * Configuration data which needs to be used in creation of services
      */
-    private $modelsData = [];
+    private $configurationData = [];
 
     /**
-     * Name space of the service
-     *
-     * @var
-     */
-    private $namespace;
-
-    /**
-     * Package name where service will be stored
-     *
-     * @var
-     */
-    private $packageDirectory;
-
-    /**
-     * Service name
-     *
-     * @var
-     */
-    private $controllerName;
-
-    /**
-     * Service route name
-     */
-    private $serviceRouteName;
-
-    /**
-     * Service URL
-     *
-     * @var
-     */
-    private $serviceURL;
-
-    /**
-     * Controller directory
-     *
-     * @var
-     */
-    private $controllerDirectory;
-
-    /**
-     * Routes file destination
-     *
-     * @var
-     */
-    private $routesDestination;
-
-    /**
-     * Routes directory
-     *
-     * @var
-     */
-    private $routesDirectory;
-
-    /**
-     * ACL prefix
-     *
-     * @var
-     */
-    private $acl_prefix;
-
-    /**
-     * Original files
-     * @var
-     */
-    private $originalFiles = [];
-
-    /**
-     * Files which were created during this command
+     * Created files which needs to be deleted in case of error
      *
      * @var array
      */
     private $createdFiles = [];
-
-    /**
-     * Translations location
-     *
-     * @var
-     */
-    private $translationsLocation;
-
-    /**
-     * Models directory
-     *
-     * @var
-     */
-    private $modelsDirectory;
 
     /**
      * Model auto fill properties
@@ -129,178 +47,387 @@ class MakeHCService extends HCCommand
     private $autoFill = ['count', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
-     * Defines if the service will be for package or for application
-     *
-     * @var bool
-     */
-    private $packageService = false;
-
-    /**
-     * Translation file name
-     * @var
-     */
-    private $translationFilePrefix;
-
-    /**
-     * Full package directory
-     * @var
-     */
-    private $rootPackageDirectory;
-
-    /**
      * Execute the console command.
-     *
-     * @return mixed
      */
     public function handle()
     {
-        $this->gatherData();
-        $this->optimizeData();
-        $this->readOriginalFiles();
-        $this->createService();
+        echo shell_exec('clear');
+        $this->loadConfiguration();
+
+        foreach ($this->configurationData as $serviceData)
+        {
+            $this->createdFiles = [];
+            $this->createService($serviceData);
+        }
+
+        //$this->updateConfiguration();
     }
 
     /**
-     * Gathering required data
+     * Generating service information
+     *
+     * @param $serviceData
      */
-    private function gatherData()
+    private function createService($serviceData)
     {
-        $this->packageDirectory = $this->ask('Enter package directory (vendor/package) or leave empty for project level ', 'app');
-        $this->serviceURL = $this->ask('Enter of the service url admin/<----');
-        $this->controllerName = $this->ask('Enter SERVICE name');
-        $this->translationFilePrefix = $this->stringWithUnderscore($this->serviceURL);
+        $this->comment('*************************************');
+        $this->comment('*         Service creation          *');
+        $this->comment('*************************************');
+        $this->comment($serviceData->serviceName);
+        $this->comment('*************************************');
 
-        if ($this->packageDirectory == 'app')
-        {
-            $this->rootPackageDirectory = '/';
-            $this->translationsLocation = $this->packageDirectory . '.' . $this->translationFilePrefix;
-        }
-        else
-        {
-            $this->rootPackageDirectory = 'packages/' . $this->packageDirectory . '/src';
-            $this->translationsLocation = json_decode($this->file->get($this->rootPackageDirectory . '/app/HoneyComb/config.json'))->general->serviceProviderNameSpace . "::" . $this->translationFilePrefix;
-            $this->packageService = true;
-            $this->checkPackage();
-        }
+        $this->createTranslations($serviceData);
+        $this->createModels($serviceData);
+        $this->createController($serviceData);
+        $this->createRoutes($serviceData);
 
-        $this->gatherTablesData();
+    }
+
+    /**
+     * Loading configuration files
+     */
+    private function loadConfiguration()
+    {
+        $allFiles = File::allFiles('_automate');
+
+        foreach ($allFiles as $file)
+            if (strpos((string)$file, '.done') === false && $this->validateFile($file))
+                $this->configurationData[] = $this->optimizeData($file);
+
+    }
+
+    /**
+     * Validate file
+     *
+     * @param $file
+     * @return bool
+     */
+    private function validateFile($file)
+    {
+        //TODO validate
+        return true;
     }
 
     /**
      * Checking package existence
+     * @param $item
      */
-    private function checkPackage()
+    private function checkPackage($item)
     {
-        if (!$this->file->exists($this->rootPackageDirectory))
-            $this->abort('Package not existing, please create a repository and launch "php artisan make:hcpackage" command');
+        if (!$this->file->exists($item->rootDirectory))
+            $this->abort('Package ' . $item->directory . ' not existing, please create a repository and launch "php artisan make:hcpackage" command');
     }
 
     /**
-     * Gathering information about DB tables
+     * Optimizing files
+     * @param $file
+     * @return mixed
      */
-    private function gatherTablesData()
+    function optimizeData($file)
     {
-        $repeat = true;
-        $oneMore = true;
+        $item = json_decode($this->file->get($file));
+        $item->file = $file;
+        $item->translationFilePrefix = $this->stringWithUnderscore($item->serviceURL);
 
-        while($oneMore)
+        if ($item->directory == '')
         {
-            while ($repeat)
+            $item->directory = '';
+            $item->rootDirectory = '';
+            $item->translationsLocation = $item->translationFilePrefix;
+        } else
+        {
+            $item->directory .= '/';
+            $item->rootDirectory = '/packages/' . $item->directory . 'src/';
+            $item->translationsLocation = json_decode($this->file->get($item->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH))->general->serviceProviderNameSpace . "::" . $item->translationFilePrefix;
+            $item->pacakgeService = true;
+            $this->checkPackage($item);
+        }
+
+        $item->controllerName = $item->serviceName . 'Controller';
+
+        // creating name space from service URL
+        $item->controllerNamespace = str_replace('/', '\\', $item->directory . 'App\Http\Controllers\\' . str_replace('-', '', $item->serviceURL));
+
+        $item->controllerNamespace = array_filter(explode('\\', $item->controllerNamespace));
+        array_pop($item->controllerNamespace);
+        $item->controllerNamespace = implode('\\', $item->controllerNamespace);
+        $item->controllerNamespace = str_replace('-', '', $item->controllerNamespace);
+
+        $item->rootDirectory = './' . $item->rootDirectory;
+
+
+        $item->controllerNameForRoutes = str_replace('/', '\\\\', $this->createItemDirectoryPath(str_replace('-', '', $item->serviceURL)) . '\\\\' . $item->controllerName);
+
+        // creating controller directory
+        $item->controllerDestination = $this->createItemDirectoryPath($item->rootDirectory . 'app/Http/Controllers/' . str_replace('-', '/', $item->serviceURL));
+
+        // creating models directory\
+        $item->modelDirectory = str_replace('/Http/Controllers', '/Models', $item->controllerDestination);
+        $item->modelNamespace = str_replace('\\Http\\Controllers', '\\Models', $item->controllerNamespace);
+
+        // finalizing destination
+        $item->controllerDestination .= '/' . $item->controllerName . '.php';
+
+        // creating routes directory
+        $item->serviceRouteName = $this->stringWithDots($item->serviceURL);
+        $item->routesDestination = $item->rootDirectory . 'app/routes/routes.' . $item->serviceRouteName . '.php';
+
+        // creating database information
+        foreach ($item->database as $dbItem)
+        {
+            $dbItem->columns = $this->getTableColumns($dbItem->tableName);
+            $dbItem->modelLocation = $item->modelDirectory . '/' . $dbItem->modelName . '.php';
+        }
+
+        $item->aclPrefix = $this->stringWithUnderscore($item->directory . $item->serviceRouteName);
+
+        return $item;
+    }
+
+    /**
+     * Creating path
+     * @param $item
+     * @return array|string
+     */
+    private function createItemDirectoryPath($item)
+    {
+        $item = array_filter(explode('/', $item));
+        array_pop($item);
+        $item = implode('/', $item);
+
+        return $item;
+    }
+
+    /**
+     * Getting table columns
+     *
+     * @param $tableName
+     * @return mixed
+     */
+    private function getTableColumns($tableName)
+    {
+        $columns = DB::getSchemaBuilder()->getColumnListing($tableName);
+
+        if (!count($columns))
+            $this->abort("Table not found: " . $tableName);
+        else
+            $columns = DB::select(DB::raw('SHOW COLUMNS FROM ' . $tableName));
+
+
+        return $columns;
+    }
+
+    /**
+     * Creating translation file
+     * @param $service
+     */
+    private function createTranslations($service)
+    {
+        //TODO integrate interactivesolutions/honeycomb-languages package
+        $this->createFileFromTemplate([
+            "destination"         => $service->rootDirectory . 'resources/lang/en/' . $service->translationFilePrefix . '.php',
+            "templateDestination" => __DIR__ . '/templates/translations.template.txt',
+            "content"             =>
+                [
+                    "translations" => $this->gatherTranslations($service),
+                ],
+        ]);
+
+        $this->createdFiles[] = $service->rootDirectory . 'resources/lang/en/' . $service->translationFilePrefix . '.php';
+    }
+
+    /**
+     * Gathering available translations
+     *
+     * @param $service
+     * @return string
+     */
+    private function gatherTranslations($service)
+    {
+        $output = '';
+
+        if (!empty($service->database))
+        {
+            $tpl = $this->file->get(__DIR__ . '/templates/helpers/translations.template.txt');
+
+            foreach ($service->database as $tableName => $model)
+                if (array_key_exists('columns', $model) && !empty($model->columns))
+                    foreach ($model->columns as $column)
+                    {
+                        $line = str_replace('{key}', $column->Field, $tpl);
+                        $line = str_replace('{value}', str_replace("_", " ", ucfirst($column->Field)), $line);
+
+                        $output .= $line;
+                    }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Creating models
+     * @param $item
+     * @internal param $modelData
+     */
+    private function createModels($item)
+    {
+        $modelData = $item->database;
+        $tableList = [];
+
+        foreach ($modelData as $tableName => $model)
+        {
+            $tableList[] = $model->tableName;
+
+            $this->createFileFromTemplate([
+                "destination"         => $model->modelLocation,
+                "templateDestination" => __DIR__ . '/templates/model.template.txt',
+                "content"             =>
+                    [
+                        "modelnamespace"  => $item->modelNamespace,
+                        "modelName"       => $model->modelName,
+                        "columnsFillable" => $this->getColumnsFillable($model->columns),
+                        "modelTable"      => $model->tableName,
+                    ],
+            ]);
+
+            $this->createdFiles[] = $model->modelLocation;
+        }
+
+        $this->call('migrate:generate', ["--path" => $item->rootDirectory . 'database/migrations', "tables" => implode(",", $tableList)]);
+    }
+
+    /**
+     * Get models fillable fields
+     *
+     * @param $columns
+     * @return string
+     */
+    private function getColumnsFillable($columns)
+    {
+        $names = [];
+
+        foreach ($columns as $column)
+        {
+            if (!in_array($column->Field, $this->autoFill))
+                array_push($names, $column->Field);
+        }
+
+        return '[\'' . implode('\',\'', $names) . '\']';
+    }
+
+    /**
+     * Restoring changed files after the abort
+     * Deleting create files
+     */
+    protected function executeAfterAbort()
+    {
+        /*foreach ($this->originalFiles as $value)
+        {
+            $this->file->put($value['path'], $value['content']);
+            $this->comment('Restored: ' . $value['path']);
+        }*/
+
+        foreach ($this->createdFiles as $value)
+        {
+            $this->file->delete($value);
+            $this->error('Deleted: ' . $value);
+        }
+    }
+
+    /**
+     * Creating controller
+     * @param $serviceData
+     * @internal param $item
+     */
+    private function createController($serviceData)
+    {
+        $this->createFileFromTemplate([
+            "destination"         => $serviceData->controllerDestination,
+            "templateDestination" => __DIR__ . '/templates/controller.template.txt',
+            "content"             =>
+                [
+                    "namespace"            => $serviceData->controllerNamespace,
+                    "controllerName"       => $serviceData->controllerName,
+                    "acl_prefix"           => $serviceData->aclPrefix,
+                    "translationsLocation" => $serviceData->translationsLocation,
+                    "serviceNameDotted"    => $this->stringWithDash($serviceData->translationFilePrefix),
+                    "controllerNameDotted" => $serviceData->serviceRouteName,
+                    "adminListHeader"      => $this->getAdminListHeader($serviceData),
+                ],
+        ]);
+
+        $this->createdFiles[] = $serviceData->controllerDestination;
+    }
+
+    /**
+     * Get list header from model data
+     *
+     * @param $serviceData
+     * @return string
+     */
+    private function getAdminListHeader($serviceData)
+    {
+        $output = "";
+        $model = null;
+
+        $tpl = $this->file->get(__DIR__ . '/templates/helpers/admin.list.header.template.txt');
+
+        foreach ($serviceData->database as $tableData)
+        {
+            if (isset($tableData->default))
+                $model = $tableData;
+        }
+
+        if ($model == null)
+            $this->abort('No default table for service');
+
+        $ignoreFields = array_merge($this->autoFill, ['id']);
+
+        if (array_key_exists('columns', $model) && !empty($model->columns))
+            foreach ($model->columns as $column)
             {
-                $tableName = $this->ask('Enter DataBase table name');
+                if (in_array($column->Field, $ignoreFields))
+                    continue;
 
-                $columns = DB::getSchemaBuilder()->getColumnListing($tableName);
+                $field = str_replace('{key}', $column->Field, $tpl);
+                $field = str_replace('{translationsLocation}', $serviceData->translationsLocation, $field);
 
-                if (!count($columns))
-                {
-                    $this->error("Table not found: " . $tableName . ". ");
-                    $repeat = $this->confirm("Reenter table name?");
-
-                    if (!$repeat)
-                        $this->abort('Aborting...');
-                    else
-                        continue;
-                } else
-                {
-                    $repeat = false;
-                    $columns = DB::select(DB::raw('SHOW COLUMNS FROM ' . $tableName));
-                }
+                $output .= $field;
             }
 
-            $this->modelsData[$tableName] = [
-                'modelName'   => $this->ask('Enter model name for "' . $tableName . '" table'),
-                'columnsData' => $this->extractColumnData($columns),
-            ];
-
-            $oneMore = $this->confirm('Add more models information?');
-
-            if ($oneMore)
-                $repeat = true;
-        }
-
+        return $output;
     }
 
     /**
-     * Optimizing gathered data
+     * Create route files
+     *
+     * @param $serviceData
      */
-    private function optimizeData()
+    private function createRoutes($serviceData)
     {
-        // creating name space from service URL
-        $this->namespace = str_replace('/', '\\', $this->packageDirectory . '\Http\Controllers\\' . str_replace('-', '', $this->serviceURL));
-        $this->namespace = array_filter(explode('\\', $this->namespace));
-        array_pop($this->namespace);
-        $this->namespace = implode('\\', $this->namespace);
-
-        $this->controllerDirectory = str_replace('\\', '/', $this->rootPackageDirectory) . '/Http/Controllers' . '/' . str_replace('-', '/', $this->serviceURL);
-        $this->controllerDirectory = array_filter(explode('/', $this->controllerDirectory));
-        array_pop($this->controllerDirectory);
-        $this->controllerDirectory = implode('/', $this->controllerDirectory);
-
-        $this->modelsDirectory = str_replace('/Http/Controllers', '/Models', $this->controllerDirectory) . '/' . str_replace('-', '/', $this->serviceURL);
-        $this->modelsDirectory = array_filter(explode('/', $this->modelsDirectory));
-        array_pop($this->modelsDirectory);
-        $this->modelsDirectory = implode('/', $this->modelsDirectory);
-
-        $this->routesDirectory = $this->rootPackageDirectory . '/Routes';
-        $this->namespace = str_replace('-', '', $this->namespace);
-
-        if ($this->packageService)
-        {
-            $this->controllerDirectory = str_replace('/Http/Controllers', '/app/Http/Controllers', $this->controllerDirectory);
-            $this->modelsDirectory = str_replace('/Models', '/app/Models', $this->modelsDirectory);
-            $this->routesDirectory = str_replace('/Routes', '/app/Routes', $this->routesDirectory);
-        }
-
-        //adding controller to service name
-        $this->controllerName .= 'Controller';
-
-        $this->serviceRouteName = $this->getServiceRouteNameDotted();
-
-        $this->routesDestination = $this->routesDirectory . '/routes.' . $this->serviceRouteName . '.php';
-
-        $this->acl_prefix = $this->getACLPrefix();
-    }
-
-    /**
-     * Creating service
-     */
-    private function createService()
-    {
-        $this->createTranslations();
-        $this->createModels();
-        $this->createController();
-        $this->createRoutes();
-        $this->updateConfiguration();
+        $this->createFileFromTemplate([
+            "destination"         => $serviceData->routesDestination,
+            "templateDestination" => __DIR__ . '/templates/routes.template.txt',
+            "content"             =>
+                [
+                    "serviceURL"           => $serviceData->serviceURL,
+                    "controllerNameDotted" => $serviceData->serviceRouteName,
+                    "acl_prefix"           => $serviceData->aclPrefix,
+                    "controllerName"       => $serviceData->controllerNameForRoutes,
+                ],
+        ]);
 
         $this->call('generate:routes');
+        $this->createdFiles[] = $serviceData->routesDestination;
     }
-
+}
+/*
     /**
      * Updating configuration
-     */
+     *
     private function updateConfiguration()
     {
-        $config = json_decode($this->file->get($this->rootPackageDirectory . '/app/' . MakeHCService::CONFIG_PATH));
+        $config = json_decode($this->file->get($this->rootPackageDirectory . 'app/' . MakeHCService::CONFIG_PATH));
         $servicePermissions = [
             "name"       => "admin." . $this->serviceRouteName,
             "controller" => $this->namespace . '\\' . $this->controllerName,
@@ -328,7 +455,7 @@ class MakeHCService extends HCCommand
                 } else
                 {
                     $this->error('Can not override existing configuration. Aborting...');
-                    $this->file->delete($this->controllerDirectory . '/' . $this->controllerName . '.php');
+                    $this->file->delete($this->controllerDestination . '/' . $this->controllerName . '.php');
                     $this->comment('Deleting controller');
 
                     return null;
@@ -339,189 +466,39 @@ class MakeHCService extends HCCommand
         if (!$contentChanged)
             $config->acl->permissions = array_merge($config->acl->permissions, [$servicePermissions]);
 
-        $this->file->put($this->rootPackageDirectory . '/app/' . MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
-    }
-
-    /**
-     * Creating controller
-     */
-    private function createController()
-    {
-        $this->createDirectory($this->controllerDirectory);
-        $this->createFileFromTemplate([
-            "destination"         => $this->controllerDirectory . '/' . $this->controllerName . '.php',
-            "templateDestination" => __DIR__ . '/templates/controller.template.txt',
-            "content"             =>
-                [
-                    "namespace"            => $this->namespace,
-                    "controllerName"       => $this->controllerName,
-                    "acl_prefix"           => $this->acl_prefix,
-                    "translationsLocation" => $this->translationsLocation,
-                    "serviceNameDotted"    => $this->stringWithDash($this->packageDirectory . '-' . $this->serviceRouteName),
-                    "controllerNameDotted" => $this->serviceRouteName,
-                    "adminListHeader"      => $this->getAdminListHeader(),
-                ],
-        ]);
-
-        $this->createdFiles[] = $this->controllerDirectory . '/' . $this->controllerName . '.php';
-    }
-
-    /**
-     * Create route files
-     *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
-    private function createRoutes()
-    {
-        $this->createDirectory($this->routesDirectory);
-        $this->createFileFromTemplate([
-            "destination"         => $this->routesDestination,
-            "templateDestination" => __DIR__ . '/templates/routes.template.txt',
-            "content"             =>
-                [
-                    "serviceURL"           => $this->serviceURL,
-                    "controllerNameDotted" => $this->serviceRouteName,
-                    "acl_prefix"           => $this->acl_prefix,
-                    "controllerName"       => $this->controllerName,
-                ],
-        ]);
-
-        $this->createdFiles[] = $this->routesDestination;
+        $this->file->put($this->rootPackageDirectory . 'app/' . MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
     }
 
     /**
      * Get dotted service name
      *
      * @return mixed
-     */
+     *
     private function getServiceRouteNameDotted()
     {
         return $this->stringWithDots($this->serviceURL);
     }
 
-    /**
-     * Get acl prefix name from package name and service name
-     *
-     * @return string
-     */
-    private function getACLPrefix()
-    {
-        return $this->stringWithUnderscore($this->packageDirectory . '_' . $this->serviceRouteName);
-    }
+
 
     /**
      * Reading original files
-     */
+     *
     private function readOriginalFiles()
     {
-        if ($this->file->exists($this->controllerDirectory . '/' . $this->controllerName . '.php'))
+        if ($this->file->exists(__DIR__  . $this->controllerDestination . '/' . $this->controllerName . '.php'))
             $this->abort('Controller exists! Aborting...');
 
-        if (!$this->file->exists($this->rootPackageDirectory . '/app/' . MakeHCService::CONFIG_PATH))
+//        dd($this->rootPackageDirectory . 'app/' . MakeHCService::CONFIG_PATH);
+//        dd($this->rootPackageDirectory . 'app/' . MakeHCService::CONFIG_PATH);
+
+        if (!$this->file->exists($this->rootPackageDirectory . 'app/' . MakeHCService::CONFIG_PATH))
             $this->abort('Configuration file not found.');
         else
-            $this->originalFiles[] = ["path" => $this->rootPackageDirectory . '/app/' . MakeHCService::CONFIG_PATH, "content" => $this->file->get($this->rootPackageDirectory . '/app/' . MakeHCService::CONFIG_PATH)];
+            $this->originalFiles[] = ["path" => $this->rootPackageDirectory . 'app/' . MakeHCService::CONFIG_PATH, "content" => $this->file->get($this->rootPackageDirectory . 'app/' . MakeHCService::CONFIG_PATH)];
 
         if ($this->file->exists($this->routesDestination))
             $this->originalFiles[] = ["path" => $this->routesDestination, "content" => $this->file->get($this->routesDestination)];
-    }
-
-    /**
-     * Restoring changed files after the abort
-     * Deleting create files
-     */
-    protected function executeAfterAbort()
-    {
-        foreach ($this->originalFiles as $value)
-        {
-            $this->file->put($value['path'], $value['content']);
-            $this->comment('Restored: ' . $value['path']);
-        }
-
-        foreach ($this->createdFiles as $value)
-        {
-            $this->file->delete($value);
-            $this->comment('Deleted: ' . $value);
-        }
-    }
-
-    /**
-     * Creating models
-     */
-    private function createModels()
-    {
-        foreach ($this->modelsData as $tableName => $model)
-        {
-            $this->createDirectory($this->modelsDirectory);
-            $this->createFileFromTemplate([
-                "destination"         => $this->modelsDirectory . '/' . $model['modelName'] . '.php',
-                "templateDestination" => __DIR__ . '/templates/model.template.txt',
-                "content"             =>
-                    [
-                        "modelnamespace"  => str_replace('Http\Controllers', 'Models', $this->namespace),
-                        "modelName"       => $model['modelName'],
-                        "columnsFillable" => $this->getColumnsFillable($model['columnsData']),
-                        "modelTable"      => $tableName,
-                    ],
-            ]);
-
-            $this->createdFiles[] = $this->modelsDirectory . '/' . $model['modelName'] . '.php';
-        }
-
-        if ($this->confirm("Create Migrations?", 'yes'))
-            $this->call('migrate:generate', ["--path" => $this->rootPackageDirectory . '/database/migrations', "tables" => implode("','", array_keys($this->modelsData))]);
-    }
-
-    /**
-     * Get models fillable fields
-     *
-     * @param $columns
-     * @return string
-     */
-    private function getColumnsFillable($columns)
-    {
-
-        $names = [];
-
-        foreach ($columns as $column)
-        {
-            if (!in_array($column->Field, $this->autoFill))
-                array_push($names, $column->Field);
-        }
-
-        return '[\'' . implode('\',\'', $names) . '\']';
-    }
-
-    /**
-     * Get list header from model data
-     *
-     * @return string
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
-    private function getAdminListHeader()
-    {
-        $output = "";
-
-        $tpl = $this->file->get(__DIR__ . '/templates/helpers/admin.list.header.template.txt');
-
-        $mainModel = head($this->modelsData);
-        $ignoreFields = array_merge($this->autoFill, ['id']);
-
-        if (array_key_exists('columnsData', $mainModel) && !empty($mainModel['columnsData']))
-        {
-            foreach ($mainModel['columnsData'] as $columnInfo)
-            {
-                if (in_array($columnInfo->Field, $ignoreFields))
-                    continue;
-
-                $field = str_replace('{key}', $columnInfo->Field, $tpl);
-                $field = str_replace('{translationsLocation}', $this->translationsLocation, $field);
-
-                $output .= $field;
-            }
-        }
-
-        return $output;
     }
 
     /**
@@ -529,7 +506,7 @@ class MakeHCService extends HCCommand
      *
      * @param $columns
      * @internal param $type
-     */
+     *
     private function extractColumnData($columns)
     {
         foreach ($columns as &$column)
@@ -547,48 +524,7 @@ class MakeHCService extends HCCommand
         return $columns;
     }
 
-    /**
-     * Creating translation file
-     */
-    private function createTranslations()
-    {
-        //TODO connect interactivesolutions/honeycomb-languages package
-        $this->createDirectory($this->rootPackageDirectory . '/resources/lang/en');
-        $this->createFileFromTemplate([
-            "destination"         => $this->rootPackageDirectory . '/resources/lang/en/' . $this->translationFilePrefix . '.php',
-            "templateDestination" => __DIR__ . '/templates/translations.template.txt',
-            "content"             =>
-                [
-                    "translations" => $this->gatherTranslations(),
-                ],
-        ]);
-    }
 
-    /**
-     * Gathering available translations
-     *
-     * @return string
-     */
-    private function gatherTranslations()
-    {
-        $output = '';
 
-        if (!empty($this->modelsData))
-        {
 
-            $tpl = $this->file->get(__DIR__ . '/templates/helpers/translations.template.txt');
-
-            foreach ($this->modelsData as $tableName => $model)
-                if (array_key_exists('columnsData', $model) && !empty($model['columnsData']))
-                    foreach ($model['columnsData'] as $column)
-                    {
-                        $line = str_replace('{key}', $column->Field, $tpl);
-                        $line = str_replace('{value}', str_replace("_", " ", ucfirst($column->Field)), $line);
-
-                        $output .= $line;
-                    }
-        }
-
-        return $output;
-    }
-}
+} */
