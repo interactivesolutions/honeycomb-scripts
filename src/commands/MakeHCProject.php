@@ -40,24 +40,24 @@ class MakeHCProject extends HCCommand
         if ($confirm)
         {
             // deleting files and folders
-            $this->deleteDirectory('app/Http/Controllers', true);
-            $this->deleteDirectory('app/Http/Console', true);
-            $this->deleteDirectory('app/HoneyComb', true);
-            $this->deleteDirectory('app/Models', true);
-            $this->deleteDirectory('app/Routes', true);
+            $this->deleteDirectory('app/http/controllers', true);
+            $this->deleteDirectory('app/http/console', true);
+            $this->deleteDirectory('app/honeycomb', true);
+            $this->deleteDirectory('app/models', true);
+            $this->deleteDirectory('app/routes', true);
             $this->deleteDirectory('routes', true);
 
             $this->file->delete('app/Providers/RouteServiceProvider.php');
 
             // creating files and folders
-            $this->createDirectory('app/Http/Controllers');
-            $this->createDirectory('app/Http/Console');
-            $this->createDirectory('app/Models');
-            $this->createDirectory('app/Routes');
-            $this->createDirectory('app/HoneyComb');
+            $this->createDirectory('app/http/controllers');
+            $this->createDirectory('app/http/console');
+            $this->createDirectory('app/models');
+            $this->createDirectory('app/routes');
+            $this->createDirectory('app/honeycomb');
 
             $this->createFileFromTemplate([
-                "destination"         => 'app/Http/Console/Kernel.php',
+                "destination"         => 'app/http/console/Kernel.php',
                 "templateDestination" => __DIR__ . '/templates/app.console.kernel.template.txt',
             ]);
 
@@ -67,7 +67,7 @@ class MakeHCProject extends HCCommand
             ]);
 
             $this->createFileFromTemplate([
-                "destination"         => "app/Providers/RouteServiceProvider.php",
+                "destination"         => "app/providers/RouteServiceProvider.php",
                 "templateDestination" => __DIR__ . '/templates/route.serviceprovider.template.txt',
                 "content"             =>
                 [

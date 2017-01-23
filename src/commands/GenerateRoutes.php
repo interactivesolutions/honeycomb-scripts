@@ -6,7 +6,7 @@ use interactivesolutions\honeycombcore\commands\HCCommand;
 
 class GenerateRoutes extends HCCommand
 {
-    const ROUTES_PATH = 'app/HoneyComb/routes.php';
+    const ROUTES_PATH = 'app/honeycomb/routes.php';
 
     /**
      * The name and signature of the console command.
