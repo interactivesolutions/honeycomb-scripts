@@ -19,7 +19,7 @@ class MakeHCPackage extends HCCommand
      *
      * @var string
      */
-    protected $description = 'Creating an empty HC package in projects packages/ diretory';
+    protected $description = 'Creating an empty HC package in projects packages/ directory';
 
     /**
      * Execute the console command.
