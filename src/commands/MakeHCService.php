@@ -57,7 +57,7 @@ class MakeHCService extends HCCommand
         foreach ($this->configurationData as $serviceData)
         {
             $this->createdFiles = [];
-            //$this->createService($serviceData);
+            $this->createService($serviceData);
             $this->finalizeFile($serviceData->file);
         }
 
