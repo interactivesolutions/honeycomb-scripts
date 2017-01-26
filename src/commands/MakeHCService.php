@@ -356,8 +356,10 @@ class MakeHCService extends HCCommand
                 [
                     "validationFormName" => $serviceData->serviceName . 'Form',
                     "modelName"          => $serviceData->database[0]->modelName,
+                    "modelNameSpace"     => $serviceData->modelNamespace,
                 ]),
             "inputData"            => $this->getInputData($serviceData),
+            "useFiles"             => $this->getUseFiles($serviceData),
         ];
 
         $this->createFileFromTemplate([
@@ -517,6 +519,26 @@ class MakeHCService extends HCCommand
                         $output .= $line;
                     }
         }
+
+        return $output;
+    }
+
+    /**
+     * @param $serviceData
+     * @return string
+     */
+    private function getUseFiles($serviceData)
+    {
+        $output = '';
+
+        $list = [];
+        $list[] = [
+            "nameSpace" => $serviceData->modelNamespace,
+            "name"      => $serviceData->database[0]->modelName,
+        ];
+
+        foreach ($list as $key => $value)
+            $output .=  "\r\n" . 'use ' . $value['nameSpace'] . '\\' . $value['name'] . ';';
 
         return $output;
     }

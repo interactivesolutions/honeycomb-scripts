@@ -1,7 +1,6 @@
 <?php namespace {namespace};
 
-use interactivesolutions\honeycombcore\http\controllers\HCBaseController;
-{imports}
+use interactivesolutions\honeycombcore\http\controllers\HCBaseController;{useFiles}
 
 class {controllerName} extends HCBaseController
 {
