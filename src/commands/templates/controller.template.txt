@@ -1,6 +1,7 @@
 <?php namespace {namespace};
 
 use interactivesolutions\honeycombcore\http\controllers\HCBaseController;
+{imports}
 
 class {controllerName} extends HCBaseController
 {
@@ -50,4 +51,6 @@ class {controllerName} extends HCBaseController
             {adminListHeader}
         ];
     }
+
+    {createFunction}
 }
