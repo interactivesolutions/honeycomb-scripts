@@ -154,6 +154,9 @@ class MakeHCService extends HCCommand
         // creating name space from service URL
         $item->controllerNamespace = str_replace('/', '\\', $item->directory . 'App\Http\Controllers\\' . str_replace('-', '', $item->serviceURL));
 
+        if ($item->pacakgeService)
+            $item->controllerNamespace = str_replace('App\\', '', $item->controllerNamespace);
+
         $item->controllerNamespace = array_filter(explode('\\', $item->controllerNamespace));
         array_pop($item->controllerNamespace);
         $item->controllerNamespace = implode('\\', $item->controllerNamespace);
@@ -538,7 +541,7 @@ class MakeHCService extends HCCommand
         ];
 
         foreach ($list as $key => $value)
-            $output .=  "\r\n" . 'use ' . $value['nameSpace'] . '\\' . $value['name'] . ';';
+            $output .= "\r\n" . 'use ' . $value['nameSpace'] . '\\' . $value['name'] . ';';
 
         return $output;
     }
