@@ -80,6 +80,7 @@ class MakeHCService extends HCCommand
         $this->createTranslations($serviceData);
         $this->createModels($serviceData);
         $this->createController($serviceData);
+        $this->createFormValidator($serviceData);
         $this->createRoutes($serviceData);
         $this->updateConfiguration($serviceData);
 
@@ -167,9 +168,14 @@ class MakeHCService extends HCCommand
         // creating controller directory
         $item->controllerDestination = $this->createItemDirectoryPath($item->rootDirectory . 'app/Http/Controllers/' . str_replace('-', '/', $item->serviceURL));
 
-        // creating models directory\
+        // creating models directory
         $item->modelDirectory = str_replace('/Http/Controllers', '/Models', $item->controllerDestination);
         $item->modelNamespace = str_replace('\\Http\\Controllers', '\\Models', $item->controllerNamespace);
+
+        // creating form validator data
+        $item->validationFormName = $item->serviceName . 'Form';
+        $item->validationFormNameSpace = str_replace('\\Http\\Controllers', '\\Forms', $item->controllerNamespace);
+        $item->validationFormDestination = str_replace('/Http/Controllers', '/Forms', $item->controllerDestination) . '/' . $item->validationFormName . '.php';
 
         // finalizing destination
         $item->controllerDestination .= '/' . $item->controllerName . '.php';
@@ -254,7 +260,7 @@ class MakeHCService extends HCCommand
 
         if (!empty($service->database))
         {
-            $tpl = $this->file->get(__DIR__ . '/templates/helpers/translations.template.txt');
+            $tpl = $this->file->get(__DIR__ . '/templates/helpers/array.element.template.txt');
 
             foreach ($service->database as $tableName => $model)
                 if (array_key_exists('columns', $model) && !empty($model->columns))
@@ -347,28 +353,26 @@ class MakeHCService extends HCCommand
      */
     private function createController($serviceData)
     {
-        $content = [
-            "namespace"            => $serviceData->controllerNamespace,
-            "controllerName"       => $serviceData->controllerName,
-            "acl_prefix"           => $serviceData->aclPrefix,
-            "translationsLocation" => $serviceData->translationsLocation,
-            "serviceNameDotted"    => $this->stringWithDash($serviceData->translationFilePrefix),
-            "controllerNameDotted" => $serviceData->serviceRouteName,
-            "adminListHeader"      => $this->getAdminListHeader($serviceData),
-            "createFunction"       => replaceBrackets($this->file->get(__DIR__ . '/templates/helpers/create.template.txt'),
-                [
-                    "validationFormName" => $serviceData->serviceName . 'Form',
-                    "modelName"          => $serviceData->database[0]->modelName,
-                    "modelNameSpace"     => $serviceData->modelNamespace,
-                ]),
-            "inputData"            => $this->getInputData($serviceData),
-            "useFiles"             => $this->getUseFiles($serviceData),
-        ];
-
         $this->createFileFromTemplate([
             "destination"         => $serviceData->controllerDestination,
             "templateDestination" => __DIR__ . '/templates/controller.template.txt',
-            "content"             => $content,
+            "content"             => [
+                "namespace"            => $serviceData->controllerNamespace,
+                "controllerName"       => $serviceData->controllerName,
+                "acl_prefix"           => $serviceData->aclPrefix,
+                "translationsLocation" => $serviceData->translationsLocation,
+                "serviceNameDotted"    => $this->stringWithDash($serviceData->translationFilePrefix),
+                "controllerNameDotted" => $serviceData->serviceRouteName,
+                "adminListHeader"      => $this->getAdminListHeader($serviceData),
+                "createFunction"       => replaceBrackets($this->file->get(__DIR__ . '/templates/helpers/create.template.txt'),
+                    [
+                        "validationFormName" => $serviceData->validationFormName,
+                        "modelName"          => $serviceData->database[0]->modelName,
+                        "modelNameSpace"     => $serviceData->modelNamespace,
+                    ]),
+                "inputData"            => $this->getInputData($serviceData),
+                "useFiles"             => $this->getUseFiles($serviceData),
+            ],
         ]);
 
         $this->createdFiles[] = $serviceData->controllerDestination;
@@ -540,8 +544,65 @@ class MakeHCService extends HCCommand
             "name"      => $serviceData->database[0]->modelName,
         ];
 
+        $list[] = [
+            "nameSpace" => $serviceData->validationFormNameSpace,
+            "name"      => $serviceData->validationFormName,
+        ];
+
         foreach ($list as $key => $value)
             $output .= "\r\n" . 'use ' . $value['nameSpace'] . '\\' . $value['name'] . ';';
+
+        return $output;
+    }
+
+    /**
+     * @param $serviceData
+     */
+    private function createFormValidator($serviceData)
+    {
+        $this->createFileFromTemplate([
+            "destination"         => $serviceData->validationFormDestination,
+            "templateDestination" => __DIR__ . '/templates/validation.form.template.txt',
+            "content"             =>
+                [
+                    "validationFormNameSpace" => $serviceData->validationFormNameSpace,
+                    "validationFormName"      => $serviceData->validationFormName,
+                    "formRules"               => $this->getRules($serviceData),
+                ],
+        ]);
+
+        $this->createdFiles[] = $serviceData->routesDestination;
+    }
+
+    /**
+     * @param $serviceData
+     * @return string
+     */
+    private function getRules($serviceData)
+    {
+        $output = "";
+        $skip = array_merge($this->autoFill, ['id']);
+
+        if (!empty($serviceData->database))
+        {
+            $tpl = $this->file->get(__DIR__ . '/templates/helpers/array.element.template.txt');
+
+            foreach ($serviceData->database as $tableName => $model)
+                if (array_key_exists('columns', $model) && !empty($model->columns) && $model->default)
+                    foreach ($model->columns as $column)
+                    {
+                        if (in_array($column->Field, $skip))
+                            continue;
+
+                        if ($column->Null == "NO")
+                        {
+                            $line = str_replace('{key}', $column->Field, $tpl);
+                            $line = str_replace('{value}', 'required', $line);
+
+                            $output .= $line;
+                        }
+                    }
+        }
 
         return $output;
     }
