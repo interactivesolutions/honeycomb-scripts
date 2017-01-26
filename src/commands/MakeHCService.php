@@ -344,7 +344,7 @@ class MakeHCService extends HCCommand
      */
     private function createController($serviceData)
     {
-        $content =  [
+        $content = [
             "namespace"            => $serviceData->controllerNamespace,
             "controllerName"       => $serviceData->controllerName,
             "acl_prefix"           => $serviceData->aclPrefix,
@@ -357,6 +357,7 @@ class MakeHCService extends HCCommand
                     "validationFormName" => $serviceData->serviceName . 'Form',
                     "modelName"          => $serviceData->database[0]->modelName,
                 ]),
+            "inputData"            => $this->getInputData($serviceData),
         ];
 
         $this->createFileFromTemplate([
@@ -488,6 +489,36 @@ class MakeHCService extends HCCommand
     private function finalizeFile($file)
     {
         $this->file->move($file->getPathName(), $file->getPathName() . '.done');
+    }
+
+    /**
+     * Get input keys from model data
+     *
+     * @param $serviceData
+     * @return string
+     */
+    private function getInputData($serviceData)
+    {
+        $output = "";
+        $skip = array_merge($this->autoFill, ['id']);
+
+        if (!empty($serviceData->database))
+        {
+            $tpl = $this->file->get(__DIR__ . '/templates/helpers/input.data.template.txt');
+
+            foreach ($serviceData->database as $tableName => $model)
+                if (array_key_exists('columns', $model) && !empty($model->columns) && $model->default)
+                    foreach ($model->columns as $column)
+                    {
+                        if (in_array($column->Field, $skip))
+                            continue;
+
+                        $line = str_replace('{key}', $column->Field, $tpl);
+                        $output .= $line;
+                    }
+        }
+
+        return $output;
     }
 }
 

@@ -53,4 +53,17 @@ class {controllerName} extends HCBaseController
     }
 
     {createFunction}
+
+    /**
+     * Getting user data on POST call
+     *
+     * @return mixed
+     */
+    protected function getInputData()
+    {
+        $_data = request()->all();
+
+        {inputData}
+        return $data;
+    }
 }
