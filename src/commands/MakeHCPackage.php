@@ -48,7 +48,7 @@ class MakeHCPackage extends HCCommand
         $this->createDirectory($packageDirectory . '/src/app/');
         $this->createDirectory($packageDirectory . '/src/app/Console');
         $this->createDirectory($packageDirectory . '/src/app/Exceptions');
-        $this->createDirectory($packageDirectory . '/src/app/HoneyComb');
+        $this->createDirectory($packageDirectory . '/src/app/honeycomb');
         $this->createDirectory($packageDirectory . '/src/app/Http');
         $this->createDirectory($packageDirectory . '/src/app/Http/Console');
         $this->createDirectory($packageDirectory . '/src/app/Http/Controllers');
@@ -76,12 +76,12 @@ class MakeHCPackage extends HCCommand
         ]);
 
         $this->createFileFromTemplate([
-            "destination"         => $packageDirectory . '/src/app/HoneyComb/routes.php',
+            "destination"         => $packageDirectory . '/src/app/honeycomb/routes.php',
             "templateDestination" => __DIR__ . '/templates/empty.template.txt',
         ]);
 
         $this->createFileFromTemplate([
-            "destination"         => $packageDirectory . '/src/app/HoneyComb/config.json',
+            "destination"         => $packageDirectory . '/src/app/honeycomb/config.json',
             "templateDestination" => __DIR__ . '/templates/config.template.txt',
             "content" =>
             [

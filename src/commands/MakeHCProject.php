@@ -62,17 +62,20 @@ class MakeHCProject extends HCCommand
             ]);
 
             $this->createFileFromTemplate([
-                "destination"         => MakeHCService::CONFIG_PATH,
+                "destination"         => 'app/' . MakeHCService::CONFIG_PATH,
                 "templateDestination" => __DIR__ . '/templates/config.template.txt',
+                "content"             => [
+                    "serviceProviderNameSpace" => "",
+                ],
             ]);
 
             $this->createFileFromTemplate([
                 "destination"         => "app/providers/RouteServiceProvider.php",
                 "templateDestination" => __DIR__ . '/templates/route.serviceprovider.template.txt',
                 "content"             =>
-                [
-                    "routesBasePath" => GenerateRoutes::ROUTES_PATH,
-                ],
+                    [
+                        "routesBasePath" => GenerateRoutes::ROUTES_PATH,
+                    ],
             ]);
 
             $this->file->put(GenerateRoutes::ROUTES_PATH, '');

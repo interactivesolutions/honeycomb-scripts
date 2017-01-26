@@ -80,6 +80,7 @@ class MakeHCService extends HCCommand
         $this->createModels($serviceData);
         $this->createController($serviceData);
         $this->createRoutes($serviceData);
+        $this->updateConfiguration($serviceData);
 
     }
 
@@ -126,18 +127,22 @@ class MakeHCService extends HCCommand
     function optimizeData($file)
     {
         $item = json_decode($this->file->get($file));
+
+        if ($item == null)
+            $this->abort($file->getFilename() . ' has Invalid JSON format.');
+
         $item->file = $file;
         $item->translationFilePrefix = $this->stringWithUnderscore($item->serviceURL);
 
         if ($item->directory == '')
         {
             $item->directory = '';
-            $item->rootDirectory = '';
+            $item->rootDirectory = './';
             $item->translationsLocation = $item->translationFilePrefix;
         } else
         {
             $item->directory .= '/';
-            $item->rootDirectory = '/packages/' . $item->directory . 'src/';
+            $item->rootDirectory = './packages/' . $item->directory . 'src/';
             $item->translationsLocation = json_decode($this->file->get($item->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH))->general->serviceProviderNameSpace . "::" . $item->translationFilePrefix;
             $item->pacakgeService = true;
             $this->checkPackage($item);
@@ -152,9 +157,6 @@ class MakeHCService extends HCCommand
         array_pop($item->controllerNamespace);
         $item->controllerNamespace = implode('\\', $item->controllerNamespace);
         $item->controllerNamespace = str_replace('-', '', $item->controllerNamespace);
-
-        $item->rootDirectory = './' . $item->rootDirectory;
-
 
         $item->controllerNameForRoutes = str_replace('/', '\\\\', $this->createItemDirectoryPath(str_replace('-', '', $item->serviceURL)) . '\\\\' . $item->controllerName);
 
@@ -420,24 +422,25 @@ class MakeHCService extends HCCommand
         $this->call('generate:routes');
         $this->createdFiles[] = $serviceData->routesDestination;
     }
-}
-/*
+
     /**
      * Updating configuration
-     *
-    private function updateConfiguration()
+     * @param $serviceData
+     * @return null
+     */
+    private function updateConfiguration($serviceData)
     {
-        $config = json_decode($this->file->get($this->rootPackageDirectory . 'app/' . MakeHCService::CONFIG_PATH));
+        $config = json_decode($this->file->get($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH));
         $servicePermissions = [
-            "name"       => "admin." . $this->serviceRouteName,
-            "controller" => $this->namespace . '\\' . $this->controllerName,
+            "name"       => "admin." . $serviceData->serviceRouteName,
+            "controller" => $serviceData->controllerNamespace . '\\' . $serviceData->controllerName,
             "actions"    =>
                 [
-                    $this->acl_prefix . "_list",
-                    $this->acl_prefix . "_create",
-                    $this->acl_prefix . "_update",
-                    $this->acl_prefix . "_delete",
-                    $this->acl_prefix . "_force_delete",
+                    $serviceData->aclPrefix . "_list",
+                    $serviceData->aclPrefix . "_create",
+                    $serviceData->aclPrefix . "_update",
+                    $serviceData->aclPrefix . "_delete",
+                    $serviceData->aclPrefix . "_force_delete",
                 ],
         ];
 
@@ -445,19 +448,16 @@ class MakeHCService extends HCCommand
 
         foreach ($config->acl->permissions as &$value)
         {
-            if ($value->name == "admin." . $this->serviceRouteName)
+            if ($value->name == "admin." . $serviceData->serviceRouteName)
             {
-                if ($this->confirm('Duplicate ACL found ' . "admin." . $this->serviceRouteName . ' Confirm override', 'no'))
+                if ($this->confirm('Duplicate ACL found ' . "admin." . $serviceData->serviceRouteName . ' Confirm override', 'no'))
                 {
                     $contentChanged = true;
                     $value = $servicePermissions;
                     break;
                 } else
                 {
-                    $this->error('Can not override existing configuration. Aborting...');
-                    $this->file->delete($this->controllerDestination . '/' . $this->controllerName . '.php');
-                    $this->comment('Deleting controller');
-
+                    $this->abort('Can not override existing configuration. Aborting...');
                     return null;
                 }
             }
@@ -466,8 +466,11 @@ class MakeHCService extends HCCommand
         if (!$contentChanged)
             $config->acl->permissions = array_merge($config->acl->permissions, [$servicePermissions]);
 
-        $this->file->put($this->rootPackageDirectory . 'app/' . MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
+        $this->file->put($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
     }
+}
+/*
+
 
     /**
      * Get dotted service name
