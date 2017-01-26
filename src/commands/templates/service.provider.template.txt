@@ -72,7 +72,7 @@ class {packageName}ServiceProvider extends ServiceProvider
     private function registerRoutes()
     {
         \Route::group(['namespace' => $this->namespace], function ($router) {
-            require __DIR__ . '/../../app/HoneyComb/routes.php';
+            require __DIR__ . '/../../app/honeycomb/routes.php';
         });
     }
 }
