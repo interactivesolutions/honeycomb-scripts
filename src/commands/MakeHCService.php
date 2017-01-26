@@ -286,7 +286,7 @@ class MakeHCService extends HCCommand
                 "templateDestination" => __DIR__ . '/templates/model.template.txt',
                 "content"             =>
                     [
-                        "modelnamespace"  => $item->modelNamespace,
+                        "modelNameSpace"  => $item->modelNamespace,
                         "modelName"       => $model->modelName,
                         "columnsFillable" => $this->getColumnsFillable($model->columns),
                         "modelTable"      => $model->tableName,
