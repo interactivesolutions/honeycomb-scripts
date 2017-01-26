@@ -13,7 +13,7 @@ class GenerateRoutes extends HCCommand
      *
      * @var string
      */
-    protected $signature = 'generate:routes';
+    protected $signature = 'generate:routes {directory?}';
 
     /**
      * The console command description.
@@ -29,7 +29,12 @@ class GenerateRoutes extends HCCommand
      */
     public function handle()
     {
-        $files = $this->file->allFiles('app/routes');
+        if ($this->argument('directory'))
+            $rootDirectory = $this->argument('directory');
+        else
+            $rootDirectory = '';
+
+        $files = $this->file->allFiles($rootDirectory . 'app/routes');
         $finalContent = '<?php';
 
         foreach ($files as $file)
@@ -39,8 +44,8 @@ class GenerateRoutes extends HCCommand
             $finalContent .= str_replace('<?php', '', $this->file->get((string)$file)) . "\r\n";
         }
 
-        $this->file->put(GenerateRoutes::ROUTES_PATH, $finalContent);
+        $this->file->put($rootDirectory . GenerateRoutes::ROUTES_PATH, $finalContent);
 
-        $this->comment(GenerateRoutes::ROUTES_PATH . ' file generated');
+        $this->comment($rootDirectory . GenerateRoutes::ROUTES_PATH . ' file generated');
     }
 }
