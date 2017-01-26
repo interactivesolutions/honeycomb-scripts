@@ -1,0 +1,17 @@
+/**
+    * Create item
+    *
+    * @param null $data
+    * @return mixed
+    */
+    public function create($data = null)
+    {
+        if(is_null($data))
+            $data = $this->getInputData();
+
+        (new {validationFormName}())->validateForm();
+
+        $record = {modelName}::create(array_get($data, 'record'));
+
+        return $this->getRecordData($record->id);
+    }
