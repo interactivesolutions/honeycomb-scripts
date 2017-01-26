@@ -65,4 +65,24 @@ class {controllerName} extends HCBaseController
         {inputData}
         return $data;
     }
+
+    /**
+     * Getting single record
+     *
+     * @param $id
+     * @return mixed
+     */
+    public function getSingleRecord($id)
+    {
+        $with = [];
+
+        $select = {mainModelName}::getFillableFields();
+
+        $record = {mainModelName}::with($with)
+            ->select($select)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        return $record;
+    }
 }

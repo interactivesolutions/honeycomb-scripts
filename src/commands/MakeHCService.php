@@ -191,6 +191,8 @@ class MakeHCService extends HCCommand
             $dbItem->modelLocation = $item->modelDirectory . '/' . $dbItem->modelName . '.php';
         }
 
+        $item->mainModelName = $item->database[0]->modelName;
+
         $item->aclPrefix = $this->stringWithUnderscore($item->directory . $item->serviceRouteName);
 
         return $item;
@@ -367,11 +369,12 @@ class MakeHCService extends HCCommand
                 "createFunction"       => replaceBrackets($this->file->get(__DIR__ . '/templates/helpers/create.template.txt'),
                     [
                         "validationFormName" => $serviceData->validationFormName,
-                        "modelName"          => $serviceData->database[0]->modelName,
+                        "modelName"          => $serviceData->mainModelName,
                         "modelNameSpace"     => $serviceData->modelNamespace,
                     ]),
                 "inputData"            => $this->getInputData($serviceData),
                 "useFiles"             => $this->getUseFiles($serviceData),
+                "mainModelName"        => $serviceData->mainModelName,
             ],
         ]);
 
