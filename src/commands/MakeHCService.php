@@ -57,7 +57,8 @@ class MakeHCService extends HCCommand
         foreach ($this->configurationData as $serviceData)
         {
             $this->createdFiles = [];
-            $this->createService($serviceData);
+            //$this->createService($serviceData);
+            $this->finalizeFile($serviceData->file);
         }
 
         //$this->updateConfiguration();
@@ -467,6 +468,15 @@ class MakeHCService extends HCCommand
             $config->acl->permissions = array_merge($config->acl->permissions, [$servicePermissions]);
 
         $this->file->put($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * Finalizing file
+     * @param $file
+     */
+    private function finalizeFile($file)
+    {
+        $this->file->move($file->getPathName(), $file->getPathName() . '.done');
     }
 }
 /*
