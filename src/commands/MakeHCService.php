@@ -60,8 +60,6 @@ class MakeHCService extends HCCommand
             $this->createService($serviceData);
             $this->finalizeFile($serviceData->file);
         }
-
-        //$this->updateConfiguration();
     }
 
     /**
@@ -420,7 +418,11 @@ class MakeHCService extends HCCommand
                 ],
         ]);
 
-        $this->call('generate:routes');
+        if ($serviceData->rootDirectory != './')
+            $this->call('generate:routes', ["directory" => $serviceData->rootDirectory]);
+        else
+            $this->call('generate:routes');
+
         $this->createdFiles[] = $serviceData->routesDestination;
     }
 
