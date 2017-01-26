@@ -75,6 +75,8 @@ class MakeHCService extends HCCommand
         $this->comment($serviceData->serviceName);
         $this->comment('*************************************');
 
+        //dd($serviceData);
+
         $this->createTranslations($serviceData);
         $this->createModels($serviceData);
         $this->createController($serviceData);
@@ -342,19 +344,25 @@ class MakeHCService extends HCCommand
      */
     private function createController($serviceData)
     {
+        $content =  [
+            "namespace"            => $serviceData->controllerNamespace,
+            "controllerName"       => $serviceData->controllerName,
+            "acl_prefix"           => $serviceData->aclPrefix,
+            "translationsLocation" => $serviceData->translationsLocation,
+            "serviceNameDotted"    => $this->stringWithDash($serviceData->translationFilePrefix),
+            "controllerNameDotted" => $serviceData->serviceRouteName,
+            "adminListHeader"      => $this->getAdminListHeader($serviceData),
+            "createFunction"       => replaceBrackets($this->file->get(__DIR__ . '/templates/helpers/create.template.txt'),
+                [
+                    "validationFormName" => $serviceData->serviceName . 'Form',
+                    "modelName"          => $serviceData->database[0]->modelName,
+                ]),
+        ];
+
         $this->createFileFromTemplate([
             "destination"         => $serviceData->controllerDestination,
             "templateDestination" => __DIR__ . '/templates/controller.template.txt',
-            "content"             =>
-                [
-                    "namespace"            => $serviceData->controllerNamespace,
-                    "controllerName"       => $serviceData->controllerName,
-                    "acl_prefix"           => $serviceData->aclPrefix,
-                    "translationsLocation" => $serviceData->translationsLocation,
-                    "serviceNameDotted"    => $this->stringWithDash($serviceData->translationFilePrefix),
-                    "controllerNameDotted" => $serviceData->serviceRouteName,
-                    "adminListHeader"      => $this->getAdminListHeader($serviceData),
-                ],
+            "content"             => $content,
         ]);
 
         $this->createdFiles[] = $serviceData->controllerDestination;
@@ -461,6 +469,7 @@ class MakeHCService extends HCCommand
                 } else
                 {
                     $this->abort('Can not override existing configuration. Aborting...');
+
                     return null;
                 }
             }
@@ -481,6 +490,7 @@ class MakeHCService extends HCCommand
         $this->file->move($file->getPathName(), $file->getPathName() . '.done');
     }
 }
+
 /*
 
 
