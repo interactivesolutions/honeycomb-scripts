@@ -1,0 +1,69 @@
+/**
+    * Create item
+    *
+    * @param null $data
+    * @return mixed
+    */
+    protected function __create($data = null)
+    {
+        if(is_null($data))
+            $data = $this->getInputData();
+
+        (new {validationFormName}())->validateForm();
+
+        $record = {modelName}::create(array_get($data, 'record'));
+
+        return $this->getSingleRecord($record->id);
+    }
+
+    /**
+    * Updates existing item based on ID
+    *
+    * @param $id
+    * @return mixed
+    */
+    protected function __update($id)
+    {
+        $record = {modelName}::findOrFail($id);
+
+        //TODO read request parameters only once fo getting data and validating it
+        $data = $this->getInputData();
+        (new {validationFormName}())->validateForm();
+
+        $record->update(array_get($data, 'record'));
+
+        return $this->getSingleRecord($record->id);
+    }
+
+    /**
+    * Delete records table
+    *
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __delete(array $list)
+    {
+        {modelName}::destroy($list);
+    }
+
+    /**
+    * Delete records table
+    *
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __forceDelete(array $list)
+    {
+        {modelName}::onlyTrashed()->whereIn('id', $list)->forceDelete();
+    }
+
+    /**
+    * Restore multiple records
+    *
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __restore(array $list)
+    {
+        {modelName}::whereIn('id', $list)->restore();
+    }

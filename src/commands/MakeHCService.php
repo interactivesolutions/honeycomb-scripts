@@ -367,13 +367,7 @@ class MakeHCService extends HCCommand
                 "serviceNameDotted"    => $this->stringWithDash($serviceData->translationFilePrefix),
                 "controllerNameDotted" => $serviceData->serviceRouteName,
                 "adminListHeader"      => $this->getAdminListHeader($serviceData),
-                "createFunction"       => replaceBrackets($this->file->get(__DIR__ . '/templates/controller/create.function.template.txt'),
-                    [
-                        "validationFormName" => $serviceData->validationFormName,
-                        "modelName"          => $serviceData->mainModelName,
-                        "modelNameSpace"     => $serviceData->modelNamespace,
-                    ]),
-                "updateFunction"       => replaceBrackets($this->file->get(__DIR__ . '/templates/controller/update.function.template.txt'),
+                "functions"            => replaceBrackets($this->file->get(__DIR__ . '/templates/controller/functions.template.txt'),
                     [
                         "validationFormName" => $serviceData->validationFormName,
                         "modelName"          => $serviceData->mainModelName,
