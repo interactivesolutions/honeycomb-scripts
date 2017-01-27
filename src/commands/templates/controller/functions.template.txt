@@ -91,7 +91,8 @@
 
         if ($orderData)
             foreach($orderData as $column => $direction)
-                $list = $list->orderBy($column, $direction);
+                if ($direction == 'ASC' || $direction == 'DESC')
+                    $list = $list->orderBy($column, $direction);
 
         // setOrdering
         $list = $list->orderBy($this->field, $this->ordering);
