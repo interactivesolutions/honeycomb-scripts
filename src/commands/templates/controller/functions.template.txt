@@ -91,7 +91,7 @@
 
         if ($orderData)
             foreach($orderData as $column => $direction)
-                if ($direction == 'ASC' || $direction == 'DESC')
+                if (strtolower($direction) == 'asc' || strtolower($direction) == 'desc')
                     $list = $list->orderBy($column, $direction);
 
         // setOrdering
