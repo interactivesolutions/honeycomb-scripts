@@ -1,10 +1,8 @@
-<?php
+<?php namespace {namespace};
 
-namespace {nameSpace};
+use interactivesolutions\honeycombcore\http\controllers\HCBaseController;{useFiles}
 
-use interactivesolutions\honeycombcore\http\controllers\HCBaseController;
-
-class {serviceName} extends HCBaseController
+class {controllerName} extends HCBaseController
 {
 
     /**
@@ -12,37 +10,33 @@ class {serviceName} extends HCBaseController
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function adminView ()
+    public function adminView()
     {
-        dd('Something');
-
         $config = [
-            'title'       => trans('{packageName}::{langFile}.page_title'),
-            'listURL'     => route('admin.api.{serviceName}'),
-            'newFormUrl'  => route('admin.api.form-manager', ['{packageName}-new']),
-            'editFormUrl' => route('admin.api.form-manager', ['{packageName}-edit']),
+            'title'       => trans('{translationsLocation}.page_title'),
+            'listURL'     => route('admin.api.{controllerNameDotted}}'),
+            'newFormUrl'  => route('admin.api.form-manager', ['{serviceNameDotted}-new']),
+            'editFormUrl' => route('admin.api.form-manager', ['{serviceNameDotted}-edit']),
             'imagesUrl'   => route('resource.get', ['/']),
-            'headers'     => $this->getListHeader(),
+            'headers'     => $this->getAdminListHeader(),
         ];
 
-        $user = auth()->user();
-
-        if( $user->can('{acl_name}_create') )
+        if ($this->user->can('{acl_prefix}_create'))
             $config['actions'][] = 'new';
 
-        if( $user->can('{acl_name}_update') )
+        if ($this->user->can('{acl_prefix}_update'))
+        {
             $config['actions'][] = 'update';
-
-        if( $user->can('{acl_name}_delete') ) {
-            $config['actions'][] = 'delete';
             $config['actions'][] = 'restore';
         }
 
-        if( $user->can('{acl_name}_search') ) {
-            $config['actions'][] = 'search';
-        }
+        if ($this->user->can('{acl_prefix}_delete'))
+            $config['actions'][] = 'delete';
 
-        return view('coreui::admin.content.list', ['config' => $config]);
+        if ($this->user->can('{acl_prefix}_search'))
+            $config['actions'][] = 'search';
+
+        return view('HCCoreUI::admin.content.list', ['config' => $config]);
     }
 
     /**
@@ -55,5 +49,40 @@ class {serviceName} extends HCBaseController
         return [
             {adminListHeader}
         ];
+    }
+
+    {functions}
+
+    /**
+     * Getting user data on POST call
+     *
+     * @return mixed
+     */
+    protected function getInputData()
+    {
+        $_data = request()->all();
+
+        {inputData}
+        return $data;
+    }
+
+    /**
+     * Getting single record
+     *
+     * @param $id
+     * @return mixed
+     */
+    public function getSingleRecord($id)
+    {
+        $with = [];
+
+        $select = {mainModelName}::getFillableFields();
+
+        $record = {mainModelName}::with($with)
+            ->select($select)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        return $record;
     }
 }

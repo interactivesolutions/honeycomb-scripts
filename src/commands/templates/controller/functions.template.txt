@@ -1,0 +1,122 @@
+/**
+    * Create item
+    *
+    * @param null $data
+    * @return mixed
+    */
+    protected function __create($data = null)
+    {
+        if(is_null($data))
+            $data = $this->getInputData();
+
+        (new {validationFormName}())->validateForm();
+
+        $record = {modelName}::create(array_get($data, 'record'));
+
+        return $this->getSingleRecord($record->id);
+    }
+
+    /**
+    * Updates existing item based on ID
+    *
+    * @param $id
+    * @return mixed
+    */
+    protected function __update($id)
+    {
+        $record = {modelName}::findOrFail($id);
+
+        //TODO read request parameters only once fo getting data and validating it
+        $data = $this->getInputData();
+        (new {validationFormName}())->validateForm();
+
+        $record->update(array_get($data, 'record'));
+
+        return $this->getSingleRecord($record->id);
+    }
+
+    /**
+    * Delete records table
+    *
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __delete(array $list)
+    {
+        {modelName}::destroy($list);
+    }
+
+    /**
+    * Delete records table
+    *
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __forceDelete(array $list)
+    {
+        {modelName}::onlyTrashed()->whereIn('id', $list)->forceDelete();
+    }
+
+    /**
+    * Restore multiple records
+    *
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __restore(array $list)
+    {
+        {modelName}::whereIn('id', $list)->restore();
+    }
+
+    /**
+    * @return mixed
+    */
+    public function getDataAPI()
+    {
+        $with = [];
+        $select = {modelName}::getFillableFields();
+
+        $list = {modelName}::with($with)->select($select)
+        // add filters
+        ->where(function ($query) use ($select) {
+            $query->where($this->getRequestParameters($select));
+        });
+
+        $list = $this->checkForDeleted($list);
+
+        // add search items
+        $list = $this->listSearch($list);
+
+        $orderData = request->get('_order');
+
+        if ($orderData)
+            foreach($orderData as $column => $direction)
+                if ($direction == 'ASC' || $direction == 'DESC')
+                    $list = $list->orderBy($column, $direction);
+
+        // setOrdering
+        $list = $list->orderBy($this->field, $this->ordering);
+
+        return $list->paginate($this->recordsPerPage)->toArray();
+    }
+
+    /**
+    * List search elements
+
+    * @param $list
+    * @return mixed
+    */
+    protected function listSearch($list)
+    {
+        if(request()->has('q'))
+        {
+            $parameter = request()->input('q');
+
+            $list = $list->where(function ($query) use ($parameter)
+            {
+                $query{searchableFields};
+            });
+        }
+
+        return $list;
+    }

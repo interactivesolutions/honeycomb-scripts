@@ -4,9 +4,10 @@ namespace interactivesolutions\honeycombscripts\providers;
 
 use Illuminate\Support\ServiceProvider;
 use interactivesolutions\honeycombscripts\commands\CreateEnvFile;
-use interactivesolutions\honeycombscripts\commands\CreateService;
+use interactivesolutions\honeycombscripts\commands\MakeHCPackage;
+use interactivesolutions\honeycombscripts\commands\MakeHCService;
 use interactivesolutions\honeycombscripts\commands\GenerateRoutes;
-use interactivesolutions\honeycombscripts\commands\PrepareProject;
+use interactivesolutions\honeycombscripts\commands\MakeHCProject;
 
 class HCScriptsServiceProvider extends ServiceProvider
 {
@@ -17,9 +18,10 @@ class HCScriptsServiceProvider extends ServiceProvider
      */
     protected $commands = [
         CreateEnvFile::class,
-        CreateService::class,
-        PrepareProject::class,
-        GenerateRoutes::class
+        MakeHCService::class,
+        MakeHCProject::class,
+        MakeHCPackage::class,
+        GenerateRoutes::class,
     ];
 
     /**
@@ -44,7 +46,9 @@ class HCScriptsServiceProvider extends ServiceProvider
         {
             $this->app->register(\Way\Generators\GeneratorsServiceProvider::class);
             $this->app->register(\Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class);
-        }$this->registerHelpers();
+        }
+
+        $this->registerHelpers();
     }
 
     /**
@@ -54,9 +58,8 @@ class HCScriptsServiceProvider extends ServiceProvider
     {
         $filePath = __DIR__ . '/../helpers/helpers.php';
 
-        if( \File::isFile($filePath) ) {
+        if (\File::isFile($filePath))
             require_once $filePath;
-        }
     }
 }
 

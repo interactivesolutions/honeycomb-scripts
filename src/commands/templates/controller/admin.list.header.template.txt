@@ -1,0 +1,4 @@
+'{key}'     => [
+    "type"  => "text",
+    "label" => trans('{translationsLocation}.{key}'),
+],

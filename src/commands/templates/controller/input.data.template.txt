@@ -1,0 +1,1 @@
+array_set($data, 'record.{key}', array_get($_data, '{key}'));

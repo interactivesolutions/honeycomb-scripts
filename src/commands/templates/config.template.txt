@@ -1,4 +1,8 @@
 {
+    "general":
+    {
+        "serviceProviderNameSpace": "{serviceProviderNameSpace}"
+    },
     "formData":
     [
     ],
