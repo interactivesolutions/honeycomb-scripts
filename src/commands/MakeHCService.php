@@ -141,6 +141,7 @@ class MakeHCService extends HCCommand
             $item->directory = '';
             $item->rootDirectory = './';
             $item->translationsLocation = $item->translationFilePrefix;
+            $item->pacakgeService = false;
         } else
         {
             $item->directory .= '/';
@@ -262,7 +263,7 @@ class MakeHCService extends HCCommand
 
         if (!empty($service->database))
         {
-            $tpl = $this->file->get(__DIR__ . '/templates/helpers/array.element.template.txt');
+            $tpl = $this->file->get(__DIR__ . '/templates/shared/array.element.template.txt');
 
             foreach ($service->database as $tableName => $model)
                 if (array_key_exists('columns', $model) && !empty($model->columns))
@@ -366,7 +367,7 @@ class MakeHCService extends HCCommand
                 "serviceNameDotted"    => $this->stringWithDash($serviceData->translationFilePrefix),
                 "controllerNameDotted" => $serviceData->serviceRouteName,
                 "adminListHeader"      => $this->getAdminListHeader($serviceData),
-                "createFunction"       => replaceBrackets($this->file->get(__DIR__ . '/templates/helpers/create.template.txt'),
+                "createFunction"       => replaceBrackets($this->file->get(__DIR__ . '/templates/controller/create.function.template.txt'),
                     [
                         "validationFormName" => $serviceData->validationFormName,
                         "modelName"          => $serviceData->mainModelName,
@@ -392,7 +393,7 @@ class MakeHCService extends HCCommand
         $output = "";
         $model = null;
 
-        $tpl = $this->file->get(__DIR__ . '/templates/helpers/admin.list.header.template.txt');
+        $tpl = $this->file->get(__DIR__ . '/templates/controller/admin.list.header.template.txt');
 
         foreach ($serviceData->database as $tableData)
         {
@@ -516,7 +517,7 @@ class MakeHCService extends HCCommand
 
         if (!empty($serviceData->database))
         {
-            $tpl = $this->file->get(__DIR__ . '/templates/helpers/input.data.template.txt');
+            $tpl = $this->file->get(__DIR__ . '/templates/controller/input.data.template.txt');
 
             foreach ($serviceData->database as $tableName => $model)
                 if (array_key_exists('columns', $model) && !empty($model->columns) && $model->default)
@@ -588,7 +589,7 @@ class MakeHCService extends HCCommand
 
         if (!empty($serviceData->database))
         {
-            $tpl = $this->file->get(__DIR__ . '/templates/helpers/array.element.template.txt');
+            $tpl = $this->file->get(__DIR__ . '/templates/shared/array.element.template.txt');
 
             foreach ($serviceData->database as $tableName => $model)
                 if (array_key_exists('columns', $model) && !empty($model->columns) && $model->default)
