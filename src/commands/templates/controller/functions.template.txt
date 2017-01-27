@@ -67,3 +67,55 @@
     {
         {modelName}::whereIn('id', $list)->restore();
     }
+
+    /**
+    * @return mixed
+    */
+    public function getDataAPI()
+    {
+        $with = [];
+        $select = {modelName}::getFillableFields();
+
+        $list = {modelName}::with($with)->select($select)
+        // add filters
+        ->where(function ($query) use ($select) {
+            $query->where($this->getRequestPrams($select));
+        });
+
+        $list = $this->checkForDeleted($list);
+
+        // add search items
+        $list = $this->listSearch($list);
+
+        $orderData = request->get('_order');
+
+        if ($orderData)
+            foreach($orderData as $column => $direction)
+                $list = $list->orderBy($column, $direction);
+
+        // setOrdering
+        $list = $list->orderBy($this->field, $this->ordering);
+
+        return $list->paginate($this->recordsPerPage)->toArray();
+    }
+
+    /**
+    * List search elements
+
+    * @param $list
+    * @return mixed
+    */
+    protected function listSearch($list)
+    {
+        if(request()->has('q'))
+        {
+            $parameter = request()->input('q');
+
+            $list = $list->where(function ($query) use ($parameter)
+            {
+                $query{searchableFields};
+            });
+        }
+
+        return $list;
+    }

@@ -1,0 +1,1 @@
+->orWhere('{key}', 'LIKE', '%' . $parameter . '%')

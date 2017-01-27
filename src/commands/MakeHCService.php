@@ -376,6 +376,7 @@ class MakeHCService extends HCCommand
                 "inputData"            => $this->getInputData($serviceData),
                 "useFiles"             => $this->getUseFiles($serviceData),
                 "mainModelName"        => $serviceData->mainModelName,
+                "searchableFields"     => $this->getSearchableFields($serviceData),
             ],
         ]);
 
@@ -390,26 +391,22 @@ class MakeHCService extends HCCommand
      */
     private function getAdminListHeader($serviceData)
     {
-        $output = "";
+        $output = '';
         $model = null;
 
         $tpl = $this->file->get(__DIR__ . '/templates/controller/admin.list.header.template.txt');
 
-        foreach ($serviceData->database as $tableData)
-        {
-            if (isset($tableData->default))
-                $model = $tableData;
-        }
+        $model = $this->getDefaultTable($serviceData->database);
 
         if ($model == null)
             $this->abort('No default table for service');
 
-        $ignoreFields = array_merge($this->autoFill, ['id']);
+        $skip = array_merge($this->autoFill, ['id']);
 
         if (array_key_exists('columns', $model) && !empty($model->columns))
             foreach ($model->columns as $column)
             {
-                if (in_array($column->Field, $ignoreFields))
+                if (in_array($column->Field, $skip))
                     continue;
 
                 $field = str_replace('{key}', $column->Field, $tpl);
@@ -512,7 +509,7 @@ class MakeHCService extends HCCommand
      */
     private function getInputData($serviceData)
     {
-        $output = "";
+        $output = '';
         $skip = array_merge($this->autoFill, ['id']);
 
         if (!empty($serviceData->database))
@@ -545,7 +542,7 @@ class MakeHCService extends HCCommand
         $list = [];
         $list[] = [
             "nameSpace" => $serviceData->modelNamespace,
-            "name"      => $serviceData->database[0]->modelName,
+            "name"      => $this->getDefaultTable($serviceData->database)->modelName,
         ];
 
         $list[] = [
@@ -584,7 +581,7 @@ class MakeHCService extends HCCommand
      */
     private function getRules($serviceData)
     {
-        $output = "";
+        $output = '';
         $skip = array_merge($this->autoFill, ['id']);
 
         if (!empty($serviceData->database))
@@ -609,6 +606,57 @@ class MakeHCService extends HCCommand
         }
 
         return $output;
+    }
+
+    /**
+     * Get searchable fields from model data
+     *
+     * @param $serviceData
+     * @return string
+     */
+    private function getSearchableFields($serviceData)
+    {
+        $output = '';
+
+        $model = $this->getDefaultTable($serviceData->database);
+
+        $whereTpl = $this->file->get(__DIR__ . '/templates/shared/where.template.txt');
+        $orWhereTpl = $this->file->get(__DIR__ . '/templates/shared/or.where.template.txt');
+
+        if (array_key_exists('columns', $model) && !empty($model->columns))
+        {
+            $skip = array_merge($this->autoFill, ['id']);
+
+            foreach ($model->columns as $index => $column)
+            {
+                if (in_array($column->Field, $skip))
+                    continue;
+
+                if ($output == '')
+                    $output .= str_replace('{key}', $column->Field, $whereTpl);
+                else
+                    $output .= str_replace('{key}', $column->Field, $orWhereTpl);
+
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * Getting default database table
+     *
+     * @param $database
+     */
+    private function getDefaultTable($database)
+    {
+        foreach ($database as $tableData)
+        {
+            if (isset($tableData->default))
+                $model = $tableData;
+        }
+
+        return $model;
     }
 }
 
