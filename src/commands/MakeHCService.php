@@ -373,6 +373,12 @@ class MakeHCService extends HCCommand
                         "modelName"          => $serviceData->mainModelName,
                         "modelNameSpace"     => $serviceData->modelNamespace,
                     ]),
+                "updateFunction"       => replaceBrackets($this->file->get(__DIR__ . '/templates/controller/update.function.template.txt'),
+                    [
+                        "validationFormName" => $serviceData->validationFormName,
+                        "modelName"          => $serviceData->mainModelName,
+                        "modelNameSpace"     => $serviceData->modelNamespace,
+                    ]),
                 "inputData"            => $this->getInputData($serviceData),
                 "useFiles"             => $this->getUseFiles($serviceData),
                 "mainModelName"        => $serviceData->mainModelName,

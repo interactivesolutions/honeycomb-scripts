@@ -53,6 +53,8 @@ class {controllerName} extends HCBaseController
 
     {createFunction}
 
+    {updateFunction}
+
     /**
      * Getting user data on POST call
      *
