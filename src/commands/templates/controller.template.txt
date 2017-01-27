@@ -14,7 +14,7 @@ class {controllerName} extends HCBaseController
     {
         $config = [
             'title'       => trans('{translationsLocation}.page_title'),
-            'listURL'     => route('admin.api.{controllerNameDotted}}'),
+            'listURL'     => route('admin.api.{controllerNameDotted}'),
             'newFormUrl'  => route('admin.api.form-manager', ['{serviceNameDotted}-new']),
             'editFormUrl' => route('admin.api.form-manager', ['{serviceNameDotted}-edit']),
             'imagesUrl'   => route('resource.get', ['/']),

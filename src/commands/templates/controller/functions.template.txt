@@ -71,7 +71,7 @@
     /**
     * @return mixed
     */
-    public function getDataAPI()
+    public function listData()
     {
         $with = [];
         $select = {modelName}::getFillableFields();
@@ -87,7 +87,7 @@
         // add search items
         $list = $this->listSearch($list);
 
-        $orderData = request->get('_order');
+        $orderData = request()->input('_order');
 
         if ($orderData)
             foreach($orderData as $column => $direction)
