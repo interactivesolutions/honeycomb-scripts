@@ -40,7 +40,7 @@ class MakeHCPackage extends HCCommand
         $packageDirectory = $this->choice('Please select package directory', $directoryList);
         $packageOfficialName = str_replace('packages/', '', $packageDirectory);
         $nameSpace = $this->stringOnly(str_replace('/', '\\', $packageOfficialName));
-        $composerNameSpace = str_replace('\\', '\\\\', $packageOfficialName . '\\');
+        $composerNameSpace = str_replace(['\\', '/'], '\\\\', $packageOfficialName . '\\');
 
         $packageName = $this->ask('Please enter package name');
 
@@ -72,12 +72,12 @@ class MakeHCPackage extends HCCommand
 
         $this->createFileFromTemplate([
             "destination"         => $packageDirectory . '/src/app/Http/helpers.php',
-            "templateDestination" => __DIR__ . '/templates/empty.template.txt',
+            "templateDestination" => __DIR__ . '/templates/shared/empty.template.txt',
         ]);
 
         $this->createFileFromTemplate([
             "destination"         => $packageDirectory . '/src/app/honeycomb/routes.php',
-            "templateDestination" => __DIR__ . '/templates/empty.template.txt',
+            "templateDestination" => __DIR__ . '/templates/shared/empty.template.txt',
         ]);
 
         $this->createFileFromTemplate([
@@ -104,7 +104,7 @@ class MakeHCPackage extends HCCommand
             "content"             => [
                 "packageName"      => $packageName,
                 "nameSpace"        => $nameSpace . '\Providers',
-                "nameSpaceGeneral" => $nameSpace,
+                "nameSpaceGeneral" => $nameSpace . '\Http\Controllers',
             ],
         ]);
 
@@ -114,7 +114,7 @@ class MakeHCPackage extends HCCommand
         if (App::environment() == 'local')
         {
             $this->comment('Please add to composer.json under "psr-4":');
-            $this->info('"' . $composerNameSpace . '":"' . $packageDirectory . '/src/"');
+            $this->info('"' . $composerNameSpace . '": "' . $packageDirectory . '/src/"');
             $this->comment('');
         }
 
