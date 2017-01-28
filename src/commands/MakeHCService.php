@@ -78,7 +78,7 @@ class MakeHCService extends HCCommand
         //dd($serviceData);
 
         $this->createTranslations($serviceData);
-        $this->createModels($serviceData);
+        $this->createmodels($serviceData);
         $this->createController($serviceData);
         $this->createFormValidator($serviceData);
         $this->createRoutes($serviceData);
@@ -154,7 +154,7 @@ class MakeHCService extends HCCommand
         $item->controllerName = $item->serviceName . 'Controller';
 
         // creating name space from service URL
-        $item->controllerNamespace = str_replace('/', '\\', $item->directory . 'App\Http\Controllers\\' . str_replace('-', '', $item->serviceURL));
+        $item->controllerNamespace = str_replace('/', '\\', $item->directory . 'App\http\controllers\\' . str_replace('-', '', $item->serviceURL));
 
         if ($item->pacakgeService)
             $item->controllerNamespace = str_replace('App\\', '', $item->controllerNamespace);
@@ -167,16 +167,16 @@ class MakeHCService extends HCCommand
         $item->controllerNameForRoutes = str_replace('/', '\\\\', $this->createItemDirectoryPath(str_replace('-', '', $item->serviceURL)) . '\\\\' . $item->controllerName);
 
         // creating controller directory
-        $item->controllerDestination = $this->createItemDirectoryPath($item->rootDirectory . 'app/Http/Controllers/' . str_replace('-', '/', $item->serviceURL));
+        $item->controllerDestination = $this->createItemDirectoryPath($item->rootDirectory . 'app/http/controllers/' . str_replace('-', '/', $item->serviceURL));
 
         // creating models directory
-        $item->modelDirectory = str_replace('/Http/Controllers', '/Models', $item->controllerDestination);
-        $item->modelNamespace = str_replace('\\Http\\Controllers', '\\Models', $item->controllerNamespace);
+        $item->modelDirectory = str_replace('/http/controllers', '/models', $item->controllerDestination);
+        $item->modelNamespace = str_replace('\\http\\controllers', '\\models', $item->controllerNamespace);
 
         // creating form validator data
         $item->validationFormName = $item->serviceName . 'Form';
-        $item->validationFormNameSpace = str_replace('\\Http\\Controllers', '\\Forms', $item->controllerNamespace);
-        $item->validationFormDestination = str_replace('/Http/Controllers', '/Forms', $item->controllerDestination) . '/' . $item->validationFormName . '.php';
+        $item->validationFormNameSpace = str_replace('\\http\\controllers', '\\forms', $item->controllerNamespace);
+        $item->validationFormDestination = str_replace('/http/controllers', '/forms', $item->controllerDestination) . '/' . $item->validationFormName . '.php';
 
         // finalizing destination
         $item->controllerDestination .= '/' . $item->controllerName . '.php';
@@ -284,7 +284,7 @@ class MakeHCService extends HCCommand
      * @param $item
      * @internal param $modelData
      */
-    private function createModels($item)
+    private function createmodels($item)
     {
         $modelData = $item->database;
         $tableList = [];
@@ -517,7 +517,7 @@ class MakeHCService extends HCCommand
             $tpl = $this->file->get(__DIR__ . '/templates/controller/input.data.template.txt');
 
             foreach ($serviceData->database as $tableName => $model)
-                if (array_key_exists('columns', $model) && !empty($model->columns) && $model->default)
+                if (array_key_exists('columns', $model) && !empty($model->columns) && isset($model->default))
                     foreach ($model->columns as $column)
                     {
                         if (in_array($column->Field, $skip))
@@ -589,7 +589,7 @@ class MakeHCService extends HCCommand
             $tpl = $this->file->get(__DIR__ . '/templates/shared/array.element.template.txt');
 
             foreach ($serviceData->database as $tableName => $model)
-                if (array_key_exists('columns', $model) && !empty($model->columns) && $model->default)
+                if (array_key_exists('columns', $model) && !empty($model->columns) && isset($model->default))
                     foreach ($model->columns as $column)
                     {
                         if (in_array($column->Field, $skip))

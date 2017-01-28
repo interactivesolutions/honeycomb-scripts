@@ -52,6 +52,7 @@ class MakeHCProject extends HCCommand
             // creating files and folders
             $this->createDirectory('app/http/controllers');
             $this->createDirectory('app/http/console');
+            $this->createDirectory('app/http/console/controllers');
             $this->createDirectory('app/models');
             $this->createDirectory('app/routes');
             $this->createDirectory('app/honeycomb');

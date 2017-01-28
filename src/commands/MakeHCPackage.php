@@ -46,16 +46,16 @@ class MakeHCPackage extends HCCommand
 
         $this->createDirectory($packageDirectory . '/src');
         $this->createDirectory($packageDirectory . '/src/app/');
-        $this->createDirectory($packageDirectory . '/src/app/Console');
-        $this->createDirectory($packageDirectory . '/src/app/Exceptions');
+        $this->createDirectory($packageDirectory . '/src/app/console');
+        $this->createDirectory($packageDirectory . '/src/app/console/commands');
+        $this->createDirectory($packageDirectory . '/src/app/exceptions');
         $this->createDirectory($packageDirectory . '/src/app/honeycomb');
-        $this->createDirectory($packageDirectory . '/src/app/Http');
-        $this->createDirectory($packageDirectory . '/src/app/Http/Console');
-        $this->createDirectory($packageDirectory . '/src/app/Http/Controllers');
-        $this->createDirectory($packageDirectory . '/src/app/Http/Middleware');
-        $this->createDirectory($packageDirectory . '/src/app/Models');
-        $this->createDirectory($packageDirectory . '/src/app/Providers');
-        $this->createDirectory($packageDirectory . '/src/app/Routes');
+        $this->createDirectory($packageDirectory . '/src/app/http');
+        $this->createDirectory($packageDirectory . '/src/app/http/controllers');
+        $this->createDirectory($packageDirectory . '/src/app/http/middleware');
+        $this->createDirectory($packageDirectory . '/src/app/models');
+        $this->createDirectory($packageDirectory . '/src/app/providers');
+        $this->createDirectory($packageDirectory . '/src/app/routes');
 
         $this->createDirectory($packageDirectory . '/src/database');
         $this->createDirectory($packageDirectory . '/src/database/migrations');
@@ -71,7 +71,7 @@ class MakeHCPackage extends HCCommand
         $this->createDirectory($packageDirectory . '/src/tests');
 
         $this->createFileFromTemplate([
-            "destination"         => $packageDirectory . '/src/app/Http/helpers.php',
+            "destination"         => $packageDirectory . '/src/app/http/helpers.php',
             "templateDestination" => __DIR__ . '/templates/shared/empty.template.txt',
         ]);
 
@@ -99,12 +99,12 @@ class MakeHCPackage extends HCCommand
         ]);
 
         $this->createFileFromTemplate([
-            "destination"         => $packageDirectory . '/src/app/Providers/' . $packageName . 'ServiceProvider.php',
+            "destination"         => $packageDirectory . '/src/app/providers/' . $packageName . 'ServiceProvider.php',
             "templateDestination" => __DIR__ . '/templates/service.provider.template.txt',
             "content"             => [
                 "packageName"      => $packageName,
-                "nameSpace"        => $nameSpace . '\Providers',
-                "nameSpaceGeneral" => $nameSpace . '\Http\Controllers',
+                "nameSpace"        => $nameSpace . '\providers',
+                "nameSpaceGeneral" => $nameSpace . '\http\controllers',
             ],
         ]);
 
@@ -119,7 +119,7 @@ class MakeHCPackage extends HCCommand
         }
 
         $this->comment('Please add to config/app.php under "providers":');
-        $this->info($nameSpace . '\Providers\\' . $packageName . 'ServiceProvider::class');
+        $this->info($nameSpace . '\providers\\' . $packageName . 'ServiceProvider::class');
 
         $this->comment('********************************************************');
 
