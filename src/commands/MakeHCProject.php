@@ -56,6 +56,7 @@ class MakeHCProject extends HCCommand
             $this->createDirectory('app/models');
             $this->createDirectory('app/routes');
             $this->createDirectory('app/honeycomb');
+            $this->createDirectory('_automate');
 
             $this->createFileFromTemplate([
                 "destination"         => 'app/http/console/Kernel.php',
@@ -77,6 +78,11 @@ class MakeHCProject extends HCCommand
                     [
                         "routesBasePath" => GenerateRoutes::ROUTES_PATH,
                     ],
+            ]);
+
+            $this->createFileFromTemplate([
+                "destination"         => "_automate/example.json",
+                "templateDestination" => __DIR__ . '/templates/automate.config.template.txt',
             ]);
 
             $this->file->put(GenerateRoutes::ROUTES_PATH, '');

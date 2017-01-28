@@ -1,0 +1,17 @@
+{
+    "directory":"",
+    "serviceURL":"",
+    "serviceName":"",
+    "database":
+    [
+        {
+            "tableName":"",
+            "modelName":"",
+            "default":1
+        },
+        {
+            "tableName":"",
+            "modelName":""
+        }
+    ]
+}
