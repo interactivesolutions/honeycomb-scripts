@@ -83,8 +83,7 @@ class MakeHCPackage extends HCCommand
         $this->createFileFromTemplate([
             "destination"         => $packageDirectory . '/src/app/honeycomb/config.json',
             "templateDestination" => __DIR__ . '/templates/config.template.txt',
-            "content" =>
-            [
+            "content"             => [
                 "serviceProviderNameSpace" => $packageName
             ]
         ]);

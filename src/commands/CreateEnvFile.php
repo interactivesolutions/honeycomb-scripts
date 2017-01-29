@@ -37,8 +37,7 @@ class CreateEnvFile extends HCCommand
         $this->welcomeMessage();
         $this->info("Environment configuration:");
 
-        //delete file
-        exec('rm .env');
+        if (file_exists('.env')) { unlink('.env'); }
 
         $this->configureEnvironment();
 
@@ -56,8 +55,7 @@ class CreateEnvFile extends HCCommand
      */
     protected function welcomeMessage()
     {
-        echo shell_exec('clear');
-
+        $this->comment('');
         $this->comment('**************************************************');
         $this->comment(' Welcome to HoneyComb CMS initial configuration!!!');
         $this->comment('**************************************************');

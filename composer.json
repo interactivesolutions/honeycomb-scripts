@@ -1,7 +1,7 @@
 {
   "name": "interactivesolutions/honeycomb-scripts",
   "description": "HoneyComb CMS scripts package",
-  "keywords": ["honeycomb", "honey", "laravel", "scripts", "automatisation"],
+  "keywords": ["honeycomb", "honey", "laravel", "scripts", "automation"],
   "licence": "MIT",
   "authors": [
     {

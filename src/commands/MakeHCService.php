@@ -51,7 +51,6 @@ class MakeHCService extends HCCommand
      */
     public function handle()
     {
-        echo shell_exec('clear');
         $this->loadConfiguration();
 
         foreach ($this->configurationData as $serviceData)
@@ -69,13 +68,12 @@ class MakeHCService extends HCCommand
      */
     private function createService($serviceData)
     {
+        $this->comment('');
         $this->comment('*************************************');
         $this->comment('*         Service creation          *');
         $this->comment('*************************************');
         $this->comment($serviceData->serviceName);
         $this->comment('*************************************');
-
-        //dd($serviceData);
 
         $this->createTranslations($serviceData);
         $this->createmodels($serviceData);
@@ -142,8 +140,7 @@ class MakeHCService extends HCCommand
             $item->rootDirectory = './';
             $item->translationsLocation = $item->translationFilePrefix;
             $item->pacakgeService = false;
-        } else
-        {
+        } else {
             $item->directory .= '/';
             $item->rootDirectory = './packages/' . $item->directory . 'src/';
             $item->translationsLocation = json_decode($this->file->get($item->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH))->general->serviceProviderNameSpace . "::" . $item->translationFilePrefix;
@@ -242,10 +239,9 @@ class MakeHCService extends HCCommand
         $this->createFileFromTemplate([
             "destination"         => $service->rootDirectory . 'resources/lang/en/' . $service->translationFilePrefix . '.php',
             "templateDestination" => __DIR__ . '/templates/translations.template.txt',
-            "content"             =>
-                [
-                    "translations" => $this->gatherTranslations($service),
-                ],
+            "content"             => [
+                "translations" => $this->gatherTranslations($service),
+            ],
         ]);
 
         $this->createdFiles[] = $service->rootDirectory . 'resources/lang/en/' . $service->translationFilePrefix . '.php';
@@ -296,13 +292,12 @@ class MakeHCService extends HCCommand
             $this->createFileFromTemplate([
                 "destination"         => $model->modelLocation,
                 "templateDestination" => __DIR__ . '/templates/model.template.txt',
-                "content"             =>
-                    [
-                        "modelNameSpace"  => $item->modelNamespace,
-                        "modelName"       => $model->modelName,
-                        "columnsFillable" => $this->getColumnsFillable($model->columns),
-                        "modelTable"      => $model->tableName,
-                    ],
+                "content"             => [
+                    "modelNameSpace"  => $item->modelNamespace,
+                    "modelName"       => $model->modelName,
+                    "columnsFillable" => $this->getColumnsFillable($model->columns),
+                    "modelTable"      => $model->tableName,
+                ],
             ]);
 
             $this->createdFiles[] = $model->modelLocation;
@@ -428,13 +423,12 @@ class MakeHCService extends HCCommand
         $this->createFileFromTemplate([
             "destination"         => $serviceData->routesDestination,
             "templateDestination" => __DIR__ . '/templates/routes.template.txt',
-            "content"             =>
-                [
-                    "serviceURL"           => $serviceData->serviceURL,
-                    "controllerNameDotted" => $serviceData->serviceRouteName,
-                    "acl_prefix"           => $serviceData->aclPrefix,
-                    "controllerName"       => $serviceData->controllerNameForRoutes,
-                ],
+            "content"             => [
+                "serviceURL"           => $serviceData->serviceURL,
+                "controllerNameDotted" => $serviceData->serviceRouteName,
+                "acl_prefix"           => $serviceData->aclPrefix,
+                "controllerName"       => $serviceData->controllerNameForRoutes,
+            ],
         ]);
 
         if ($serviceData->rootDirectory != './')
@@ -456,14 +450,13 @@ class MakeHCService extends HCCommand
         $servicePermissions = [
             "name"       => "admin." . $serviceData->serviceRouteName,
             "controller" => $serviceData->controllerNamespace . '\\' . $serviceData->controllerName,
-            "actions"    =>
-                [
-                    $serviceData->aclPrefix . "_list",
-                    $serviceData->aclPrefix . "_create",
-                    $serviceData->aclPrefix . "_update",
-                    $serviceData->aclPrefix . "_delete",
-                    $serviceData->aclPrefix . "_force_delete",
-                ],
+            "actions"    => [
+                $serviceData->aclPrefix . "_list",
+                $serviceData->aclPrefix . "_create",
+                $serviceData->aclPrefix . "_update",
+                $serviceData->aclPrefix . "_delete",
+                $serviceData->aclPrefix . "_force_delete",
+            ],
         ];
 
         $contentChanged = false;
@@ -477,8 +470,7 @@ class MakeHCService extends HCCommand
                     $contentChanged = true;
                     $value = $servicePermissions;
                     break;
-                } else
-                {
+                } else {
                     $this->abort('Can not override existing configuration. Aborting...');
 
                     return null;
@@ -564,12 +556,11 @@ class MakeHCService extends HCCommand
         $this->createFileFromTemplate([
             "destination"         => $serviceData->validationFormDestination,
             "templateDestination" => __DIR__ . '/templates/validation.form.template.txt',
-            "content"             =>
-                [
-                    "validationFormNameSpace" => $serviceData->validationFormNameSpace,
-                    "validationFormName"      => $serviceData->validationFormName,
-                    "formRules"               => $this->getRules($serviceData),
-                ],
+            "content"             => [
+                "validationFormNameSpace" => $serviceData->validationFormNameSpace,
+                "validationFormName"      => $serviceData->validationFormName,
+                "formRules"               => $this->getRules($serviceData),
+            ],
         ]);
 
         $this->createdFiles[] = $serviceData->routesDestination;
