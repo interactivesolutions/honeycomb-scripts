@@ -3,6 +3,8 @@
 namespace interactivesolutions\honeycombscripts\commands;
 
 use interactivesolutions\honeycombcore\commands\HCCommand;
+use League\Flysystem\Exception;
+use Symfony\Component\HttpFoundation\Tests\JsonSerializableObject;
 
 class MakeHCProject extends HCCommand
 {
@@ -39,52 +41,63 @@ class MakeHCProject extends HCCommand
 
         if ($confirm)
         {
-            // deleting files and folders
-            $this->deleteDirectory('app/http/controllers', true);
-            $this->deleteDirectory('app/http/console', true);
-            $this->deleteDirectory('app/honeycomb', true);
-            $this->deleteDirectory('app/models', true);
-            $this->deleteDirectory('app/routes', true);
-            $this->deleteDirectory('routes', true);
+            try {
+                // deleting files and folders
+                $version = substr(app()::VERSION, 0, strrpos(app()::VERSION, "."));
+                if (!file_exists(__DIR__.'/templates/config.'.$version.'/cleanup.json')) {
+                    $this->error('Missing configuration file for laravel version '. app()::VERSION);
+                    dd();
+                }
+                $json = json_decode($this->file->get(__DIR__.'/templates/config.'.$version.'/cleanup.json'), true);
+                foreach($json['remove_folders'] as $location) {
+                    $this->info('Deleting folder: '. $location);
+                    $this->deleteDirectory($location, true);
+                }
+                foreach($json['remove_files'] as $location) {
+                    $this->info('Deleting file: '. $location);
+                    $this->file->delete($location);
+                }
 
-            $this->file->delete('app/Providers/RouteServiceProvider.php');
+                foreach($json['create_folders'] as $location) {
+                    $this->info('Creating folder: ' . $location);
+                    $this->createDirectory($location);
+                }
 
-            // creating files and folders
-            $this->createDirectory('app/http/controllers');
-            $this->createDirectory('app/http/console');
-            $this->createDirectory('app/http/console/controllers');
-            $this->createDirectory('app/models');
-            $this->createDirectory('app/routes');
-            $this->createDirectory('app/honeycomb');
-            $this->createDirectory('_automate');
+                $this->createFileFromTemplate([
+                    "destination" => 'app/http/console/Kernel.php',
+                    "templateDestination" => __DIR__ . '/templates/app.console.kernel.template.txt',
+                ]);
 
-            $this->createFileFromTemplate([
-                "destination"         => 'app/http/console/Kernel.php',
-                "templateDestination" => __DIR__ . '/templates/app.console.kernel.template.txt',
-            ]);
+                $this->createFileFromTemplate([
+                    "destination" => 'app/' . MakeHCService::CONFIG_PATH,
+                    "templateDestination" => __DIR__ . '/templates/config.template.txt',
+                    "content" => [
+                        "serviceProviderNameSpace" => "",
+                    ],
+                ]);
 
-            $this->createFileFromTemplate([
-                "destination"         => 'app/' . MakeHCService::CONFIG_PATH,
-                "templateDestination" => __DIR__ . '/templates/config.template.txt',
-                "content"             => [
-                    "serviceProviderNameSpace" => "",
-                ],
-            ]);
+                $this->createFileFromTemplate([
+                    "destination" => "app/providers/RouteServiceProvider.php",
+                    "templateDestination" => __DIR__ . '/templates/route.serviceprovider.template.txt',
+                    "content" => [
+                        "routesBasePath" => GenerateRoutes::ROUTES_PATH,
+                    ],
+                ]);
 
-            $this->createFileFromTemplate([
-                "destination"         => "app/providers/RouteServiceProvider.php",
-                "templateDestination" => __DIR__ . '/templates/route.serviceprovider.template.txt',
-                "content"             => [
-                    "routesBasePath" => GenerateRoutes::ROUTES_PATH,
-                ],
-            ]);
+                $this->createFileFromTemplate([
+                    "destination" => "_automate/example.json",
+                    "templateDestination" => __DIR__ . '/templates/automate.config.template.txt',
+                ]);
 
-            $this->createFileFromTemplate([
-                "destination"         => "_automate/example.json",
-                "templateDestination" => __DIR__ . '/templates/automate.config.template.txt',
-            ]);
-
-            $this->file->put(GenerateRoutes::ROUTES_PATH, '');
+                $this->file->put(GenerateRoutes::ROUTES_PATH, '');
+            } catch (Exception $e) {
+                $this->info('Error occurred!');
+                $this->info('Error code: '. $e->getCode());
+                $this->info('Error message: '. $e->getMessage());
+                $this->info('');
+                $this->info('Rolling back configuration.');
+                $this->abort('');
+            }
         }
     }
 }

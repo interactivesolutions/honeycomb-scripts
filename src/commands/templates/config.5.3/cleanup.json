@@ -1,0 +1,23 @@
+{
+  "remove_folders" : [
+    "app/http/controllers",
+    "app/http/console",
+    "app/honeycomb",
+    "app/models",
+    "app/routes",
+    "routes"
+  ],
+  "remove_files" : [
+    "app/Providers/RouteServiceProvider.php"
+  ],
+  "create_folders": [
+    "app/http/controllers",
+    "app/http/console",
+    "app/http/console/controllers",
+    "app/models",
+    "app/routes",
+    "app/honeycomb",
+    "_automate"
+  ]
+
+}
