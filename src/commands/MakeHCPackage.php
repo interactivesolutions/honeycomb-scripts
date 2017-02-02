@@ -40,7 +40,8 @@ class MakeHCPackage extends HCCommand
         $packageDirectory = $this->choice('Please select package directory', $directoryList);
         $packageOfficialName = str_replace('packages/', '', $packageDirectory);
         $nameSpace = $this->stringOnly(str_replace('/', '\\', $packageOfficialName));
-        $composerNameSpace = str_replace(['\\', '/'], '\\\\', $packageOfficialName . '\\');
+        $composerNameSpace = str_replace(['\\', '/'], '\\', $packageOfficialName . '\\');
+        $composerNameSpace = str_replace('-', '', $composerNameSpace);
 
         $packageName = $this->ask('Please enter package name');
 
@@ -112,9 +113,12 @@ class MakeHCPackage extends HCCommand
 
         if (App::environment() == 'local')
         {
-            $this->comment('Please add to composer.json under "psr-4":');
-            $this->info('"' . $composerNameSpace . '": "' . $packageDirectory . '/src/"');
-            $this->comment('');
+            $composer = json_decode($this->file->get('composer.json'));
+
+            if (!isset($composer->autoload->{'psr-4'}->{$composerNameSpace}))
+                $composer->autoload->{'psr-4'}->{$composerNameSpace} = $packageDirectory;
+
+            $this->file->put('composer.json', json_encode($composer, JSON_PRETTY_PRINT));
         }
 
         $this->comment('Please add to config/app.php under "providers":');

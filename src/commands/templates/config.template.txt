@@ -14,7 +14,7 @@
         "permissions" :
         [
         ],
-        "roles-actions" :
+        "rolesActions" :
         [
         ]
     }

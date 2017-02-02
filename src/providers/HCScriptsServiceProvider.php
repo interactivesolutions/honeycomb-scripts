@@ -8,6 +8,7 @@ use interactivesolutions\honeycombscripts\commands\MakeHCPackage;
 use interactivesolutions\honeycombscripts\commands\MakeHCService;
 use interactivesolutions\honeycombscripts\commands\GenerateRoutes;
 use interactivesolutions\honeycombscripts\commands\MakeHCProject;
+use interactivesolutions\honeycombscripts\commands\SeedHC;
 
 class HCScriptsServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,7 @@ class HCScriptsServiceProvider extends ServiceProvider
         MakeHCProject::class,
         MakeHCPackage::class,
         GenerateRoutes::class,
+        SeedHC::class,
     ];
 
     /**

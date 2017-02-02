@@ -2,6 +2,7 @@
     "directory":"",
     "serviceURL":"",
     "serviceName":"",
+    "generateMigrations":1,
     "database":
     [
         {
