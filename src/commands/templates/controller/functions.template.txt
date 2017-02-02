@@ -94,9 +94,6 @@
                 if (strtolower($direction) == 'asc' || strtolower($direction) == 'desc')
                     $list = $list->orderBy($column, $direction);
 
-        // setOrdering
-        $list = $list->orderBy($this->field, $this->ordering);
-
         return $list->paginate($this->recordsPerPage)->toArray();
     }
 
