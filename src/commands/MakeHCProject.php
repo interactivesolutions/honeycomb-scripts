@@ -64,7 +64,7 @@ class MakeHCProject extends HCCommand
                 }
 
                 $this->createFileFromTemplate([
-                    "destination" => 'app/http/console/Kernel.php',
+                    "destination" => 'app/Console/Kernel.php',
                     "templateDestination" => __DIR__ . '/templates/app.console.kernel.template.txt',
                 ]);
 

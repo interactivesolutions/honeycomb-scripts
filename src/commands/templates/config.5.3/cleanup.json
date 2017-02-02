@@ -12,8 +12,7 @@
   ],
   "create_folders": [
     "app/http/controllers",
-    "app/http/console",
-    "app/http/console/controllers",
+    "app/Console/controllers",
     "app/models",
     "app/routes",
     "app/honeycomb",
