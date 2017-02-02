@@ -76,7 +76,7 @@ class MakeHCService extends HCCommand
         $this->comment('*************************************');
 
         $this->createTranslations($serviceData);
-        $this->createmodels($serviceData);
+        $this->createModels($serviceData);
         $this->createController($serviceData);
         $this->createFormValidator($serviceData);
         $this->createRoutes($serviceData);
@@ -280,7 +280,7 @@ class MakeHCService extends HCCommand
      * @param $item
      * @internal param $modelData
      */
-    private function createmodels($item)
+    private function createModels($item)
     {
         $modelData = $item->database;
         $tableList = [];
@@ -303,7 +303,8 @@ class MakeHCService extends HCCommand
             $this->createdFiles[] = $model->modelLocation;
         }
 
-        $this->call('migrate:generate', ["--path" => $item->rootDirectory . 'database/migrations', "tables" => implode(",", $tableList)]);
+        if (isset($item->generateMigrations) && $item->generateMigrations)
+            $this->call('migrate:generate', ["--path" => $item->rootDirectory . 'database/migrations', "tables" => implode(",", $tableList)]);
     }
 
     /**
