@@ -448,6 +448,21 @@ class MakeHCService extends HCCommand
     private function updateConfiguration($serviceData)
     {
         $config = json_decode($this->file->get($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH));
+
+        $config = $this->updateActions($config, $serviceData);
+        $config = $this->updateRolesActions($config, $serviceData);
+
+        $this->file->put($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * Updating service actions
+     * @param $config
+     * @param $serviceData
+     * @return null
+     */
+    private function updateActions($config, $serviceData)
+    {
         $servicePermissions = [
             "name"       => "admin." . $serviceData->serviceRouteName,
             "controller" => $serviceData->controllerNamespace . '\\' . $serviceData->controllerName,
@@ -482,7 +497,32 @@ class MakeHCService extends HCCommand
         if (!$contentChanged)
             $config->acl->permissions = array_merge($config->acl->permissions, [$servicePermissions]);
 
-        $this->file->put($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
+        return $config;
+    }
+
+    /**
+     * Updating roles actions
+     *
+     * @param $config
+     * @param $serviceData
+     */
+    private function updateRolesActions($config, $serviceData)
+    {
+        $rolesActions = [
+            "project-admin" =>
+                [$serviceData->aclPrefix . "_list",
+                    $serviceData->aclPrefix . "_create",
+                    $serviceData->aclPrefix . "_update",
+                    $serviceData->aclPrefix . "_delete",
+                ]
+        ];
+
+        if (empty($config->acl->rolesActions))
+            $config->acl->rolesActions = $rolesActions;
+        else
+            $config->acl->rolesActions->{"project-admin"} = $rolesActions['project-admin'];
+
+        return $config;
     }
 
     /**
