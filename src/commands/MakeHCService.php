@@ -323,7 +323,7 @@ class MakeHCService extends HCCommand
                 array_push($names, $column->Field);
         }
 
-        return '[\'' . implode('\',\'', $names) . '\']';
+        return '[\'' . implode('\', \'', $names) . '\']';
     }
 
     /**
