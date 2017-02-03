@@ -8,7 +8,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['web', 'auth']], function ()
     {
         Route::get('{serviceURL}', ['as' => 'admin.api.{controllerNameDotted}', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@listData']);
         Route::get('{serviceURL}/search', ['as' => 'admin.api.{controllerNameDotted}.search', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@search']);
-        Route::get('{serviceURL}/{id}', ['as' => 'admin.api.{controllerNameDotted}.single', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@single']);
+        Route::get('{serviceURL}/{id}', ['as' => 'admin.api.{controllerNameDotted}.single', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@getSingleRecord']);
         Route::post('{serviceURL}/{id}/duplicate', ['as' => 'admin.api.{controllerNameDotted}.duplicate', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@duplicate']);
         Route::post('{serviceURL}/restore', ['as' => 'admin.api.{controllerNameDotted}.restore', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@restore']);
         Route::post('{serviceURL}/merge', ['as' => 'admin.api.{controllerNameDotted}.merge', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@merge']);
