@@ -520,7 +520,7 @@ class MakeHCService extends HCCommand
         if (empty($config->acl->rolesActions))
             $config->acl->rolesActions = $rolesActions;
         else
-            $config->acl->rolesActions->{"project-admin"} = $rolesActions['project-admin'];
+            $config->acl->rolesActions->{"project-admin"} = array_merge($config->acl->rolesActions->{"project-admin"}, $rolesActions['project-admin']);
 
         return $config;
     }
