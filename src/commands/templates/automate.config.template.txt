@@ -1,6 +1,7 @@
 {
     "directory":"",
     "serviceURL":"",
+    "serviceIcon":"square-o",
     "serviceName":"",
     "generateMigrations":1,
     "database":
