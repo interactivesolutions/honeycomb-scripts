@@ -3,6 +3,7 @@
 namespace interactivesolutions\honeycombscripts\commands;
 
 use interactivesolutions\honeycombcore\commands\HCCommand;
+use Nette\Reflection\AnnotationsParser;
 
 class SeedHC extends HCCommand
 {
@@ -25,8 +26,25 @@ class SeedHC extends HCCommand
      *
      * @return mixed
      */
-    public function handle()
+    public function handle ()
     {
-        //TODO find all HC packages available seeds and
+        $seeders = [];
+
+        foreach ($this->getSeederFiles() as $filePath)
+            $seeders = array_merge($seeders, array_keys(AnnotationsParser::parsePhp(file_get_contents($filePath))));
+
+        foreach ($seeders as $class)
+            $this->call('db:seed',["--class" => $class]);
+
+    }
+
+    /**
+     * Scan folders for honeycomb seeder files
+     *
+     * @return array
+     */
+    protected function getSeederFiles ()
+    {
+        return array_merge ($this->file->glob (__DIR__ . '/../../../../*/*/*/database/seeds/DatabaseSeeder.php'));
     }
 }
