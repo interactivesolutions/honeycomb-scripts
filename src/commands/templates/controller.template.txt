@@ -21,19 +21,19 @@ class {controllerName} extends HCBaseController
             'headers'     => $this->getAdminListHeader(),
         ];
 
-        if ($this->user->can('{acl_prefix}_create'))
+        if ($this->user()->can('{acl_prefix}_create'))
             $config['actions'][] = 'new';
 
-        if ($this->user->can('{acl_prefix}_update'))
+        if ($this->user()->can('{acl_prefix}_update'))
         {
             $config['actions'][] = 'update';
             $config['actions'][] = 'restore';
         }
 
-        if ($this->user->can('{acl_prefix}_delete'))
+        if ($this->user()->can('{acl_prefix}_delete'))
             $config['actions'][] = 'delete';
 
-        if ($this->user->can('{acl_prefix}_search'))
+        if ($this->user()->can('{acl_prefix}_search'))
             $config['actions'][] = 'search';
 
         return view('HCCoreUI::admin.content.list', ['config' => $config]);
