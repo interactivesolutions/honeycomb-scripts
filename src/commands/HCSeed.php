@@ -5,14 +5,14 @@ namespace interactivesolutions\honeycombscripts\commands;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 use Nette\Reflection\AnnotationsParser;
 
-class SeedHC extends HCCommand
+class HCSeed extends HCCommand
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'seed:hc';
+    protected $signature = 'hc:seed';
 
     /**
      * The console command description.
@@ -45,6 +45,6 @@ class SeedHC extends HCCommand
      */
     protected function getSeederFiles ()
     {
-        return array_merge ($this->file->glob (__DIR__ . '/../../../../*/*/*/database/seeds/DatabaseSeeder.php'));
+        return array_merge ($this->file->glob (__DIR__ . '/../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
     }
 }
