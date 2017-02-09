@@ -28,9 +28,14 @@ class MakeHCPackage extends HCCommand
      */
     public function handle()
     {
-        $this->createDirectory('packages');
+        $version = substr (app ()::VERSION, 0, strrpos (app ()::VERSION, "."));
 
-        $this->info('An active repository required!');
+        if (!file_exists (__DIR__ . '/templates/config.' . $version . '/package.json'))
+            $this->abort ('Missing package configuration file for laravel version ' . $version);
+
+        $json = json_decode ($this->file->get (__DIR__ . '/templates/config.' . $version . '/package.json'), true);
+
+        $this->createDirectory('packages');
 
         $directoryList = [];
 
@@ -45,31 +50,10 @@ class MakeHCPackage extends HCCommand
 
         $packageName = $this->ask('Please enter package name');
 
-        $this->createDirectory($packageDirectory . '/src');
-        $this->createDirectory($packageDirectory . '/src/app/');
-        $this->createDirectory($packageDirectory . '/src/app/console');
-        $this->createDirectory($packageDirectory . '/src/app/console/commands');
-        $this->createDirectory($packageDirectory . '/src/app/exceptions');
-        $this->createDirectory($packageDirectory . '/src/app/honeycomb');
-        $this->createDirectory($packageDirectory . '/src/app/http');
-        $this->createDirectory($packageDirectory . '/src/app/http/controllers');
-        $this->createDirectory($packageDirectory . '/src/app/http/middleware');
-        $this->createDirectory($packageDirectory . '/src/app/models');
-        $this->createDirectory($packageDirectory . '/src/app/providers');
-        $this->createDirectory($packageDirectory . '/src/app/routes');
-
-        $this->createDirectory($packageDirectory . '/src/database');
-        $this->createDirectory($packageDirectory . '/src/database/migrations');
-        $this->createDirectory($packageDirectory . '/src/database/seeds');
-        $this->createDirectory($packageDirectory . '/src/public');
-        $this->createDirectory($packageDirectory . '/src/public/css');
-        $this->createDirectory($packageDirectory . '/src/public/js');
-
-        $this->createDirectory($packageDirectory . '/src/resources');
-        $this->createDirectory($packageDirectory . '/src/resources/lang');
-        $this->createDirectory($packageDirectory . '/src/resources/lang/en');
-        $this->createDirectory($packageDirectory . '/src/resources/views');
-        $this->createDirectory($packageDirectory . '/src/tests');
+        foreach ($json['create_folders'] as $location) {
+            $this->info ('Creating folder: ' . $packageDirectory . '/src/' . $location);
+            $this->createDirectory ($location);
+        }
 
         $this->createFileFromTemplate([
             "destination"         => $packageDirectory . '/src/app/http/helpers.php',
@@ -105,6 +89,14 @@ class MakeHCPackage extends HCCommand
                 "packageName"      => $packageName,
                 "nameSpace"        => $nameSpace . '\providers',
                 "nameSpaceGeneral" => $nameSpace . '\http\controllers',
+            ],
+        ]);
+
+        $this->createFileFromTemplate([
+            "destination"         => $packageDirectory . '/src/database/seeds/HoneyCombDatabaseSeeder.php',
+            "templateDestination" => __DIR__ . '/templates/database.seeder.template.txt',
+            "content"             => [
+                "nameSpace"        => $nameSpace,
             ],
         ]);
 

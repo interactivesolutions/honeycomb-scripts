@@ -1,0 +1,27 @@
+{
+  "create_folders": [
+    "src",
+    "src/app/",
+    "src/app/console",
+    "src/app/console/commands",
+    "src/app/exceptions",
+    "src/app/honeycomb",
+    "src/app/http",
+    "src/app/http/controllers",
+    "src/app/http/middleware",
+    "src/app/models",
+    "src/app/providers",
+    "src/app/routes",
+    "src/database",
+    "src/database/migrations",
+    "src/database/seeds",
+    "src/public",
+    "src/public/css",
+    "src/public/js",
+    "src/resources",
+    "src/resources/lang",
+    "src/resources/lang/en",
+    "src/resources/views",
+    "src/tests"
+  ]
+}
