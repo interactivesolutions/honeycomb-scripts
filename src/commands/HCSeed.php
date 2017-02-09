@@ -36,6 +36,7 @@ class HCSeed extends HCCommand
         foreach ($seeders as $class)
             $this->call('db:seed',["--class" => $class]);
 
+        $this->call('db:seed');
     }
 
     /**
