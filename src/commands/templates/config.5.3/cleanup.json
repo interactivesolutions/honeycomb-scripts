@@ -5,6 +5,7 @@
     "app/honeycomb",
     "app/models",
     "app/routes",
+    "database",
     "routes"
   ],
   "remove_files" : [
@@ -16,6 +17,8 @@
     "app/models",
     "app/routes",
     "app/honeycomb",
+    "database/migrations",
+    "database/seed",
     "_automate"
   ]
 
