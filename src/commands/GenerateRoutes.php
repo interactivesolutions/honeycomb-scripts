@@ -13,7 +13,7 @@ class GenerateRoutes extends HCCommand
      *
      * @var string
      */
-    protected $signature = 'generate:routes {directory?}';
+    protected $signature = 'hc:routes {directory?}';
 
     /**
      * The console command description.
