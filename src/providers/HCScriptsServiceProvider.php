@@ -4,6 +4,7 @@ namespace interactivesolutions\honeycombscripts\providers;
 
 use Illuminate\Support\ServiceProvider;
 use interactivesolutions\honeycombscripts\commands\CreateEnvFile;
+use interactivesolutions\honeycombscripts\commands\HCUpdate;
 use interactivesolutions\honeycombscripts\commands\MakeHCPackage;
 use interactivesolutions\honeycombscripts\commands\MakeHCService;
 use interactivesolutions\honeycombscripts\commands\GenerateRoutes;
@@ -24,6 +25,7 @@ class HCScriptsServiceProvider extends ServiceProvider
         MakeHCPackage::class,
         GenerateRoutes::class,
         HCSeed::class,
+        HCUpdate::class,
     ];
 
     /**
