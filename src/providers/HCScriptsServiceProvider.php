@@ -3,6 +3,7 @@
 namespace interactivesolutions\honeycombscripts\providers;
 
 use Illuminate\Support\ServiceProvider;
+use interactivesolutions\honeycombscripts\commands\CreateDocFile;
 use interactivesolutions\honeycombscripts\commands\CreateEnvFile;
 use interactivesolutions\honeycombscripts\commands\HCUpdate;
 use interactivesolutions\honeycombscripts\commands\MakeHCPackage;
@@ -19,6 +20,7 @@ class HCScriptsServiceProvider extends ServiceProvider
      * @var array
      */
     protected $commands = [
+        CreateDocFile::class,
         CreateEnvFile::class,
         MakeHCService::class,
         MakeHCProject::class,
