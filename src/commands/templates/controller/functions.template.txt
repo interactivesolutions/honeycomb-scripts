@@ -79,20 +79,17 @@
         $list = {modelName}::with($with)->select($select)
         // add filters
         ->where(function ($query) use ($select) {
-            $query->where($this->getRequestParameters($select));
+            $query = where($this->getRequestParameters($query, $select));
         });
 
+        // enabling check for deleted
         $list = $this->checkForDeleted($list);
 
         // add search items
         $list = $this->listSearch($list);
 
-        $orderData = request()->input('_order');
-
-        if ($orderData)
-            foreach($orderData as $column => $direction)
-                if (strtolower($direction) == 'asc' || strtolower($direction) == 'desc')
-                    $list = $list->orderBy($column, $direction);
+        // ordering data
+        $list = $this->orderData($list, $select);
 
         return $list->paginate($this->recordsPerPage)->toArray();
     }
