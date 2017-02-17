@@ -175,9 +175,9 @@ class MakeHCService extends HCCommand
         $item->modelNamespace = str_replace ('\\http\\controllers', '\\models', $item->controllerNamespace);
 
         // creating form validator data
-        $item->validationFormName = $item->serviceName . 'Form';
-        $item->validationFormNameSpace = str_replace ('\\http\\controllers', '\\forms', $item->controllerNamespace);
-        $item->validationFormDestination = str_replace ('/http/controllers', '/forms', $item->controllerDestination) . '/' . $item->validationFormName . '.php';
+        $item->formValidationName = $item->serviceName . 'Form';
+        $item->formValidationNameSpace = str_replace ('\\http\\controllers', '\\forms\\validators', $item->controllerNamespace);
+        $item->formValidationDestination = str_replace ('/http/controllers', '/forms/validators', $item->controllerDestination) . '/' . $item->formValidationName . '.php';
 
         // finalizing destination
         $item->controllerDestination .= '/' . $item->controllerName . '.php';
@@ -367,7 +367,7 @@ class MakeHCService extends HCCommand
                 "adminListHeader"      => $this->getAdminListHeader ($serviceData),
                 "functions"            => replaceBrackets ($this->file->get (__DIR__ . '/templates/controller/functions.hctpl'),
                     [
-                        "validationFormName" => $serviceData->validationFormName,
+                        "formValidationName" => $serviceData->formValidationName,
                         "modelName"          => $serviceData->mainModelName,
                         "modelNameSpace"     => $serviceData->modelNamespace,
                     ]),
@@ -576,8 +576,8 @@ class MakeHCService extends HCCommand
         ];
 
         $list[] = [
-            "nameSpace" => $serviceData->validationFormNameSpace,
-            "name"      => $serviceData->validationFormName,
+            "nameSpace" => $serviceData->formValidationNameSpace,
+            "name"      => $serviceData->formValidationName,
         ];
 
         foreach ($list as $key => $value)
@@ -592,16 +592,16 @@ class MakeHCService extends HCCommand
     private function createFormValidator ($serviceData)
     {
         $this->createFileFromTemplate ([
-            "destination"         => $serviceData->validationFormDestination,
+            "destination"         => $serviceData->formValidationDestination,
             "templateDestination" => __DIR__ . '/templates/validation.form.hctpl',
             "content"             => [
-                "validationFormNameSpace" => $serviceData->validationFormNameSpace,
-                "validationFormName"      => $serviceData->validationFormName,
+                "formValidationNameSpace" => $serviceData->formValidationNameSpace,
+                "formValidationName"      => $serviceData->formValidationName,
                 "formRules"               => $this->getRules ($serviceData),
             ],
         ]);
 
-        $this->createdFiles[] = $serviceData->validationFormDestination;
+        $this->createdFiles[] = $serviceData->formValidationDestination;
     }
 
     /**
@@ -738,20 +738,20 @@ class MakeHCService extends HCCommand
      */
     private function createForm ($serviceData)
     {
-        dd($serviceData);
+        dd ($serviceData);
 
-        $tpl = $this->files->get($this->getTpl('formManager'));
+        $tpl = $this->files->get ($this->getTpl ('formManager'));
 
-        $tpl = str_replace('{formRootNamespace}', $this->getFormManagerRootNamespace(), $tpl);
-        $tpl = str_replace('{formFields}', $this->getFormManagerFormFields(), $tpl);
-        $tpl = str_replace('{formMethodName}', $this->getServiceNameFormatted(), $tpl);
-        $tpl = str_replace('{routeServiceName}', $this->getServiceRouteNameDotted(), $tpl);
-        $tpl = str_replace('{packageName}', $this->packageName, $tpl);
-        $tpl = str_replace('{serviceName}', $this->getRouteFileName(), $tpl);
+        $tpl = str_replace ('{formRootNamespace}', $this->getFormManagerRootNamespace (), $tpl);
+        $tpl = str_replace ('{formFields}', $this->getFormManagerFormFields (), $tpl);
+        $tpl = str_replace ('{formMethodName}', $this->getServiceNameFormatted (), $tpl);
+        $tpl = str_replace ('{routeServiceName}', $this->getServiceRouteNameDotted (), $tpl);
+        $tpl = str_replace ('{packageName}', $this->packageName, $tpl);
+        $tpl = str_replace ('{serviceName}', $this->getRouteFileName (), $tpl);
 
-        $path = $this->getFormManagerFilePath();
+        $path = $this->getFormManagerFilePath ();
 
-        $this->createFiles($path, $tpl);
+        $this->createFiles ($path, $tpl);
 
     }
 }

@@ -60,6 +60,8 @@ class {controllerName} extends HCBaseController
      */
     protected function getInputData()
     {
+        (new {validationFormName}())->validateForm();
+
         $_data = request()->all();
 
         {inputData}

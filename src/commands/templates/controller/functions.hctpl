@@ -9,8 +9,6 @@
         if(is_null($data))
             $data = $this->getInputData();
 
-        (new {validationFormName}())->validateForm();
-
         $record = {modelName}::create(array_get($data, 'record'));
 
         return $this->getSingleRecord($record->id);
@@ -26,9 +24,7 @@
     {
         $record = {modelName}::findOrFail($id);
 
-        //TODO read request parameters only once fo getting data and validating it
         $data = $this->getInputData();
-        (new {validationFormName}())->validateForm();
 
         $record->update(array_get($data, 'record'));
 
