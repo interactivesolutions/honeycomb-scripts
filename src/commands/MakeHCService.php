@@ -428,9 +428,9 @@ class MakeHCService extends HCCommand
         ]);
 
         if ($serviceData->rootDirectory != './')
-            $this->call ('generate:routes', ["directory" => $serviceData->rootDirectory]);
+            $this->call ('hc:routes', ["directory" => $serviceData->rootDirectory]);
         else
-            $this->call ('generate:routes');
+            $this->call ('hc:routes');
 
         $this->createdFiles[] = $serviceData->routesDestination;
     }
