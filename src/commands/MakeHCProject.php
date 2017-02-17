@@ -4,7 +4,6 @@ namespace interactivesolutions\honeycombscripts\commands;
 
 use interactivesolutions\honeycombcore\commands\HCCommand;
 use League\Flysystem\Exception;
-use Symfony\Component\HttpFoundation\Tests\JsonSerializableObject;
 
 class MakeHCProject extends HCCommand
 {
