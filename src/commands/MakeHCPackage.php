@@ -51,8 +51,8 @@ class MakeHCPackage extends HCCommand
         $packageName = $this->ask('Please enter package name');
 
         foreach ($json['create_folders'] as $location) {
-            $this->info ('Creating folder: ' . $packageDirectory . '/src/' . $location);
-            $this->createDirectory ($location);
+            $this->info ('Creating folder: ' . $packageDirectory . '/' . $location);
+            $this->createDirectory ($packageDirectory . '/' . $location);
         }
 
         $this->createFileFromTemplate([
