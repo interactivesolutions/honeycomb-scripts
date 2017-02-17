@@ -159,7 +159,12 @@ class MakeHCService extends HCCommand
         $item->controllerNamespace = implode ('\\', $item->controllerNamespace);
         $item->controllerNamespace = str_replace ('-', '', $item->controllerNamespace);
 
-        $item->controllerNameForRoutes = str_replace ('/', '\\\\', $this->createItemDirectoryPath (str_replace ('-', '', $item->serviceURL)) . '\\\\' . $item->controllerName);
+        $routesNameSpace = str_replace ('/', '\\\\', $this->createItemDirectoryPath (str_replace ('-', '', $item->serviceURL)));
+
+        if ($routesNameSpace == "")
+            $item->controllerNameForRoutes = $item->controllerName;
+        else
+            $item->controllerNameForRoutes = $routesNameSpace . '\\\\' . $item->controllerName;
 
         // creating controller directory
         $item->controllerDestination = $this->createItemDirectoryPath ($item->rootDirectory . 'app/http/controllers/' . str_replace ('-', '/', $item->serviceURL));
