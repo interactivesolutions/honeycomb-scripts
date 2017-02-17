@@ -26,7 +26,7 @@ class MakeHCPackage extends HCCommand
      *
      * @return mixed
      */
-    public function handle()
+    public function handle ()
     {
         $version = substr (app ()::VERSION, 0, strrpos (app ()::VERSION, "."));
 
@@ -35,37 +35,37 @@ class MakeHCPackage extends HCCommand
 
         $json = json_decode ($this->file->get (__DIR__ . '/templates/config.' . $version . '/package.json'), true);
 
-        $this->createDirectory('packages');
+        $this->createDirectory ('packages');
 
         $directoryList = [];
 
-        foreach ($this->file->directories('packages') as $directory)
-            $directoryList = array_merge($directoryList, $this->file->directories($directory));
+        foreach ($this->file->directories ('packages') as $directory)
+            $directoryList = array_merge ($directoryList, $this->file->directories ($directory));
 
-        $packageDirectory = $this->choice('Please select package directory', $directoryList);
-        $packageOfficialName = str_replace('packages/', '', $packageDirectory);
-        $nameSpace = $this->stringOnly(str_replace('/', '\\', $packageOfficialName));
-        $composerNameSpace = str_replace(['\\', '/'], '\\', $packageOfficialName . '\\');
-        $composerNameSpace = str_replace('-', '', $composerNameSpace);
+        $packageDirectory = $this->choice ('Please select package directory', $directoryList);
+        $packageOfficialName = str_replace ('packages/', '', $packageDirectory);
+        $nameSpace = $this->stringOnly (str_replace ('/', '\\', $packageOfficialName));
+        $composerNameSpace = str_replace (['\\', '/'], '\\', $packageOfficialName . '\\');
+        $composerNameSpace = str_replace ('-', '', $composerNameSpace);
 
-        $packageName = $this->ask('Please enter package name');
+        $packageName = $this->ask ('Please enter package name');
 
         foreach ($json['create_folders'] as $location) {
             $this->info ('Creating folder: ' . $packageDirectory . '/' . $location);
             $this->createDirectory ($packageDirectory . '/' . $location);
         }
 
-        $this->createFileFromTemplate([
+        $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/http/helpers.php',
             "templateDestination" => __DIR__ . '/templates/shared/empty.template.txt',
         ]);
 
-        $this->createFileFromTemplate([
+        $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/honeycomb/routes.php',
             "templateDestination" => __DIR__ . '/templates/shared/empty.template.txt',
         ]);
 
-        $this->createFileFromTemplate([
+        $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/honeycomb/config.json',
             "templateDestination" => __DIR__ . '/templates/config.template.txt',
             "content"             => [
@@ -73,7 +73,7 @@ class MakeHCPackage extends HCCommand
             ]
         ]);
 
-        $this->createFileFromTemplate([
+        $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/composer.json',
             "templateDestination" => __DIR__ . '/templates/composer.template.txt',
             "content"             => [
@@ -82,7 +82,7 @@ class MakeHCPackage extends HCCommand
             ],
         ]);
 
-        $this->createFileFromTemplate([
+        $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/providers/' . $packageName . 'ServiceProvider.php',
             "templateDestination" => __DIR__ . '/templates/service.provider.template.txt',
             "content"             => [
@@ -92,31 +92,31 @@ class MakeHCPackage extends HCCommand
             ],
         ]);
 
-        $this->createFileFromTemplate([
+        $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/database/seeds/HoneyCombDatabaseSeeder.php',
             "templateDestination" => __DIR__ . '/templates/database.seeder.template.txt',
             "content"             => [
-                "nameSpace"        => $nameSpace,
+                "nameSpace" => $nameSpace,
+                "className" => "HoneyComb"
             ],
         ]);
 
-        $this->comment('');
-        $this->comment('********************************************************');
+        $this->comment ('');
+        $this->comment ('********************************************************');
 
-        if (App::environment() == 'local')
-        {
-            $composer = json_decode($this->file->get('composer.json'));
+        if (App::environment () == 'local') {
+            $composer = json_decode ($this->file->get ('composer.json'));
 
             if (!isset($composer->autoload->{'psr-4'}->{$composerNameSpace}))
                 $composer->autoload->{'psr-4'}->{$composerNameSpace} = $packageDirectory;
 
-            $this->file->put('composer.json', json_encode($composer, JSON_PRETTY_PRINT));
+            $this->file->put ('composer.json', json_encode ($composer, JSON_PRETTY_PRINT));
         }
 
-        $this->comment('Please add to config/app.php under "providers":');
-        $this->info($nameSpace . '\providers\\' . $packageName . 'ServiceProvider::class');
+        $this->comment ('Please add to config/app.php under "providers":');
+        $this->info ($nameSpace . '\providers\\' . $packageName . 'ServiceProvider::class');
 
-        $this->comment('********************************************************');
+        $this->comment ('********************************************************');
 
 
     }

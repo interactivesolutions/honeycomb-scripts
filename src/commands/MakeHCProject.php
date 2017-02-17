@@ -82,6 +82,10 @@ class MakeHCProject extends HCCommand
                         "routesBasePath" => GenerateRoutes::ROUTES_PATH,
                     ],
                 ]);
+                $this->createFileFromTemplate ([
+                    "destination"         => 'database/seed/DatabaseSeeder.php',
+                    "templateDestination" => __DIR__ . '/templates/l.database.seeder.template.txt',
+                ]);
 
                 $this->createFileFromTemplate ([
                     "destination"         => "_automate/example.json",
