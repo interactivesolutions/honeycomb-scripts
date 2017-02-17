@@ -686,7 +686,7 @@ class MakeHCService extends HCCommand
     private function updateMenu ($config, $serviceData)
     {
         $menuItem = [
-            "path"          => $serviceData->serviceURL,
+            "path"          => 'admin/' . $serviceData->serviceURL,
             "translation"   => $serviceData->translationsLocation . '.page_title',
             "icon"          => $serviceData->serviceIcon,
             "aclPermission" => $serviceData->aclPrefix . "_list"
