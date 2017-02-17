@@ -57,17 +57,17 @@ class MakeHCPackage extends HCCommand
 
         $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/http/helpers.php',
-            "templateDestination" => __DIR__ . '/templates/shared/empty.template.txt',
+            "templateDestination" => __DIR__ . '/templates/shared/empty.hctpl',
         ]);
 
         $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/honeycomb/routes.php',
-            "templateDestination" => __DIR__ . '/templates/shared/empty.template.txt',
+            "templateDestination" => __DIR__ . '/templates/shared/empty.hctpl',
         ]);
 
         $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/honeycomb/config.json',
-            "templateDestination" => __DIR__ . '/templates/config.template.txt',
+            "templateDestination" => __DIR__ . '/templates/config.hctpl',
             "content"             => [
                 "serviceProviderNameSpace" => $packageName
             ]
@@ -75,7 +75,7 @@ class MakeHCPackage extends HCCommand
 
         $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/composer.json',
-            "templateDestination" => __DIR__ . '/templates/composer.template.txt',
+            "templateDestination" => __DIR__ . '/templates/composer.hctpl',
             "content"             => [
                 "packageOfficialName" => $packageOfficialName,
                 "packagePath"         => $composerNameSpace,
@@ -84,7 +84,7 @@ class MakeHCPackage extends HCCommand
 
         $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/providers/' . $packageName . 'ServiceProvider.php',
-            "templateDestination" => __DIR__ . '/templates/service.provider.template.txt',
+            "templateDestination" => __DIR__ . '/templates/service.provider.hctpl',
             "content"             => [
                 "packageName"      => $packageName,
                 "nameSpace"        => $nameSpace . '\providers',
@@ -94,7 +94,7 @@ class MakeHCPackage extends HCCommand
 
         $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/database/seeds/HoneyCombDatabaseSeeder.php',
-            "templateDestination" => __DIR__ . '/templates/database.seeder.template.txt',
+            "templateDestination" => __DIR__ . '/templates/database.seeder.hctpl',
             "content"             => [
                 "nameSpace" => $nameSpace,
                 "className" => "HoneyComb"

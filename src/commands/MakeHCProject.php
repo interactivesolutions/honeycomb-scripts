@@ -64,12 +64,12 @@ class MakeHCProject extends HCCommand
 
                 $this->createFileFromTemplate ([
                     "destination"         => 'app/Console/Kernel.php',
-                    "templateDestination" => __DIR__ . '/templates/app.console.kernel.template.txt',
+                    "templateDestination" => __DIR__ . '/templates/app.console.kernel.hctpl',
                 ]);
 
                 $this->createFileFromTemplate ([
                     "destination"         => 'app/' . MakeHCService::CONFIG_PATH,
-                    "templateDestination" => __DIR__ . '/templates/config.template.txt',
+                    "templateDestination" => __DIR__ . '/templates/config.hctpl',
                     "content"             => [
                         "serviceProviderNameSpace" => "",
                     ],
@@ -77,19 +77,19 @@ class MakeHCProject extends HCCommand
 
                 $this->createFileFromTemplate ([
                     "destination"         => "app/providers/RouteServiceProvider.php",
-                    "templateDestination" => __DIR__ . '/templates/route.serviceprovider.template.txt',
+                    "templateDestination" => __DIR__ . '/templates/route.serviceprovider.hctpl',
                     "content"             => [
                         "routesBasePath" => GenerateRoutes::ROUTES_PATH,
                     ],
                 ]);
                 $this->createFileFromTemplate ([
                     "destination"         => 'database/seed/DatabaseSeeder.php',
-                    "templateDestination" => __DIR__ . '/templates/l.database.seeder.template.txt',
+                    "templateDestination" => __DIR__ . '/templates/l.database.seeder.hctpl',
                 ]);
 
                 $this->createFileFromTemplate ([
                     "destination"         => "_automate/example.json",
-                    "templateDestination" => __DIR__ . '/templates/automate.config.template.txt',
+                    "templateDestination" => __DIR__ . '/templates/automate.config.hctpl',
                 ]);
 
                 $this->file->put (GenerateRoutes::ROUTES_PATH, '');
