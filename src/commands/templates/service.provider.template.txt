@@ -24,10 +24,10 @@ class {packageName}ServiceProvider extends ServiceProvider
         $this->commands($this->commands);
 
         // loading views
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', '{packageName}');
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', '{packageName}');
 
         // loading translations
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', '{packageName}');
+        $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', '{packageName}');
 
         // registering elements to publish
         $this->registerPublishElements();
