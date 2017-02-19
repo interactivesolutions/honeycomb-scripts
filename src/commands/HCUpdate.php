@@ -19,7 +19,7 @@ class HCUpdate extends HCCommand
      *
      * @var string
      */
-    protected $description = 'Updates all of the honey comb enviroment';
+    protected $description = 'Updates all of the honey comb environment';
 
     /**
      * Execute the console command.
