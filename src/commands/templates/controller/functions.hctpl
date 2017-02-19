@@ -75,7 +75,7 @@
         $list = {modelName}::with($with)->select($select)
         // add filters
         ->where(function ($query) use ($select) {
-            $query = where($this->getRequestParameters($query, $select));
+            $query = $this->getRequestParameters($query, $select);
         });
 
         // enabling check for deleted
