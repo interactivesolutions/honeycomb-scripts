@@ -35,6 +35,9 @@ class HCRoutes extends HCCommand
             $rootDirectory = '';
 
         $files = $this->file->allFiles($rootDirectory . 'app/routes');
+
+        $files = array_reverse($files);
+
         $finalContent = '<?php' . "\r\n";
 
         foreach ($files as $file)
