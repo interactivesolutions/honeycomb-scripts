@@ -4,7 +4,7 @@ namespace interactivesolutions\honeycombscripts\commands;
 
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
-class CreateEnvFile extends HCCommand
+class HCEnv extends HCCommand
 {
     /**
      * The name and signature of the console command.

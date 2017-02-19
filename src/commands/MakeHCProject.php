@@ -79,7 +79,7 @@ class MakeHCProject extends HCCommand
                     "destination"         => "app/providers/RouteServiceProvider.php",
                     "templateDestination" => __DIR__ . '/templates/route.serviceprovider.hctpl',
                     "content"             => [
-                        "routesBasePath" => GenerateRoutes::ROUTES_PATH,
+                        "routesBasePath" => HCRoutes::ROUTES_PATH,
                     ],
                 ]);
                 $this->createFileFromTemplate ([
@@ -92,7 +92,7 @@ class MakeHCProject extends HCCommand
                     "templateDestination" => __DIR__ . '/templates/automate.config.hctpl',
                 ]);
 
-                $this->file->put (GenerateRoutes::ROUTES_PATH, '');
+                $this->file->put (HCRoutes::ROUTES_PATH, '');
             } catch (Exception $e) {
                 $this->info ('Error occurred!');
                 $this->info ('Error code: ' . $e->getCode ());

@@ -4,7 +4,7 @@ namespace interactivesolutions\honeycombscripts\commands;
 
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
-class GenerateRoutes extends HCCommand
+class HCRoutes extends HCCommand
 {
     const ROUTES_PATH = 'app/honeycomb/routes.php';
 
@@ -44,8 +44,8 @@ class GenerateRoutes extends HCCommand
             $finalContent .= str_replace('<?php', '', $this->file->get((string)$file)) . "\r\n";
         }
 
-        $this->file->put($rootDirectory . GenerateRoutes::ROUTES_PATH, $finalContent);
+        $this->file->put($rootDirectory . HCRoutes::ROUTES_PATH, $finalContent);
 
-        $this->comment($rootDirectory . GenerateRoutes::ROUTES_PATH . ' file generated');
+        $this->comment($rootDirectory . HCRoutes::ROUTES_PATH . ' file generated');
     }
 }

@@ -5,7 +5,7 @@ use interactivesolutions\honeycombcore\commands\HCCommand;
 use Nette\Reflection\AnnotationsParser;
 use Symfony\Component\Finder\Finder;
 
-class CreateDocFile extends HCCommand
+class HCDocs extends HCCommand
 {
 
     //TODO create docs directory
