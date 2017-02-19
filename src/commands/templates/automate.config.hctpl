@@ -4,6 +4,7 @@
     "serviceIcon":"square-o",
     "serviceName":"",
     "generateMigrations":1,
+    "multiLanguage":0,
     "database":
     [
         {
