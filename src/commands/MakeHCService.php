@@ -77,8 +77,8 @@ class MakeHCService extends HCCommand
         $this->createTranslations ($serviceData);
         $this->createModels ($serviceData);
         $this->createController ($serviceData);
-        $this->createForm ($serviceData);
         $this->createFormValidator ($serviceData);
+        $this->createForm ($serviceData);
         $this->createRoutes ($serviceData);
         $this->updateConfiguration ($serviceData);
 
@@ -175,9 +175,14 @@ class MakeHCService extends HCCommand
         $item->modelNamespace = str_replace ('\\http\\controllers', '\\models', $item->controllerNamespace);
 
         // creating form validator data
-        $item->formValidationName = $item->serviceName . 'Form';
-        $item->formValidationNameSpace = str_replace ('\\http\\controllers', '\\forms\\validators', $item->controllerNamespace);
-        $item->formValidationDestination = str_replace ('/http/controllers', '/forms/validators', $item->controllerDestination) . '/' . $item->formValidationName . '.php';
+        $item->formValidationName = $item->serviceName . 'Validator';
+        $item->formValidationNameSpace = str_replace ('\\http\\controllers', '\\validators', $item->controllerNamespace);
+        $item->formValidationDestination = str_replace ('/http/controllers', '/validators', $item->controllerDestination) . '/' . $item->formValidationName . '.php';
+
+        $item->formName = $item->serviceName . 'Form';
+        $item->formNameSpace = str_replace ('\\http\\controllers', '\\forms', $item->controllerNamespace);
+        $item->formDestination = str_replace ('/http/controllers', '/forms', $item->controllerDestination) . '/' . $item->formName . '.php';
+        $item->formID = $this->stringWithDash ($item->serviceURL);
 
         // finalizing destination
         $item->controllerDestination .= '/' . $item->controllerName . '.php';
@@ -365,11 +370,11 @@ class MakeHCService extends HCCommand
                 "serviceNameDotted"    => $this->stringWithDash ($serviceData->translationFilePrefix),
                 "controllerNameDotted" => $serviceData->serviceRouteName,
                 "adminListHeader"      => $this->getAdminListHeader ($serviceData),
+                "formValidationName"   => $serviceData->formValidationName,
                 "functions"            => replaceBrackets ($this->file->get (__DIR__ . '/templates/controller/functions.hctpl'),
                     [
-                        "formValidationName" => $serviceData->formValidationName,
-                        "modelName"          => $serviceData->mainModelName,
-                        "modelNameSpace"     => $serviceData->modelNamespace,
+                        "modelName"      => $serviceData->mainModelName,
+                        "modelNameSpace" => $serviceData->modelNamespace,
                     ]),
                 "inputData"            => $this->getInputData ($serviceData),
                 "useFiles"             => $this->getUseFiles ($serviceData),
@@ -453,6 +458,7 @@ class MakeHCService extends HCCommand
         $config = $this->updateActions ($config, $serviceData);
         $config = $this->updateRolesActions ($config, $serviceData);
         $config = $this->updateMenu ($config, $serviceData);
+        $config = $this->updateFormManager ($config, $serviceData);
 
         $this->file->put ($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH, json_encode ($config, JSON_PRETTY_PRINT));
     }
@@ -519,7 +525,7 @@ class MakeHCService extends HCCommand
         if (empty($config->acl->rolesActions))
             $config->acl->rolesActions = $rolesActions;
         else
-            $config->acl->rolesActions->{"project-admin"} = array_merge ($config->acl->rolesActions->{"project-admin"}, $rolesActions['project-admin']);
+            $config->acl->rolesActions->{"project-admin"} = array_unique (array_merge ($config->acl->rolesActions->{"project-admin"}, $rolesActions['project-admin']));
 
         return $config;
     }
@@ -738,39 +744,77 @@ class MakeHCService extends HCCommand
      */
     private function createForm ($serviceData)
     {
-        dd ($serviceData);
+        $this->createFileFromTemplate ([
+            "destination"         => $serviceData->formDestination,
+            "templateDestination" => __DIR__ . '/templates/form.hctpl',
+            "content"             => [
+                "nameSpace"        => $serviceData->formNameSpace,
+                "className"        => $serviceData->formName,
+                "formID"           => $serviceData->formID,
+                "multiLanguage"    => $serviceData->multiLanguage,
+                "formFields"       => $this->getFormFields ($serviceData),
+                "serviceRouteName" => $serviceData->serviceRouteName
+            ],
+        ]);
 
-        $tpl = $this->files->get ($this->getTpl ('formManager'));
 
-        $tpl = str_replace ('{formRootNamespace}', $this->getFormManagerRootNamespace (), $tpl);
-        $tpl = str_replace ('{formFields}', $this->getFormManagerFormFields (), $tpl);
-        $tpl = str_replace ('{formMethodName}', $this->getServiceNameFormatted (), $tpl);
-        $tpl = str_replace ('{routeServiceName}', $this->getServiceRouteNameDotted (), $tpl);
-        $tpl = str_replace ('{packageName}', $this->packageName, $tpl);
-        $tpl = str_replace ('{serviceName}', $this->getRouteFileName (), $tpl);
+    }
 
-        $path = $this->getFormManagerFilePath ();
+    /**
+     * Get form manager form fields from model
+     *
+     * @param $data
+     * @return string
+     */
+    private function getFormFields ($data)
+    {
+        $output = '';
+        $skip = array_merge ($this->autoFill, ['id']);
 
-        $this->createFiles ($path, $tpl);
+        $tmp = $this->file->get (__DIR__ . '/templates/form/single.field.hctpl');
 
+        $model = $this->getDefaultTable ($data->database);
+
+        if (isset($model->columns))
+            foreach ($model->columns as $column) {
+                if (in_array ($column->Field, $skip))
+                    continue;
+
+                $field = replaceBrackets ($tmp, [
+                    "type"     => "singleLine",
+                    "fieldID"  => $column->Field,
+                    "label"    => $data->translationsLocation . '.' . $column->Field,
+                    "required" => $column->Null == "YES" ? 0 : 1,
+                ]);
+
+                $output .= $field;
+
+            }
+
+        return $output;
+    }
+
+    /**
+     * Updating form manager
+     *
+     * @param $config
+     * @param $serviceData
+     * @return mixed
+     */
+    private function updateFormManager ($config, $serviceData)
+    {
+        $config->formData = json_decode (json_encode ($config->formData), true);
+
+        if (isset($config->formData[$serviceData->formID]))
+            $this->abort ('Form already exists');
+
+        $config->formData[$serviceData->formID] = $serviceData->formNameSpace . '\\' . $serviceData->formName;
+
+        return $config;
     }
 }
 
 /*
-
-
-    /**
-     * Get dotted service name
-     *
-     * @return mixed
-     *
-    private function getServiceRouteNameDotted()
-    {
-        return $this->stringWithDots($this->serviceURL);
-    }
-
-
-
     /**
      * Reading original files
      *
@@ -790,31 +834,4 @@ class MakeHCService extends HCCommand
         if ($this->file->exists($this->routesDestination))
             $this->originalFiles[] = ["path" => $this->routesDestination, "content" => $this->file->get($this->routesDestination)];
     }
-
-    /**
-     * Extracting type information
-     *
-     * @param $columns
-     * @internal param $type
-     *
-    private function extractColumnData($columns)
-    {
-        foreach ($columns as &$column)
-        {
-            $beginning = strpos($column->Type, '(');
-            $end = strpos($column->Type, ')');
-
-            if ($beginning)
-            {
-                $column->Length = substr($column->Type, $beginning + 1, $end - $beginning - 1);
-                $column->Type = substr($column->Type, 0, $beginning);
-            }
-        }
-
-        return $columns;
-    }
-
-
-
-
 } */
