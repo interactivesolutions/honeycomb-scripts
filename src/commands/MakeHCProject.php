@@ -83,7 +83,7 @@ class MakeHCProject extends HCCommand
                     ],
                 ]);
                 $this->createFileFromTemplate ([
-                    "destination"         => 'database/seed/DatabaseSeeder.php',
+                    "destination"         => 'database/seeds/DatabaseSeeder.php',
                     "templateDestination" => __DIR__ . '/templates/l.database.seeder.hctpl',
                 ]);
 
