@@ -33,6 +33,9 @@ class HCDocs extends HCCommand
      */
     public function handle ()
     {
+        if('path' == null)
+            error_log('Path must be given');
+
         $this->createDirectory($this->argument('path') . 'docs');         // creates one
 
         foreach ($this->getPhpFiles($this->argument('path')) as $parsedClass) {
