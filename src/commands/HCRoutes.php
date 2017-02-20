@@ -27,28 +27,25 @@ class HCRoutes extends HCCommand
      *
      * @return mixed
      */
-    public function handle()
+    public function handle ()
     {
-        if ($this->argument('directory'))
-            $rootDirectory = $this->argument('directory');
+        if ($this->argument ('directory'))
+            $rootDirectory = $this->argument ('directory');
         else
             $rootDirectory = '';
 
-        $files = $this->file->allFiles($rootDirectory . 'app/routes');
-
-        $files = array_reverse($files);
+        $files = $this->file->allFiles ($rootDirectory . 'app/routes');
 
         $finalContent = '<?php' . "\r\n";
 
-        foreach ($files as $file)
-        {
+        foreach ($files as $file) {
             $finalContent .= "\r\n";
             $finalContent .= '//' . (string)$file;
-            $finalContent .= str_replace('<?php', '', $this->file->get((string)$file)) . "\r\n";
+            $finalContent .= str_replace ('<?php', '', $this->file->get ((string)$file)) . "\r\n";
         }
 
-        $this->file->put($rootDirectory . HCRoutes::ROUTES_PATH, $finalContent);
+        $this->file->put ($rootDirectory . HCRoutes::ROUTES_PATH, $finalContent);
 
-        $this->comment($rootDirectory . HCRoutes::ROUTES_PATH . ' file generated');
+        $this->comment ($rootDirectory . HCRoutes::ROUTES_PATH . ' file generated');
     }
 }
