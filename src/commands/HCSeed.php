@@ -24,6 +24,7 @@ class HCSeed extends HCCommand
     /**
      * Execute the console command.
      *
+     * @return this
      */
     public function handle ()
     {

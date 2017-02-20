@@ -10,6 +10,8 @@ class MakeHCService extends HCCommand
 {
     /**
      * Configuration path
+     *
+     * @return this
      */
     const CONFIG_PATH = 'honeycomb/config.json';
 
@@ -29,6 +31,8 @@ class MakeHCService extends HCCommand
 
     /**
      * Configuration data which needs to be used in creation of services
+     *
+     * @return this
      */
     private $configurationData = [];
 
@@ -48,6 +52,8 @@ class MakeHCService extends HCCommand
 
     /**
      * Execute the console command.
+     *
+     * @return this
      */
     public function handle ()
     {
@@ -86,6 +92,8 @@ class MakeHCService extends HCCommand
 
     /**
      * Loading configuration files
+     *
+     * @return this
      */
     private function loadConfiguration ()
     {
@@ -239,6 +247,7 @@ class MakeHCService extends HCCommand
 
     /**
      * Creating translation file
+     *
      * @param $service
      */
     private function createTranslations ($service)
@@ -287,6 +296,7 @@ class MakeHCService extends HCCommand
 
     /**
      * Creating models
+     *
      * @param $item
      * @internal param $modelData
      */
@@ -337,6 +347,8 @@ class MakeHCService extends HCCommand
     /**
      * Restoring changed files after the abort
      * Deleting create files
+     *
+     * @return this
      */
     protected function executeAfterAbort ()
     {
@@ -354,6 +366,7 @@ class MakeHCService extends HCCommand
 
     /**
      * Creating controller
+     *
      * @param $serviceData
      * @internal param $item
      */
@@ -448,6 +461,7 @@ class MakeHCService extends HCCommand
 
     /**
      * Updating configuration
+     *
      * @param $serviceData
      * @return null
      */
@@ -465,6 +479,7 @@ class MakeHCService extends HCCommand
 
     /**
      * Updating service actions
+     *
      * @param $config
      * @param $serviceData
      * @return null
@@ -532,6 +547,7 @@ class MakeHCService extends HCCommand
 
     /**
      * Finalizing file
+     *
      * @param $file
      */
     private function finalizeFile ($file)
@@ -568,6 +584,8 @@ class MakeHCService extends HCCommand
     }
 
     /**
+     * get use files
+     *
      * @param $serviceData
      * @return string
      */
@@ -593,6 +611,8 @@ class MakeHCService extends HCCommand
     }
 
     /**
+     * create form validator
+     *
      * @param $serviceData
      */
     private function createFormValidator ($serviceData)
@@ -611,6 +631,8 @@ class MakeHCService extends HCCommand
     }
 
     /**
+     * get rules
+     *
      * @param $serviceData
      * @return string
      */
@@ -729,6 +751,8 @@ class MakeHCService extends HCCommand
     }
 
     /**
+     * get service pro
+     *
      * @param $item
      * @return mixed
      */

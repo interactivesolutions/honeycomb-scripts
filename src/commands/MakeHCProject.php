@@ -33,6 +33,8 @@ class MakeHCProject extends HCCommand
 
     /**
      * Removing default structure of application
+     *
+     * @return this
      */
     private function removeDefaultStructure ()
     {

@@ -52,6 +52,8 @@ class HCEnv extends HCCommand
 
     /**
      * Shows welcome message
+     *
+     * @return welcome message
      */
     protected function welcomeMessage()
     {
@@ -199,6 +201,8 @@ class HCEnv extends HCCommand
 
     /**
      * App configuration
+     *
+     * @return app
      */
     protected function configureApp()
     {
@@ -210,6 +214,8 @@ class HCEnv extends HCCommand
 
     /**
      * Driver settings configuration
+     *
+     * @return driver
      */
     protected function configureDriverSettings()
     {
