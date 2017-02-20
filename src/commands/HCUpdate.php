@@ -28,6 +28,7 @@ class HCUpdate extends HCCommand
      */
     public function handle ()
     {
+        $this->call('vendor:publish', ['--force' => true]);
         $this->call('migrate');
         $this->call('hc:seed');
         $this->call('hc:permissions');
