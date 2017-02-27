@@ -136,7 +136,7 @@ class HCDocs extends HCCommand
     public function createControllerMenu($classesInfo)
     {
         //dd($classesInfo['controllers']);
-        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMenu.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMenu.hctpl.txt');
         $output = '';
 
         foreach ($classesInfo['controllers'] as $value) {
@@ -148,7 +148,7 @@ class HCDocs extends HCCommand
     }
     public function createControllerRow($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/controllersRow.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/controllersRow.hctpl.txt');
         $output = '';
         if(isset($classesInfo['controllers'])) {
             foreach ($classesInfo['controllers'] as $value) {
@@ -169,7 +169,7 @@ class HCDocs extends HCCommand
     }
     public function controllerPublicMethods($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethod.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethod.hctpl.txt');
         $output = '';
 
         foreach($classesInfo['classMethods']['publicMethods'] as $value)
@@ -186,7 +186,7 @@ class HCDocs extends HCCommand
     }
     public function controllerPrivateMethods($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethodPrivate.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethodPrivate.hctpl.txt');
         $output = '';
 
         foreach($classesInfo['classMethods']['privateMethods'] as $value)
@@ -203,7 +203,7 @@ class HCDocs extends HCCommand
     }
     public function controllerProtectedMethods($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethodProtected.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethodProtected.hctpl.txt');
         $output = '';
 
         foreach($classesInfo['classMethods']['protectedMethods'] as $value)
@@ -244,7 +244,7 @@ class HCDocs extends HCCommand
 
     public function createMiddlewareMenu($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMenu.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMenu.hctpl.txt');
         $output = '';
 
         foreach ($classesInfo['middleware'] as $value) {
@@ -256,7 +256,7 @@ class HCDocs extends HCCommand
     }
     public function createMiddlewareRow($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareRow.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareRow.hctpl.txt');
         $output = '';
         if(isset($classesInfo['middleware'])) {
             foreach ($classesInfo['middleware'] as $value) {
@@ -276,24 +276,24 @@ class HCDocs extends HCCommand
     }
     public function middlewarePublicMethods($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethod.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethod.hctpl.txt');
         $output = '';
 
-            foreach($classesInfo['classMethods']['publicMethods'] as $value)
-            {
-                if($value != null) {
-                    $field = str_replace('{methodName}', $value['method'], $file);
-                    $field = str_replace('{methodDescription}', $value['comment'], $field);
-                    $field = str_replace('{className}', $classesInfo['classInfo']['className'], $field);
-                    $output .= $field;
-                }
+        foreach($classesInfo['classMethods']['publicMethods'] as $value)
+        {
+            if($value != null) {
+                $field = str_replace('{methodName}', $value['method'], $file);
+                $field = str_replace('{methodDescription}', $value['comment'], $field);
+                $field = str_replace('{className}', $classesInfo['classInfo']['className'], $field);
+                $output .= $field;
             }
+        }
 
         return $output;
     }
     public function middlewarePrivateMethods($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethodPrivate.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethodPrivate.hctpl.txt');
         $output = '';
 
         foreach($classesInfo['classMethods']['privateMethods'] as $value)
@@ -310,7 +310,7 @@ class HCDocs extends HCCommand
     }
     public function middlewareProtectedMethods($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethodProtected.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethodProtected.hctpl.txt');
         $output = '';
 
         foreach($classesInfo['classMethods']['protectedMethods'] as $value)
@@ -355,7 +355,7 @@ class HCDocs extends HCCommand
     public function createCommandsRow($classesInfo)
     {
 
-        $file = $this->file->get (__DIR__ . '/templates/docs/commandsRow.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/commandsRow.hctpl.txt');
         $output = '';
 
 
@@ -375,7 +375,7 @@ class HCDocs extends HCCommand
 
     public function createCommandsMenu($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/commandsMenu.template.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/commandsMenu.hctpl.txt');
         $output = '';
 
         foreach ($classesInfo['commands'] as $value) {
@@ -398,7 +398,7 @@ class HCDocs extends HCCommand
         if(isset($classesInfo['middleware'])) {
             $this->createFileFromTemplate([
                 "destination" => $this->argument('path') . 'docs/docs.html',
-                "templateDestination" => __DIR__ . '/templates/docs/docs.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/docs.hctpl.txt',
                 "content" => [
                     "packageName" => explode(':', explode(',', $composer)[0])[1],
                     "name" => $classesInfo['commands'][0]['classInfo']['name'],
@@ -417,7 +417,7 @@ class HCDocs extends HCCommand
         {
             $this->createFileFromTemplate([
                 "destination" => $this->argument('path') . 'docs/docs.html',
-                "templateDestination" => __DIR__ . '/templates/docs/docs.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/docs.hctpl.txt',
                 "content" => [
                     "packageName" => explode(':', explode(',', $composer)[0])[1],
                     "name" => $classesInfo['commands'][0]['classInfo']['name'],
@@ -442,87 +442,87 @@ class HCDocs extends HCCommand
             //assets/css
             [
                 "destination" => $path . '/docs/assets/css/styles.css',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/css/styles.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/css/styles.hctpl.txt',
             ],
             //assets/js
             [
                 "destination" => $path . '/docs/assets/js/main.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/js/main.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/js/main.hctpl.txt',
             ],
             //assets/less
             [
                 "destination" => $path . '/docs/assets/less/base.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/base.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/base.hctpl.txt',
             ],
             [
                 "destination" => $path . '/docs/assets/less/doc.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/doc.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/doc.hctpl.txt',
             ],
             [
                 "destination" => $path . '/docs/assets/less/landing.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/landing.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/landing.hctpl.txt',
             ],
             [
                 "destination" => $path . '/docs/assets/less/mixins.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/mixins.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/mixins.hctpl.txt',
             ],
             [
                 "destination" => $path . '/docs/assets/less/styles.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/styles.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/styles.hctpl.txt',
             ],
             [
                 "destination" => $path . '/docs/assets/less/theme-default.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/theme-default.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/theme-default.hctpl.txt',
             ],
             //assets/plugins
             [
                 "destination" => $path . '/docs/assets/plugins/jquery-1.12.3.min.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-1123-min.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-1123-min.hctpl.txt',
             ],
             //assets/plugins/bootstrap/css
             [
                 "destination" => $path . '/docs/assets/plugins/bootstrap/css/bootstrap.css',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/css/bootstrap.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/css/bootstrap.hctpl.txt',
             ],
             [
                 "destination" => $path . '/docs/assets/plugins/bootstrap/css/bootstrap.min.css',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/css/bootstrap-min.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/css/bootstrap-min.hctpl.txt',
             ],
             //assets/plugins/bootstrap/js
             [
                 "destination" => $path . '/docs/assets/plugins/bootstrap/js/bootstrap.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/bootstrap.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/bootstrap.hctpl.txt',
             ],
             [
                 "destination" => $path . '/docs/assets/plugins/bootstrap/js/bootstrap.min.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/bootstrap-min.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/bootstrap-min.hctpl.txt',
             ],
             [
                 "destination" => $path . '/docs/assets/plugins/bootstrap/js/npm.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/npm.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/npm.hctpl.txt',
             ],
             //assets/plugins/prism
             [
                 "destination" => $path . '/docs/assets/plugins/prism/prism.css',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/prism-css.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/prism-css.hctpl.txt',
             ],
             [
                 "destination" => $path . '/docs/assets/plugins/prism/prism.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/prism-js.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/prism-js.hctpl.txt',
             ],
             //assets/plugins/prism/min
             [
                 "destination" => $path . '/docs/assets/plugins/prism/min/prism-min.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/min/prism-min.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/min/prism-min.hctpl.txt',
             ],
             //assets/plugins/jquery-scrollTo
             [
                 "destination" => $path . '/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.hctpl.txt',
             ],
             [
                 "destination" => $path . '/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.template.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.hctpl.txt',
             ],
 
 
@@ -541,88 +541,88 @@ class HCDocs extends HCCommand
 
 
 
-  /*
-    public function createControllerBlockCode($classData){
+    /*
+      public function createControllerBlockCode($classData){
 
-        $inheritance = ' ';
-        $protectedMethods = ' ';
-        $privateMethods = ' ';
-        $publicMethods = ' ';
-        $publicMethods = $this->createControllerPublicMethodsBlockCode($classData);
-        $protectedMethods = $this->createControllerProtectedMethodsBlockCode($classData);
-        $privateMethods = $this->createControllerPrivateMethodsBlockCode($classData);
-        foreach ($classData['classInheritance'] as $inherit){
+          $inheritance = ' ';
+          $protectedMethods = ' ';
+          $privateMethods = ' ';
+          $publicMethods = ' ';
+          $publicMethods = $this->createControllerPublicMethodsBlockCode($classData);
+          $protectedMethods = $this->createControllerProtectedMethodsBlockCode($classData);
+          $privateMethods = $this->createControllerPrivateMethodsBlockCode($classData);
+          foreach ($classData['classInheritance'] as $inherit){
 
-            $inheritance .= ' &#x2192 ' . $inherit;
-        }
-        $topCodeBlock = '<p><span style="font-size: 16px;"><strong>Package: </strong></span>'. $classData['classInfo']['name'] .'</p>
-                  <p><span style="font-size: 16px;"><strong>Class:</strong></span> class '. $classData['classInfo']['className'] .'</p>
-                  <p><span style="font-size: 16px;"><strong>Inheritance:</strong></span> '. $classData['classInfo']['className'] .' Inheritance ' . $inheritance .'</p>';
+              $inheritance .= ' &#x2192 ' . $inherit;
+          }
+          $topCodeBlock = '<p><span style="font-size: 16px;"><strong>Package: </strong></span>'. $classData['classInfo']['name'] .'</p>
+                    <p><span style="font-size: 16px;"><strong>Class:</strong></span> class '. $classData['classInfo']['className'] .'</p>
+                    <p><span style="font-size: 16px;"><strong>Inheritance:</strong></span> '. $classData['classInfo']['className'] .' Inheritance ' . $inheritance .'</p>';
 
-        $codeBlock ='<div id="' . $classData['classInfo']['className'] . '" class="section-block">'.
-            $topCodeBlock . '
-                        <div class="code-block">
-                            <h6>' . $classData['classInfo']['className'] . '</h6>
-                            <div class="table-responsive">
-                                <table class="table" style="width:80%">
-                                    <thead>
-                                        <tr>
-                                            <th>Methods</th>
-                                            <th style="text-align: right;">Defined By</th>
-                                        </tr>
-                                    </thead>
-                                   ' . $publicMethods . $protectedMethods . $privateMethods . '
-                                </table>
-                            </div>
-                        </div>
-                    </div>';
+          $codeBlock ='<div id="' . $classData['classInfo']['className'] . '" class="section-block">'.
+              $topCodeBlock . '
+                          <div class="code-block">
+                              <h6>' . $classData['classInfo']['className'] . '</h6>
+                              <div class="table-responsive">
+                                  <table class="table" style="width:80%">
+                                      <thead>
+                                          <tr>
+                                              <th>Methods</th>
+                                              <th style="text-align: right;">Defined By</th>
+                                          </tr>
+                                      </thead>
+                                     ' . $publicMethods . $protectedMethods . $privateMethods . '
+                                  </table>
+                              </div>
+                          </div>
+                      </div>';
 
-        return $info = [
-            'code' => $codeBlock,
-            'className' => $classData['classInfo']['className']
-        ];
-    }
-    public function createControllerPublicMethodsBlockCode($classData){
-        $tablecontent = ' ';
+          return $info = [
+              'code' => $codeBlock,
+              'className' => $classData['classInfo']['className']
+          ];
+      }
+      public function createControllerPublicMethodsBlockCode($classData){
+          $tablecontent = ' ';
 
-            foreach ($classData['classMethods']['publicMethods'] as $m)
-            {
-                $row = "<tr>
-                            <td><strong>public function " . $m['method'] . "()" . "</strong></br>" . $m['comment']. "</td>
-						    <td style='text-align: right;'>" . $classData['classInfo']['className'] . "</td>
-					    </tr>";
-                $tablecontent .= $row;
-            }
-        $tablecontent =  '<tbody>' . $tablecontent . '</tbody>';
-        return $tablecontent;
-    }
-    public function createControllerProtectedMethodsBlockCode($classData){
-        $tablecontent = '';
-            foreach ($classData['classMethods']['protectedMethods'] as $m)
-            {
-                $row = "<tr>
-                            <td><strong>protected function " . $m['method'] . "()" . "</strong></br>" . $m['comment']. "</td>
-						    <td style='text-align: right;'>" . $classData['classInfo']['className'] . "</td>
-					    </tr>";
-                $tablecontent .= $row;
-            }
-        $tablecontent =  '<tbody>' . $tablecontent . '</tbody>';
-        return $tablecontent;
-    }
-    public function createControllerPrivateMethodsBlockCode($classData){
-        $tablecontent = '';
-            foreach ($classData['classMethods']['privateMethods'] as $m)
-            {
-                $row = "<tr>
-                            <td><strong>private function " . $m['method'] . "()" . "</strong></br>" . $m['comment']. "</td>
-						    <td style='text-align: right;'>" . $classData['classInfo']['className'] . "</td>
-					    </tr>";
-                $tablecontent .= $row;
-            }
-        $tablecontent =  '<tbody>' . $tablecontent . '</tbody>';
-        return $tablecontent;
-    }
-*/
+              foreach ($classData['classMethods']['publicMethods'] as $m)
+              {
+                  $row = "<tr>
+                              <td><strong>public function " . $m['method'] . "()" . "</strong></br>" . $m['comment']. "</td>
+                              <td style='text-align: right;'>" . $classData['classInfo']['className'] . "</td>
+                          </tr>";
+                  $tablecontent .= $row;
+              }
+          $tablecontent =  '<tbody>' . $tablecontent . '</tbody>';
+          return $tablecontent;
+      }
+      public function createControllerProtectedMethodsBlockCode($classData){
+          $tablecontent = '';
+              foreach ($classData['classMethods']['protectedMethods'] as $m)
+              {
+                  $row = "<tr>
+                              <td><strong>protected function " . $m['method'] . "()" . "</strong></br>" . $m['comment']. "</td>
+                              <td style='text-align: right;'>" . $classData['classInfo']['className'] . "</td>
+                          </tr>";
+                  $tablecontent .= $row;
+              }
+          $tablecontent =  '<tbody>' . $tablecontent . '</tbody>';
+          return $tablecontent;
+      }
+      public function createControllerPrivateMethodsBlockCode($classData){
+          $tablecontent = '';
+              foreach ($classData['classMethods']['privateMethods'] as $m)
+              {
+                  $row = "<tr>
+                              <td><strong>private function " . $m['method'] . "()" . "</strong></br>" . $m['comment']. "</td>
+                              <td style='text-align: right;'>" . $classData['classInfo']['className'] . "</td>
+                          </tr>";
+                  $tablecontent .= $row;
+              }
+          $tablecontent =  '<tbody>' . $tablecontent . '</tbody>';
+          return $tablecontent;
+      }
+  */
 
 
 
