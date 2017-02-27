@@ -33,8 +33,7 @@ class {controllerName} extends HCBaseController
         if ($this->user()->can('{acl_prefix}_delete'))
             $config['actions'][] = 'delete';
 
-        if ($this->user()->can('{acl_prefix}_search'))
-            $config['actions'][] = 'search';
+        $config['actions'][] = 'search';
 
         return view('HCCoreUI::admin.content.list', ['config' => $config]);
     }
