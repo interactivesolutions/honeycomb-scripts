@@ -2,7 +2,7 @@
     "name": "{packageOfficialName}",
     "description": "",
     "keywords": [],
-    "licence": "MIT",
+    "license": "MIT",
     "authors": [],
     "repositories": [],
     "require": {
