@@ -45,7 +45,7 @@ class MakeHCPackage extends HCCommand
         $packageDirectory = $this->choice ('Please select package directory', $directoryList);
         $packageOfficialName = str_replace ('packages/', '', $packageDirectory);
         $nameSpace = $this->stringOnly (str_replace ('/', '\\', $packageOfficialName));
-        $composerNameSpace = str_replace (['\\', '/'], '\\', $packageOfficialName . '\\');
+        $composerNameSpace = str_replace (['\\', '/'], '\\\\', $packageOfficialName . '\\');
         $composerNameSpace = str_replace ('-', '', $composerNameSpace);
 
         $packageName = $this->ask ('Please enter package name');
@@ -108,7 +108,7 @@ class MakeHCPackage extends HCCommand
             $composer = json_decode ($this->file->get ('composer.json'));
 
             if (!isset($composer->autoload->{'psr-4'}->{$composerNameSpace}))
-                $composer->autoload->{'psr-4'}->{$composerNameSpace} = $packageDirectory;
+                $composer->autoload->{'psr-4'}->{str_replace('\\\\', '\\', $composerNameSpace)} = $packageDirectory;
 
             $this->file->put ('composer.json', json_encode ($composer, JSON_PRETTY_PRINT));
         }
