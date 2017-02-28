@@ -73,7 +73,7 @@ class {controllerName} extends HCBaseController
      * @param $id
      * @return mixed
      */
-    public function getSingleRecord($id)
+    public function getSingleRecord(string $id)
     {
         $with = [];
 
