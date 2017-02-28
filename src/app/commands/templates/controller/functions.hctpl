@@ -1,7 +1,7 @@
 /**
     * Create item
     *
-    * @param null $data
+    * @param array|null $data
     * @return mixed
     */
     protected function __create(array $data = null)
@@ -34,12 +34,12 @@
     /**
     * Updates existing specific items based on ID
     *
-    * @param $id
+    * @param string $id
     * @return mixed
     */
     protected function __updateStrict(string $id)
     {
-        {modelName}::where('id', $id)->update(Request::all());
+        {modelName}::where('id', $id)->update(request()->all());
 
         return $this->getSingleRecord($id);
     }
