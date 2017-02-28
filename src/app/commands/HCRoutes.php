@@ -1,6 +1,6 @@
 <?php
 
-namespace interactivesolutions\honeycombscripts\commands;
+namespace interactivesolutions\honeycombscripts\app\commands;
 
 use interactivesolutions\honeycombcore\commands\HCCommand;
 

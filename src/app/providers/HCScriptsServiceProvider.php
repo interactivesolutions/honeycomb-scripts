@@ -1,16 +1,16 @@
 <?php
 
-namespace interactivesolutions\honeycombscripts\providers;
+namespace interactivesolutions\honeycombscripts\app\providers;
 
 use Illuminate\Support\ServiceProvider;
-use interactivesolutions\honeycombscripts\commands\HCDocs;
-use interactivesolutions\honeycombscripts\commands\HCEnv;
-use interactivesolutions\honeycombscripts\commands\HCUpdate;
-use interactivesolutions\honeycombscripts\commands\MakeHCPackage;
-use interactivesolutions\honeycombscripts\commands\MakeHCService;
-use interactivesolutions\honeycombscripts\commands\HCRoutes;
-use interactivesolutions\honeycombscripts\commands\MakeHCProject;
-use interactivesolutions\honeycombscripts\commands\HCSeed;
+use interactivesolutions\honeycombscripts\app\commands\HCDocs;
+use interactivesolutions\honeycombscripts\app\commands\HCEnv;
+use interactivesolutions\honeycombscripts\app\commands\HCUpdate;
+use interactivesolutions\honeycombscripts\app\commands\MakeHCPackage;
+use interactivesolutions\honeycombscripts\app\commands\MakeHCService;
+use interactivesolutions\honeycombscripts\app\commands\HCRoutes;
+use interactivesolutions\honeycombscripts\app\commands\MakeHCProject;
+use interactivesolutions\honeycombscripts\app\commands\HCSeed;
 
 class HCScriptsServiceProvider extends ServiceProvider
 {

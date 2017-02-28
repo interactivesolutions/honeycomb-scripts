@@ -1,6 +1,6 @@
 <?php
 
-namespace interactivesolutions\honeycombscripts\commands;
+namespace interactivesolutions\honeycombscripts\app\commands;
 
 use Illuminate\Support\Facades\App;
 use interactivesolutions\honeycombcore\commands\HCCommand;
@@ -87,7 +87,7 @@ class MakeHCPackage extends HCCommand
             "templateDestination" => __DIR__ . '/templates/service.provider.hctpl',
             "content"             => [
                 "packageName"      => $packageName,
-                "nameSpace"        => $nameSpace . '\providers',
+                "nameSpace"        => $nameSpace . '\app\providers',
                 "nameSpaceGeneral" => $nameSpace . '\http\controllers',
             ],
         ]);
@@ -114,7 +114,7 @@ class MakeHCPackage extends HCCommand
         }
 
         $this->comment ('Please add to config/app.php under "providers":');
-        $this->info ($nameSpace . '\providers\\' . $packageName . 'ServiceProvider::class');
+        $this->info ($nameSpace . '\app\providers\\' . $packageName . 'ServiceProvider::class');
 
         $this->comment ('********************************************************');
 
