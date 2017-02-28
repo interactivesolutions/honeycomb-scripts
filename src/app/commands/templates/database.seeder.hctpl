@@ -1,5 +1,5 @@
 <?php
-namespace {nameSpace};
+namespace {nameSpace}\database\seeds;
 
 use Illuminate\Database\Seeder;
 
