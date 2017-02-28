@@ -39,9 +39,9 @@
     */
     protected function __updateStrict(string $id)
     {
-        $record = {modelName}::where('id', $id)->update(Request::all());
+        {modelName}::where('id', $id)->update(Request::all());
 
-        return $this->getSingleRecord($record->id);
+        return $this->getSingleRecord($id);
     }
 
     /**
