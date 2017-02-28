@@ -108,7 +108,7 @@ class MakeHCPackage extends HCCommand
             $composer = json_decode ($this->file->get ('composer.json'));
 
             if (!isset($composer->autoload->{'psr-4'}->{$composerNameSpace}))
-                $composer->autoload->{'psr-4'}->{str_replace('\\\\', '\\', $composerNameSpace)} = $packageDirectory;
+                $composer->autoload->{'psr-4'}->{str_replace('\\\\', '\\', $composerNameSpace)} = $packageDirectory . '/src';
 
             $this->file->put ('composer.json', json_encode ($composer, JSON_PRETTY_PRINT));
         }
