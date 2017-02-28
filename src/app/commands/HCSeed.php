@@ -33,8 +33,6 @@ class HCSeed extends HCCommand
         foreach ($this->getSeederFiles() as $filePath)
             $seeders = array_merge($seeders, array_keys(AnnotationsParser::parsePhp(file_get_contents($filePath))));
 
-        dd($seeders);
-
         foreach ($seeders as $class)
             $this->call('db:seed',["--class" => $class]);
 
