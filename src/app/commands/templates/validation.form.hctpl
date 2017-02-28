@@ -1,6 +1,6 @@
 <?php namespace {formValidationNameSpace};
 
-use interactivesolutions\honeycombcore\app\http\controllers\HCCoreFormValidator;
+use interactivesolutions\honeycombcore\http\controllers\HCCoreFormValidator;
 
 class {formValidationName} extends HCCoreFormValidator
 {
