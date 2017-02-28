@@ -46,6 +46,6 @@ class HCSeed extends HCCommand
      */
     protected function getSeederFiles ()
     {
-        return array_merge ($this->file->glob (__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
+        return array_merge ($this->file->glob (__DIR__ . './../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
     }
 }
