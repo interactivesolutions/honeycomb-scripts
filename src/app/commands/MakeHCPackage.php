@@ -88,7 +88,7 @@ class MakeHCPackage extends HCCommand
             "content"             => [
                 "packageName"      => $packageName,
                 "nameSpace"        => $nameSpace . '\app\providers',
-                "nameSpaceGeneral" => $nameSpace . '\http\controllers',
+                "nameSpaceGeneral" => $nameSpace . '\app\http\controllers',
             ],
         ]);
 

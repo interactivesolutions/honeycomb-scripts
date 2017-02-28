@@ -159,10 +159,7 @@ class MakeHCService extends HCCommand
         $item->controllerName = $item->serviceName . 'Controller';
 
         // creating name space from service URL
-        $item->controllerNamespace = str_replace ('/', '\\', $item->directory . 'App\http\controllers\\' . str_replace ('-', '', $item->serviceURL));
-
-        if ($item->pacakgeService)
-            $item->controllerNamespace = str_replace ('App\\', '', $item->controllerNamespace);
+        $item->controllerNamespace = str_replace ('/', '\\', $item->directory . 'app\http\controllers\\' . str_replace ('-', '', $item->serviceURL));
 
         $item->controllerNamespace = array_filter (explode ('\\', $item->controllerNamespace));
         array_pop ($item->controllerNamespace);
