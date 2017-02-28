@@ -146,7 +146,7 @@ class HCEnv extends HCCommand
      * @param $db
      * @return bool
      */
-    private function _connected($db)
+    private function _connected(array $db)
     {
         try {
             $connection = mysqli_connect($db['host'], $db['username'], $db['password'], $db['name']);

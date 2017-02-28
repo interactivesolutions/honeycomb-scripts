@@ -5,6 +5,7 @@ namespace interactivesolutions\honeycombscripts\commands;
 use DB;
 use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
+use stdClass;
 
 class MakeHCService extends HCCommand
 {
@@ -71,7 +72,7 @@ class MakeHCService extends HCCommand
      *
      * @param $serviceData
      */
-    private function createService ($serviceData)
+    private function createService (stdClass $serviceData)
     {
         $this->comment ('');
         $this->comment ('*************************************');
@@ -111,7 +112,7 @@ class MakeHCService extends HCCommand
      * @param $file
      * @return bool
      */
-    private function validateFile ($file)
+    private function validateFile (string $file)
     {
         //TODO validate
         return true;
@@ -121,7 +122,7 @@ class MakeHCService extends HCCommand
      * Checking package existence
      * @param $item
      */
-    private function checkPackage ($item)
+    private function checkPackage (stdClass $item)
     {
         if (!$this->file->exists ($item->rootDirectory))
             $this->abort ('Package ' . $item->directory . ' not existing, please create a repository and launch "php artisan make:hcpackage" command');
@@ -132,7 +133,7 @@ class MakeHCService extends HCCommand
      * @param $file
      * @return mixed
      */
-    function optimizeData ($file)
+    function optimizeData (string $file)
     {
         $item = json_decode ($this->file->get ($file));
 
@@ -217,7 +218,7 @@ class MakeHCService extends HCCommand
      * @param $item
      * @return array|string
      */
-    private function createItemDirectoryPath ($item)
+    private function createItemDirectoryPath (string $item)
     {
         $item = array_filter (explode ('/', $item));
         array_pop ($item);
@@ -232,7 +233,7 @@ class MakeHCService extends HCCommand
      * @param $tableName
      * @return mixed
      */
-    private function getTableColumns ($tableName)
+    private function getTableColumns (string $tableName)
     {
         $columns = DB::getSchemaBuilder ()->getColumnListing ($tableName);
 
@@ -250,7 +251,7 @@ class MakeHCService extends HCCommand
      *
      * @param $service
      */
-    private function createTranslations ($service)
+    private function createTranslations (stdClass $service)
     {
         //TODO integrate interactivesolutions/honeycomb-languages package
         $this->createFileFromTemplate ([
@@ -270,7 +271,7 @@ class MakeHCService extends HCCommand
      * @param $service
      * @return string
      */
-    private function gatherTranslations ($service)
+    private function gatherTranslations (stdClass $service)
     {
         $output = '';
         $tpl = $this->file->get (__DIR__ . '/templates/shared/array.element.hctpl');
@@ -300,7 +301,7 @@ class MakeHCService extends HCCommand
      * @param $item
      * @internal param $modelData
      */
-    private function createModels ($item)
+    private function createModels (stdClass $item)
     {
         $modelData = $item->database;
         $tableList = [];
@@ -332,7 +333,7 @@ class MakeHCService extends HCCommand
      * @param $columns
      * @return string
      */
-    private function getColumnsFillable ($columns)
+    private function getColumnsFillable (array $columns)
     {
         $names = [];
 
@@ -370,7 +371,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @internal param $item
      */
-    private function createController ($serviceData)
+    private function createController (stdClass $serviceData)
     {
         $this->createFileFromTemplate ([
             "destination"         => $serviceData->controllerDestination,
@@ -405,7 +406,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return string
      */
-    private function getAdminListHeader ($serviceData)
+    private function getAdminListHeader (stdClass $serviceData)
     {
         $output = '';
         $model = null;
@@ -438,7 +439,7 @@ class MakeHCService extends HCCommand
      *
      * @param $serviceData
      */
-    private function createRoutes ($serviceData)
+    private function createRoutes (stdClass $serviceData)
     {
         $this->createFileFromTemplate ([
             "destination"         => $serviceData->routesDestination,
@@ -465,7 +466,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return null
      */
-    private function updateConfiguration ($serviceData)
+    private function updateConfiguration (stdClass $serviceData)
     {
         $config = json_decode ($this->file->get ($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH));
 
@@ -484,7 +485,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return null
      */
-    private function updateActions ($config, $serviceData)
+    private function updateActions (stdClass $config, stdClass $serviceData)
     {
         $servicePermissions = [
             "name"       => "admin." . $serviceData->serviceRouteName,
@@ -526,7 +527,7 @@ class MakeHCService extends HCCommand
      * @param $config
      * @param $serviceData
      */
-    private function updateRolesActions ($config, $serviceData)
+    private function updateRolesActions (stdClass $config, stdClass $serviceData)
     {
         $rolesActions = [
             "project-admin" =>
@@ -550,7 +551,7 @@ class MakeHCService extends HCCommand
      *
      * @param $file
      */
-    private function finalizeFile ($file)
+    private function finalizeFile (stdClass $file)
     {
         $this->file->move ($file->getPathName (), $file->getPathName () . '.done');
     }
@@ -561,7 +562,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return string
      */
-    private function getInputData ($serviceData)
+    private function getInputData (stdClass $serviceData)
     {
         $output = '';
         $skip = array_merge ($this->autoFill, ['id']);
@@ -589,7 +590,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return string
      */
-    private function getUseFiles ($serviceData)
+    private function getUseFiles (stdClass $serviceData)
     {
         $output = '';
 
@@ -615,7 +616,7 @@ class MakeHCService extends HCCommand
      *
      * @param $serviceData
      */
-    private function createFormValidator ($serviceData)
+    private function createFormValidator (stdClass $serviceData)
     {
         $this->createFileFromTemplate ([
             "destination"         => $serviceData->formValidationDestination,
@@ -636,7 +637,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return string
      */
-    private function getRules ($serviceData)
+    private function getRules (stdClass $serviceData)
     {
         $output = '';
         $skip = array_merge ($this->autoFill, ['id']);
@@ -668,7 +669,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return string
      */
-    private function getSearchableFields ($serviceData)
+    private function getSearchableFields (stdClass $serviceData)
     {
         $output = '';
 
@@ -699,8 +700,9 @@ class MakeHCService extends HCCommand
      * Getting default database table
      *
      * @param $database
+     * @return mixed
      */
-    private function getDefaultTable ($database)
+    private function getDefaultTable (array $database)
     {
         foreach ($database as $tableData) {
             if (isset($tableData->default))
@@ -717,7 +719,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return null
      */
-    private function updateMenu ($config, $serviceData)
+    private function updateMenu (stdClass $config, stdClass $serviceData)
     {
         $menuItem = [
             "path"          => 'admin/' . $serviceData->serviceURL,
@@ -756,7 +758,7 @@ class MakeHCService extends HCCommand
      * @param $item
      * @return mixed
      */
-    private function getServiceProviderNameSpace ($item)
+    private function getServiceProviderNameSpace (stdClass $item)
     {
         return json_decode ($this->file->get ($item->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH))->general->serviceProviderNameSpace;
     }
@@ -766,7 +768,7 @@ class MakeHCService extends HCCommand
      *
      * @param $serviceData
      */
-    private function createForm ($serviceData)
+    private function createForm (stdClass $serviceData)
     {
         $this->createFileFromTemplate ([
             "destination"         => $serviceData->formDestination,
@@ -790,7 +792,7 @@ class MakeHCService extends HCCommand
      * @param $data
      * @return string
      */
-    private function getFormFields ($data)
+    private function getFormFields (stdClass $data)
     {
         $output = '';
         $skip = array_merge ($this->autoFill, ['id']);
@@ -825,7 +827,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return mixed
      */
-    private function updateFormManager ($config, $serviceData)
+    private function updateFormManager (stdClass $config, stdClass $serviceData)
     {
         $config->formData = json_decode (json_encode ($config->formData), true);
 

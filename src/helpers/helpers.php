@@ -7,7 +7,7 @@ if (!function_exists('replaceBrackets'))
      * @param array $data
      * @return mixed
      */
-    function replaceBrackets($string, $data = [])
+    function replaceBrackets(string $string, array $data = [])
     {
         foreach ($data as $key => $value)
         {

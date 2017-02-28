@@ -79,7 +79,6 @@ class HCDocs extends HCCommand
                     'commandsInfo'      => $this->getCommands($class)
                 ]);
                 $classesInfo['commands'][] = $info;
-
             }
             elseif((strpos($parsedClass->getRelativePath(),'controllers') != false) && (strpos($parsedClass->getRelativePath(),'controllers/traits') != true))
             {
@@ -114,29 +113,14 @@ class HCDocs extends HCCommand
             $this->error('There are no controllers or commands!');
             exit();
         }
+
         $this->createDocFile($classesInfo, $codeBlockControllers, $codeBlockSectionControllers);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public function createControllerMenu($classesInfo)
+    public function createControllerMenu(array $classesInfo)
     {
         //dd($classesInfo['controllers']);
-        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMenu.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMenu.hctpl');
         $output = '';
 
         foreach ($classesInfo['controllers'] as $value) {
@@ -146,9 +130,10 @@ class HCDocs extends HCCommand
 
         return $output;
     }
-    public function createControllerRow($classesInfo)
+
+    public function createControllerRow(array $classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/controllersRow.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/controllersRow.hctpl');
         $output = '';
         if(isset($classesInfo['controllers'])) {
             foreach ($classesInfo['controllers'] as $value) {
@@ -167,9 +152,10 @@ class HCDocs extends HCCommand
         //dd($output);
         return $output;
     }
-    public function controllerPublicMethods($classesInfo)
+
+    public function controllerPublicMethods(array $classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethod.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethod.hctpl');
         $output = '';
 
         foreach($classesInfo['classMethods']['publicMethods'] as $value)
@@ -184,9 +170,10 @@ class HCDocs extends HCCommand
 
         return $output;
     }
-    public function controllerPrivateMethods($classesInfo)
+
+    public function controllerPrivateMethods(array $classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethodPrivate.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethodPrivate.hctpl');
         $output = '';
 
         foreach($classesInfo['classMethods']['privateMethods'] as $value)
@@ -201,9 +188,10 @@ class HCDocs extends HCCommand
 
         return $output;
     }
-    public function controllerProtectedMethods($classesInfo)
+
+    public function controllerProtectedMethods(array $classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethodProtected.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/controllersMethodProtected.hctpl');
         $output = '';
 
         foreach($classesInfo['classMethods']['protectedMethods'] as $value)
@@ -244,7 +232,7 @@ class HCDocs extends HCCommand
 
     public function createMiddlewareMenu($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMenu.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMenu.hctpl');
         $output = '';
 
         foreach ($classesInfo['middleware'] as $value) {
@@ -256,7 +244,7 @@ class HCDocs extends HCCommand
     }
     public function createMiddlewareRow($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareRow.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareRow.hctpl');
         $output = '';
         if(isset($classesInfo['middleware'])) {
             foreach ($classesInfo['middleware'] as $value) {
@@ -276,7 +264,7 @@ class HCDocs extends HCCommand
     }
     public function middlewarePublicMethods($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethod.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethod.hctpl');
         $output = '';
 
         foreach($classesInfo['classMethods']['publicMethods'] as $value)
@@ -293,7 +281,7 @@ class HCDocs extends HCCommand
     }
     public function middlewarePrivateMethods($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethodPrivate.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethodPrivate.hctpl');
         $output = '';
 
         foreach($classesInfo['classMethods']['privateMethods'] as $value)
@@ -310,7 +298,7 @@ class HCDocs extends HCCommand
     }
     public function middlewareProtectedMethods($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethodProtected.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/middlewareMethodProtected.hctpl');
         $output = '';
 
         foreach($classesInfo['classMethods']['protectedMethods'] as $value)
@@ -355,7 +343,7 @@ class HCDocs extends HCCommand
     public function createCommandsRow($classesInfo)
     {
 
-        $file = $this->file->get (__DIR__ . '/templates/docs/commandsRow.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/commandsRow.hctpl');
         $output = '';
 
 
@@ -375,7 +363,7 @@ class HCDocs extends HCCommand
 
     public function createCommandsMenu($classesInfo)
     {
-        $file = $this->file->get (__DIR__ . '/templates/docs/commandsMenu.hctpl.txt');
+        $file = $this->file->get (__DIR__ . '/templates/docs/commandsMenu.hctpl');
         $output = '';
 
         foreach ($classesInfo['commands'] as $value) {
@@ -398,7 +386,7 @@ class HCDocs extends HCCommand
         if(isset($classesInfo['middleware'])) {
             $this->createFileFromTemplate([
                 "destination" => $this->argument('path') . 'docs/docs.html',
-                "templateDestination" => __DIR__ . '/templates/docs/docs.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/docs.hctpl',
                 "content" => [
                     "packageName" => explode(':', explode(',', $composer)[0])[1],
                     "name" => $classesInfo['commands'][0]['classInfo']['name'],
@@ -417,7 +405,7 @@ class HCDocs extends HCCommand
         {
             $this->createFileFromTemplate([
                 "destination" => $this->argument('path') . 'docs/docs.html',
-                "templateDestination" => __DIR__ . '/templates/docs/docs.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/docs.hctpl',
                 "content" => [
                     "packageName" => explode(':', explode(',', $composer)[0])[1],
                     "name" => $classesInfo['commands'][0]['classInfo']['name'],
@@ -442,87 +430,87 @@ class HCDocs extends HCCommand
             //assets/css
             [
                 "destination" => $path . '/docs/assets/css/styles.css',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/css/styles.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/css/styles.hctpl',
             ],
             //assets/js
             [
                 "destination" => $path . '/docs/assets/js/main.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/js/main.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/js/main.hctpl',
             ],
             //assets/less
             [
                 "destination" => $path . '/docs/assets/less/base.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/base.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/base.hctpl',
             ],
             [
                 "destination" => $path . '/docs/assets/less/doc.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/doc.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/doc.hctpl',
             ],
             [
                 "destination" => $path . '/docs/assets/less/landing.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/landing.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/landing.hctpl',
             ],
             [
                 "destination" => $path . '/docs/assets/less/mixins.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/mixins.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/mixins.hctpl',
             ],
             [
                 "destination" => $path . '/docs/assets/less/styles.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/styles.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/styles.hctpl',
             ],
             [
                 "destination" => $path . '/docs/assets/less/theme-default.less',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/less/theme-default.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/less/theme-default.hctpl',
             ],
             //assets/plugins
             [
                 "destination" => $path . '/docs/assets/plugins/jquery-1.12.3.min.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-1123-min.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-1123-min.hctpl',
             ],
             //assets/plugins/bootstrap/css
             [
                 "destination" => $path . '/docs/assets/plugins/bootstrap/css/bootstrap.css',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/css/bootstrap.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/css/bootstrap.hctpl',
             ],
             [
                 "destination" => $path . '/docs/assets/plugins/bootstrap/css/bootstrap.min.css',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/css/bootstrap-min.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/css/bootstrap-min.hctpl',
             ],
             //assets/plugins/bootstrap/js
             [
                 "destination" => $path . '/docs/assets/plugins/bootstrap/js/bootstrap.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/bootstrap.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/bootstrap.hctpl',
             ],
             [
                 "destination" => $path . '/docs/assets/plugins/bootstrap/js/bootstrap.min.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/bootstrap-min.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/bootstrap-min.hctpl',
             ],
             [
                 "destination" => $path . '/docs/assets/plugins/bootstrap/js/npm.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/npm.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/bootstrap/js/npm.hctpl',
             ],
             //assets/plugins/prism
             [
                 "destination" => $path . '/docs/assets/plugins/prism/prism.css',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/prism-css.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/prism-css.hctpl',
             ],
             [
                 "destination" => $path . '/docs/assets/plugins/prism/prism.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/prism-js.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/prism-js.hctpl',
             ],
             //assets/plugins/prism/min
             [
                 "destination" => $path . '/docs/assets/plugins/prism/min/prism-min.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/min/prism-min.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/prism/min/prism-min.hctpl',
             ],
             //assets/plugins/jquery-scrollTo
             [
                 "destination" => $path . '/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.hctpl',
             ],
             [
                 "destination" => $path . '/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.js',
-                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.hctpl.txt',
+                "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.hctpl',
             ],
 
 
