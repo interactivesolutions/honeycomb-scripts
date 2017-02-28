@@ -526,6 +526,7 @@ class MakeHCService extends HCCommand
      *
      * @param $config
      * @param $serviceData
+     * @return stdClass
      */
     private function updateRolesActions (stdClass $config, stdClass $serviceData)
     {
@@ -551,9 +552,9 @@ class MakeHCService extends HCCommand
      *
      * @param $file
      */
-    private function finalizeFile (stdClass $file)
+    private function finalizeFile (string $file)
     {
-        $this->file->move ($file->getPathName (), $file->getPathName () . '.done');
+        $this->file->move ($file, $file . '.done');
     }
 
     /**
