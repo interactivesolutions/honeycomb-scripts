@@ -14,6 +14,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['web', 'auth']], function ()
         Route::post('{serviceURL}/merge', ['as' => 'admin.api.{controllerNameDotted}.merge', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@merge']);
         Route::post('{serviceURL}', ['middleware' => ['acl:{acl_prefix}_create'], 'uses' => '{controllerName}@create']);
         Route::put('{serviceURL}/{id}', ['middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@update']);
+        Route::put('{serviceURL}/{id}/strict', ['as' => 'admin.api.{controllerNameDotted}.strict', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@updateStrict']);
         Route::delete('{serviceURL}/{id}', ['middleware' => ['acl:{acl_prefix}_delete'], 'uses' => '{controllerName}@delete']);
         Route::delete('{serviceURL}', ['middleware' => ['acl:{acl_prefix}_delete'], 'uses' => '{controllerName}@delete']);
         Route::delete('{serviceURL}/{id}/force', ['as' => 'admin.api.{controllerNameDotted}.force', 'middleware' => ['acl:{acl_prefix}_force_delete'], 'uses' => '{controllerName}@forceDelete']);
