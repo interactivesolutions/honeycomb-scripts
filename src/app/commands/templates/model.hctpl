@@ -2,7 +2,7 @@
 
 namespace {modelNameSpace};
 
-use interactivesolutions\honeycombcore\models\HCUuidModel;
+use interactivesolutions\honeycombcore\app\models\HCUuidModel;
 
 class {modelName} extends HCUuidModel
 {
