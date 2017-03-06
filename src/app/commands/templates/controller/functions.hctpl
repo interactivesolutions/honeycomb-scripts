@@ -78,13 +78,17 @@
     }
 
     /**
-    * Creating data query
-    * @return mixed
-    */
-    public function createQuery()
+     * Creating data query
+     *
+     * @param array $select
+     * @return mixed
+     */
+    public function createQuery(array $select = null)
     {
         $with = [];
-        $select = {modelName}::getFillableFields();
+
+        if ($select == null)
+            $select = {modelName}::getFillableFields();
 
         $list = {modelName}::with($with)->select($select)
         // add filters
