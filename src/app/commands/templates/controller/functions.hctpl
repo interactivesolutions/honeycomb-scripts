@@ -112,7 +112,7 @@
     * Creating data list
     * @return mixed
     */
-    public function listData()
+    public function pageData()
     {
         return $this->createQuery()->paginate($this->recordsPerPage);
     }
@@ -128,26 +128,35 @@
 
         //TODO set limit to start search
 
-        return $this->createQuery()->get();
+        return $this->list();
     }
 
-    /**
-    * List search elements
+     /**
+     * Creating data list
+     * @return mixed
+     */
+     public function list()
+     {
+         return $this->createQuery()->get();
+     }
 
-    * @param $list
-    * @return mixed
-    */
-    protected function listSearch(Builder $list)
-    {
-        if(request()->has('q'))
-        {
-            $parameter = request()->input('q');
+     /**
+     * List search elements
 
-            $list = $list->where(function ($query) use ($parameter)
-            {
+     * @param $list
+     * @return mixed
+     */
+     protected function listSearch(Builder $list)
+     {
+         if(request()->has('q'))
+         {
+             $parameter = request()->input('q');
+
+             $list = $list->where(function ($query) use ($parameter)
+             {
                 $query{searchableFields};
-            });
-        }
+             });
+         }
 
-        return $list;
-    }
+         return $list;
+     }
