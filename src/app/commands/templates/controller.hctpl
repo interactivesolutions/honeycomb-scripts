@@ -6,6 +6,8 @@ use interactivesolutions\honeycombcore\http\controllers\HCBaseController;{useFil
 class {controllerName} extends HCBaseController
 {
 
+    //TODO recordsPerPage setting
+
     /**
      * Returning configured admin view
      *
