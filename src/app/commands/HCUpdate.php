@@ -37,5 +37,7 @@ class HCUpdate extends HCCommand
         //TODO before each call check if package (HCACL) is registered with the project
         $this->call('hc:permissions');
         $this->call('hc:admin-menu');
+
+        $this->call('config:cache');
     }
 }
