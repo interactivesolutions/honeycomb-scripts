@@ -6,7 +6,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['web', 'auth']], function ()
 
     Route::group(['prefix' => 'api'], function ()
     {
-        Route::get('{serviceURL}', ['as' => 'admin.api.{controllerNameDotted}', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@listData']);
+        Route::get('{serviceURL}', ['as' => 'admin.api.{controllerNameDotted}', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@pageData']);
+        Route::get('{serviceURL}/list', ['as' => 'admin.api.{controllerNameDotted}.list', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@list']);
         Route::get('{serviceURL}/search', ['as' => 'admin.api.{controllerNameDotted}.search', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@search']);
         Route::get('{serviceURL}/{id}', ['as' => 'admin.api.{controllerNameDotted}.single', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@getSingleRecord']);
         Route::post('{serviceURL}/{id}/duplicate', ['as' => 'admin.api.{controllerNameDotted}.duplicate', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@duplicate']);
