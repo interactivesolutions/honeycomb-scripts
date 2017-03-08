@@ -13,9 +13,7 @@
   "require": {
     "php": ">=7.0.0",
     "laravel\/framework": "5.3.*",
-    "nette\/reflection": "^2.4"
-  },
-  "require-dev": {
+    "nette\/reflection": "^2.4",
     "xethron\/migrations-generator": "^2.0"
   },
   "autoload": {
