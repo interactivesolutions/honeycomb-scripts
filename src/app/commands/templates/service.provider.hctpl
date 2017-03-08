@@ -37,6 +37,9 @@ class {packageName}ServiceProvider extends ServiceProvider
 
         // registering routes
         $this->registerRoutes();
+
+        //register providers
+        $this->registerProviders();
     }
 
     /**
@@ -83,6 +86,14 @@ class {packageName}ServiceProvider extends ServiceProvider
             \Route::group (['namespace' => $this->namespace], function ($router) use ($filePath) {
                 require $filePath;
             });
+    }
+
+    /**
+     * Registering 3rd party providers which are required for this package to run
+     */
+    private function registerProviders()
+    {
+
     }
 }
 
