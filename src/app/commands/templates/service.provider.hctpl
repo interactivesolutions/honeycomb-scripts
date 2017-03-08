@@ -49,7 +49,7 @@ class {packageName}ServiceProvider extends ServiceProvider
     {
         $filePath = __DIR__ . '/../http/helpers.php';
 
-        if (\File::isFile($filePath))
+        if (file_exists($filePath))
             require_once $filePath;
     }
 
