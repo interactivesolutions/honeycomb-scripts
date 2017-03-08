@@ -1,25 +1,11 @@
 # honeycomb-scripts
-HoneyComb scripts repository, helpers to generate code
+HoneyComb scripts repository, helpers to generate code or create code documentation
 
-## Installation
+## Attention
 
-Begin by installing this package through Composer.
+This is part of HoneyComb CMS package.
 
+It will not work alone.
 
-```js
-	{
-	    "require": {
-	    	"interactivesolutions/honeycomb-scripts": "*"
-		}
-	}
-```
-
-```js
-    composer require interactivesolutions/honeycomb-scripts "*"
-```
-
-## Laravel installation
-
-Then register the service provider and Facade by opening `config/app.php`
-
-    interactivesolutions\honeycomb-scripts\providers\HCScriptsProvider::class
+Please use:
+https://github.com/interactivesolutions/honeycomb-cms
