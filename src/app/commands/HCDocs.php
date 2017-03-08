@@ -509,7 +509,7 @@ class HCDocs extends HCCommand
                 "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.hctpl',
             ],
             [
-                "destination" => $path . 'app/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.js',
+                "destination" => $path . 'docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.js',
                 "templateDestination" => __DIR__ . '/templates/docs/assets/plugins/jquery-scrollTo/jquery.scrollTo.min.hctpl',
             ],
 
