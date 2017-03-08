@@ -8,6 +8,14 @@
     {
       "name": "Jevgenij Dmitrijev",
       "email": "jd@interactivesolutions.lt"
+    },
+    {
+      "name": "Mantas Gelčius",
+      "email": "mantas.gelcius@gmail.com"
+    },
+    {
+      "name": "Liutauras Kavaliauskas",
+      "email": "liutauraskav@gmail.com"
     }
   ],
   "require": {
@@ -20,6 +28,5 @@
     "psr-4": {
       "interactivesolutions\\honeycombscripts\\": "src/"
     }
-  },
-  "minimum-stability": "dev"
+  }
 }
