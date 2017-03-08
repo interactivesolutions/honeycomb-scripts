@@ -1,0 +1,162 @@
+/**
+    * Create item
+    *
+    * @param array|null $data
+    * @return mixed
+    */
+    protected function __create(array $data = null)
+    {
+        if(is_null($data))
+            $data = $this->getInputData();
+
+        $record = {modelName}::create(array_get($data, 'record'));
+
+        return $this->getSingleRecord($record->id);
+    }
+
+    /**
+    * Updates existing item based on ID
+    *
+    * @param $id
+    * @return mixed
+    */
+    protected function __update(string $id)
+    {
+        $record = {modelName}::findOrFail($id);
+
+        $data = $this->getInputData();
+
+        $record->update(array_get($data, 'record'));
+
+        return $this->getSingleRecord($record->id);
+    }
+
+    /**
+    * Updates existing specific items based on ID
+    *
+    * @param string $id
+    * @return mixed
+    */
+    protected function __updateStrict(string $id)
+    {
+        {modelName}::where('id', $id)->update(request()->all());
+
+        return $this->getSingleRecord($id);
+    }
+
+    /**
+    * Delete records table
+    *
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __delete(array $list)
+    {
+        {modelName}::destroy($list);
+    }
+
+    /**
+    * Delete records table
+    *
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __forceDelete(array $list)
+    {
+        {modelName}::onlyTrashed()->whereIn('id', $list)->forceDelete();
+    }
+
+    /**
+    * Restore multiple records
+    *
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __restore(array $list)
+    {
+        {modelName}::whereIn('id', $list)->restore();
+    }
+
+    /**
+     * Creating data query
+     *
+     * @param array $select
+     * @return mixed
+     */
+    public function createQuery(array $select = null)
+    {
+        $with = [];
+
+        if ($select == null)
+            $select = {modelName}::getFillableFields();
+
+        $list = {modelName}::with($with)->select($select)
+        // add filters
+        ->where(function ($query) use ($select) {
+            $query = $this->getRequestParameters($query, $select);
+        });
+
+        // enabling check for deleted
+        $list = $this->checkForDeleted($list);
+
+        // add search items
+        $list = $this->listSearch($list);
+
+        // ordering data
+        $list = $this->orderData($list, $select);
+
+        return $list;
+    }
+
+    /**
+    * Creating data list
+    * @return mixed
+    */
+    public function pageData()
+    {
+        return $this->createQuery()->paginate($this->recordsPerPage);
+    }
+
+    /**
+    * Creating data list based on search
+    * @return mixed
+    */
+    public function search()
+    {
+        if (!request('q'))
+            return [];
+
+        //TODO set limit to start search
+
+        return $this->list();
+    }
+
+     /**
+     * Creating data list
+     * @return mixed
+     */
+     public function list()
+     {
+         return $this->createQuery()->get();
+     }
+
+     /**
+     * List search elements
+
+     * @param $list
+     * @return mixed
+     */
+     protected function listSearch(Builder $list)
+     {
+         if(request()->has('q'))
+         {
+             $parameter = request()->input('q');
+
+             $list = $list->where(function ($query) use ($parameter)
+             {
+                $query{searchableFields};
+             });
+         }
+
+         return $list;
+     }

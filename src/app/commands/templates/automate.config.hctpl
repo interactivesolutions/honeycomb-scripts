@@ -1,0 +1,20 @@
+{
+    "directory":"",
+    "serviceURL":"",
+    "serviceIcon":"square-o",
+    "serviceName":"",
+    "generateMigrations":1,
+    "multiLanguage":0,
+    "database":
+    [
+        {
+            "tableName":"",
+            "modelName":"",
+            "default":1
+        },
+        {
+            "tableName":"",
+            "modelName":""
+        }
+    ]
+}

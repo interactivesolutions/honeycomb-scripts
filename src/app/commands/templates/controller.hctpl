@@ -1,0 +1,92 @@
+<?php namespace {namespace};
+
+use Illuminate\Database\Eloquent\Builder;
+use interactivesolutions\honeycombcore\http\controllers\HCBaseController;{useFiles}
+
+class {controllerName} extends HCBaseController
+{
+
+    //TODO recordsPerPage setting
+
+    /**
+     * Returning configured admin view
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function adminView()
+    {
+        $config = [
+            'title'       => trans('{translationsLocation}.page_title'),
+            'listURL'     => route('admin.api.{controllerNameDotted}'),
+            'newFormUrl'  => route('admin.api.form-manager', ['{serviceNameDotted}-new']),
+            'editFormUrl' => route('admin.api.form-manager', ['{serviceNameDotted}-edit']),
+            'imagesUrl'   => route('resource.get', ['/']),
+            'headers'     => $this->getAdminListHeader(),
+        ];
+
+        if ($this->user()->can('{acl_prefix}_create'))
+            $config['actions'][] = 'new';
+
+        if ($this->user()->can('{acl_prefix}_update'))
+        {
+            $config['actions'][] = 'update';
+            $config['actions'][] = 'restore';
+        }
+
+        if ($this->user()->can('{acl_prefix}_delete'))
+            $config['actions'][] = 'delete';
+
+        $config['actions'][] = 'search';
+
+        return view('HCCoreUI::admin.content.list', ['config' => $config]);
+    }
+
+    /**
+     * Creating Admin List Header based on Main Table
+     *
+     * @return array
+     */
+    public function getAdminListHeader()
+    {
+        return [
+            {adminListHeader}
+        ];
+    }
+
+    {functions}
+
+    /**
+     * Getting user data on POST call
+     *
+     * @return mixed
+     */
+    protected function getInputData()
+    {
+        (new {formValidationName}())->validateForm();
+
+        $_data = request()->all();
+
+        {inputData}
+        return $data;
+    }
+
+    /**
+     * Getting single record
+     *
+     * @param $id
+     * @return mixed
+     */
+    public function getSingleRecord(string $id)
+    {
+        $with = [];
+
+        $select = {mainModelName}::getFillableFields();
+
+        $record = {mainModelName}::with($with)
+            ->select($select)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        return $record;
+    }
+}

@@ -1,0 +1,46 @@
+<?php
+
+namespace {nameSpace};
+
+class {className}
+{
+    // name of the form
+    protected $formID = '{formID}';
+
+    // is form multi language
+    protected $multiLanguage = {multiLanguage};
+
+    /**
+     * Creating form
+     *
+     * @param bool $edit
+     * @return array
+     */
+    public function createForm(bool $edit = false)
+    {
+        $form = [
+            'storageURL' => route('admin.api.{serviceRouteName}'),
+            'buttons'    => [
+                [
+                    "class" => "col-centered",
+                    "label" => trans('HCCoreUI::core.button.submit'),
+                    "type"  => "submit",
+                ],
+            ],
+            'structure'  => [
+                {formFields}
+            ],
+        ];
+
+        if ($this->multiLanguage)
+            $form['availableLanguages'] = []; //TOTO implement honeycomb-languages package
+
+        if (!$edit)
+            return $form;
+
+        //Make changes to edit form if needed
+        // $form['structure'][] = [];
+
+        return $form;
+    }
+}

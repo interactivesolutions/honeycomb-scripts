@@ -1,0 +1,18 @@
+<?php namespace {formValidationNameSpace};
+
+use interactivesolutions\honeycombcore\http\controllers\HCCoreFormValidator;
+
+class {formValidationName} extends HCCoreFormValidator
+{
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    protected function rules()
+    {
+        return [
+            {formRules}
+        ];
+    }
+}
