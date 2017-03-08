@@ -15,12 +15,18 @@
     "nette\/reflection": "^2.4"
   },
   "require-dev": {
-    "orangehill\/iseed": "dev-master",
+    "way\/generators": "dev-feature\/laravel-five-stable",
     "xethron\/migrations-generator": "^2.0"
   },
   "autoload": {
     "psr-4": {
       "interactivesolutions\\honeycombscripts\\": "src/"
+    }
+  },
+  "repositories": {
+    "repo-name": {
+      "type": "vcs",
+      "url": "https:\/\/github.com\/jamisonvalenta\/Laravel-4-Generators.git"
     }
   },
   "minimum-stability": "dev"
