@@ -72,12 +72,13 @@ class MakeHCProject extends HCCommand
                     ],
                 ]);
 
-                foreach ($json['create_files'] as $source => $destination) {
-                    $this->info ('Creating file: ' . $destination);
-                    $this->createFileFromTemplate ([
-                        "destination"         => $destination,
-                        "templateDestination" => __DIR__ . '/templates/project/' . $source
-                    ]);
+                foreach ($json['create_files'] as $source => $destinations) {
+
+                    if (!is_array($destinations))
+                        $this->createProjectFile($source, $destinations);
+                    else
+                        foreach ($destinations as $destination)
+                            $this->createProjectFile($source, $destination);
                 }
 
                 replaceTextInFile('composer.json', ['"App\\\\"' => '"app\\\\"']);
@@ -95,5 +96,19 @@ class MakeHCProject extends HCCommand
                 $this->abort ('');
             }
         }
+    }
+
+    /**
+     * Creating project file
+     *
+     * @param string $source
+     * @param string $destination
+     */
+    private function createProjectFile(string $source, string $destination)
+    {
+        $this->createFileFromTemplate ([
+            "destination"         => $destination,
+            "templateDestination" => __DIR__ . '/templates/project/' . $source
+        ]);
     }
 }

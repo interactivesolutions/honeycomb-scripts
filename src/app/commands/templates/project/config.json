@@ -52,6 +52,6 @@
     "bootstrap.app.hctpl": "bootstrap/app.php",
     "database.seeds.databaseseeder.hctpl": "database/seeds/DatabaseSeeder.php",
     "config.app.hctpl": "config/app.php",
-    "../shared/empty.hctpl": "app/honeycomb/routes.php"
+    "../shared/empty.hctpl": ["app/honeycomb/routes.php", "app/honeycomb/routes-custom.php"]
   }
 }
