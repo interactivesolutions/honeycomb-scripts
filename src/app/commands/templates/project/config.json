@@ -3,6 +3,13 @@
     "app",
     "database/seeds",
     "database/migrations",
+    "resources/lang",
+    "storage/app/cache",
+    "storage/app/public",
+    "storage/app/uploads",
+    "storage/framework/cache",
+    "storage/framework/sessions",
+    "storage/framework/views",
     "routes"
   ],
   "remove_files": [
@@ -23,6 +30,12 @@
     "app/routes",
     "database/migrations",
     "database/seed",
+    "storage/app/cache",
+    "storage/app/public",
+    "storage/app/uploads",
+    "storage/framework/cache",
+    "storage/framework/sessions",
+    "storage/framework/views",
     "_automate"
   ],
   "create_files": {
