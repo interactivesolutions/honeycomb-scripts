@@ -52,7 +52,7 @@ class RouteServiceProvider extends ServiceProvider
         $routes = base_path ("app/honeycomb/routes-custom.php");
 
         if (file_exists ($routes))
-            Route::group (function ($router) use ($routes) {
+            Route::group ([], function ($router) use ($routes) {
                 require $routes;
             });
     }
