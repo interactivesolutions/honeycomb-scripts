@@ -4,6 +4,7 @@ namespace app\http;
 
 use app\http\middleware\EncryptCookies;
 use app\http\middleware\VerifyCsrfToken;
+use app\http\middleware\RedirectIfAuthenticated;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
 use Illuminate\Auth\Middleware\Authorize;
@@ -61,6 +62,7 @@ class Kernel extends HttpKernel
         'auth.basic' => AuthenticateWithBasicAuth::class,
         'bindings' => SubstituteBindings::class,
         'can' => Authorize::class,
+        'guest' => RedirectIfAuthenticated::class,
         'throttle' => ThrottleRequests::class,
     ];
 }

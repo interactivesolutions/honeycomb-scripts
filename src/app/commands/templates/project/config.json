@@ -44,6 +44,7 @@
     "app.http.kernel.hctpl": "app/http/Kernel.php",
     "app.http.middleware.encryptcookies.hctpl": "app/http/middleware/EncryptCookies.php",
     "app.http.middleware.verifycsrftoken.hctpl": "app/http/middleware/VerifyCsrfToken.php",
+    "app.http.middleware.redirectifauthenticated.hctpl": "app/http/middleware/RedirectIfAuthenticated.php",
     "app.providers.broadcastserviceprovider.hctpl": "app/providers/BroadcastServiceProvider.php",
     "app.providers.eventserviceprovider.hctpl": "app/providers/EventServiceProvider.php",
     "app.providers.routeserviceprovider.hctpl": "app/providers/RouteServiceProvider.php",
