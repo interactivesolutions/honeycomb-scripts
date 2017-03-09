@@ -39,3 +39,23 @@ if (!function_exists ('validateJSONFromPath')) {
         return $json;
     }
 }
+
+if (!function_exists ('replaceTextInFile')) {
+
+    /**
+     * Function which reads and validates json file
+     *
+     * @param string $path
+     * @param array $content
+     * @throws Exception
+     */
+    function replaceTextInFile (string $path, array $content)
+    {
+        $file = file_get_contents ($path);
+
+        foreach ($content as $replace => $subject)
+            $file = str_replace($replace, $subject, $file);
+
+        file_put_contents($path, $file);
+    }
+}

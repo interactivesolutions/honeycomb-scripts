@@ -4,6 +4,7 @@ namespace interactivesolutions\honeycombscripts\app\commands;
 
 use interactivesolutions\honeycombcore\commands\HCCommand;
 use League\Flysystem\Exception;
+use phpDocumentor\Reflection\Types\This;
 
 class MakeHCProject extends HCCommand
 {
@@ -35,8 +36,6 @@ class MakeHCProject extends HCCommand
 
     /**
      * Removing default structure of application
-     *
-     * @return this
      */
     private function removeDefaultStructure ()
     {
@@ -80,15 +79,9 @@ class MakeHCProject extends HCCommand
                     ]);
                 }
 
-                $composer = validateJSONFromPath('composer.json');
-
-                if (isset($composer['autoload']['psr-4']['App\\']))
-                {
-                    array_forget($composer['autoload']['psr-4'], 'App\\');
-                    $composer['autoload']['psr-4'] = array_prepend($composer['autoload']['psr-4'], 'app', 'app\\');
-
-                    file_put_contents('composer.json', json_encode($composer, JSON_PRETTY_PRINT));
-                }
+                replaceTextInFile('composer.json', ['"App\\\\"' => '"app\\\\"']);
+                replaceTextInFile('config/auth.php', ['=> App\User::class' => '=> interactivesolutions\honeycombacl\app\models\HCUsers::class']);
+                replaceTextInFile('config/database.php', ['utf8\'' => 'utf8mb4\'', 'utf8_' => 'utf8mb4_']);
 
             } catch (Exception $e) {
                 $this->info ('Error occurred!');
