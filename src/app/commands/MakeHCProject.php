@@ -2,6 +2,7 @@
 
 namespace interactivesolutions\honeycombscripts\app\commands;
 
+use Illuminate\Support\Facades\Artisan;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 use League\Flysystem\Exception;
 use phpDocumentor\Reflection\Types\This;
@@ -82,6 +83,8 @@ class MakeHCProject extends HCCommand
                 replaceTextInFile('composer.json', ['"App\\\\"' => '"app\\\\"']);
                 replaceTextInFile('config/auth.php', ['=> App\User::class' => '=> interactivesolutions\honeycombacl\app\models\HCUsers::class']);
                 replaceTextInFile('config/database.php', ['utf8\'' => 'utf8mb4\'', 'utf8_' => 'utf8mb4_']);
+
+                $this->comment('Please run composer dump');
 
             } catch (Exception $e) {
                 $this->info ('Error occurred!');
