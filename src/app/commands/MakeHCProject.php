@@ -12,14 +12,14 @@ class MakeHCProject extends HCCommand
      *
      * @var string
      */
-    protected $signature = 'make:hcproject';
+    protected $signature = 'hc:new-project';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Deleting default laravel project files and creating hc structure';
+    protected $description = 'Deleting default laravel project files and creating honeycomb cms structure';
 
     /**
      * Execute the console command.
@@ -30,6 +30,8 @@ class MakeHCProject extends HCCommand
     {
         $this->removeDefaultStructure ();
     }
+
+    const CONFIG = __DIR__ . '/templates/project/config.json';
 
     /**
      * Removing default structure of application
@@ -43,11 +45,11 @@ class MakeHCProject extends HCCommand
         if ($confirm) {
             try {
                 // deleting files and folders
-                $version = substr (app ()::VERSION, 0, strrpos (app ()::VERSION, "."));
-                if (!file_exists (__DIR__ . '/templates/config.' . $version . '/project.json'))
-                    $this->abort ('Missing project configuration file for laravel version ' . $version);
 
-                $json = json_decode ($this->file->get (__DIR__ . '/templates/config.' . $version . '/project.json'), true);
+                if (!file_exists (MakeHCProject::CONFIG))
+                    $this->abort ('Missing project configuration file for laravel version');
+
+                $json = validateJSONFromPath (MakeHCProject::CONFIG);
 
                 foreach ($json['remove_folders'] as $location) {
                     $this->info ('Deleting folder: ' . $location);
@@ -65,36 +67,21 @@ class MakeHCProject extends HCCommand
                 }
 
                 $this->createFileFromTemplate ([
-                    "destination"         => 'app/Console/Kernel.php',
-                    "templateDestination" => __DIR__ . '/templates/app.console.kernel.hctpl',
-                ]);
-
-                $this->createFileFromTemplate ([
                     "destination"         => 'app/' . MakeHCService::CONFIG_PATH,
                     "templateDestination" => __DIR__ . '/templates/config.hctpl',
                     "content"             => [
-                        "serviceProviderNameSpace" => "",
+                        "serviceProviderNameSpace" => "app",
                     ],
                 ]);
 
-                $this->createFileFromTemplate ([
-                    "destination"         => "app/providers/RouteServiceProvider.php",
-                    "templateDestination" => __DIR__ . '/templates/route.serviceprovider.hctpl',
-                    "content"             => [
-                        "routesBasePath" => HCRoutes::ROUTES_PATH,
-                    ],
-                ]);
-                $this->createFileFromTemplate ([
-                    "destination"         => 'database/seeds/DatabaseSeeder.php',
-                    "templateDestination" => __DIR__ . '/templates/l.database.seeder.hctpl',
-                ]);
+                foreach ($json['create_files'] as $source => $destination) {
+                    $this->info ('Creating file: ' . $destination);
+                    $this->createFileFromTemplate ([
+                        "destination"         => $destination,
+                        "templateDestination" => __DIR__ . '/templates/project/' . $source
+                    ]);
+                }
 
-                $this->createFileFromTemplate ([
-                    "destination"         => "_automate/example.json",
-                    "templateDestination" => __DIR__ . '/templates/automate.config.hctpl',
-                ]);
-
-                $this->file->put (HCRoutes::ROUTES_PATH, '');
             } catch (Exception $e) {
                 $this->info ('Error occurred!');
                 $this->info ('Error code: ' . $e->getCode ());

@@ -14,7 +14,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    protected $namespace = 'App\Http\Controllers';
+    protected $namespace = 'app\http\controllers';
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -43,7 +43,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapHCRoutes()
     {
         Route::group(['namespace' => $this->namespace], function ($router) {
-            require base_path("{routesBasePath}");
+            require base_path("app/honeycomb/routes.php");
         });
     }
 }
