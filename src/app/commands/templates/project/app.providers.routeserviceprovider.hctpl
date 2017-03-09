@@ -21,9 +21,9 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot ()
     {
-        parent::boot();
+        parent::boot ();
     }
 
     /**
@@ -31,19 +31,29 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function map()
+    public function map ()
     {
-        $this->mapHCRoutes();
+        $this->mapHCRoutes ();
     }
 
     /**
      * Including HoneyComb routes
      * @return void
      */
-    protected function mapHCRoutes()
+    protected function mapHCRoutes ()
     {
-        Route::group(['namespace' => $this->namespace], function ($router) {
-            require base_path("app/honeycomb/routes.php");
-        });
+        $routes = base_path ("app/honeycomb/routes.php");
+
+        if (file_exists ($routes))
+            Route::group (['namespace' => $this->namespace], function ($router) use ($routes) {
+                require $routes;
+            });
+
+        $routes = base_path ("app/honeycomb/routes-custom.php");
+
+        if (file_exists ($routes))
+            Route::group (function ($router) use ($routes) {
+                require $routes;
+            });
     }
 }
