@@ -51,10 +51,8 @@ class MakeHCProject extends HCCommand
 
                 $json = validateJSONFromPath (MakeHCProject::CONFIG);
 
-                foreach ($json['remove_folders'] as $location) {
-                    $this->info ('Deleting folder: ' . $location);
+                foreach ($json['remove_folders'] as $location)
                     $this->deleteDirectory ($location, true);
-                }
 
                 foreach ($json['remove_files'] as $location) {
                     $this->info ('Deleting file: ' . $location);
@@ -80,6 +78,16 @@ class MakeHCProject extends HCCommand
                         "destination"         => $destination,
                         "templateDestination" => __DIR__ . '/templates/project/' . $source
                     ]);
+                }
+
+                $composer = validateJSONFromPath('composer.json');
+
+                if (isset($composer['autoload']['psr-4']['App\\']))
+                {
+                    array_forget($composer['autoload']['psr-4'], 'App\\');
+                    $composer['autoload']['psr-4'] = array_prepend($composer['autoload']['psr-4'], 'app', 'app\\');
+
+                    file_put_contents('composer.json', json_encode($composer, JSON_PRETTY_PRINT));
                 }
 
             } catch (Exception $e) {
