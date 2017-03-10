@@ -37,6 +37,7 @@ class {controllerName} extends HCBaseController
             $config['actions'][] = 'delete';
 
         $config['actions'][] = 'search';
+        $config['filters'] = $this->getFilters ();
 
         return view('HCCoreUI::admin.content.list', ['config' => $config]);
     }
@@ -88,5 +89,17 @@ class {controllerName} extends HCBaseController
             ->firstOrFail();
 
         return $record;
+    }
+
+    /**
+     * Generating filters required for admin view
+     *
+     * @return array
+     */
+    public function getFilters()
+    {
+        $filters = [];
+
+        return $filters;
     }
 }
