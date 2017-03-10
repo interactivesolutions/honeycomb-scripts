@@ -43,6 +43,8 @@ class HCRoutes extends HCCommand
                     if (strpos ($file, '/vendor/') === false)
                         $this->generateRoutes (realpath(implode ('/', array_slice (explode ('/', $file), 0, -3))) . '/');
             }
+        else
+            $this->generateRoutes ($rootDirectory);
     }
 
     /**
