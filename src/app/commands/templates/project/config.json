@@ -3,7 +3,6 @@
     "app",
     "database/seeds",
     "database/migrations",
-    "resources/lang",
     "storage/app/cache",
     "storage/app/public",
     "storage/app/uploads",
