@@ -20,7 +20,6 @@ class HCScriptsServiceProvider extends ServiceProvider
      * @var array
      */
     protected $commands = [
-        HCDocs::class,
         HCEnv::class,
         MakeHCService::class,
         MakeHCProject::class,
