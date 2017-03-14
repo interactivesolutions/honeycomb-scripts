@@ -494,6 +494,13 @@ class MakeHCService extends HCCommand
                 $serviceData->aclPrefix . "_delete",
                 $serviceData->aclPrefix . "_force_delete",
             ],
+            "actionsApps" => [
+                'api_v1_' . $serviceData->aclPrefix . "_list",
+                'api_v1_' . $serviceData->aclPrefix . "_create",
+                'api_v1_' . $serviceData->aclPrefix . "_update",
+                'api_v1_' . $serviceData->aclPrefix . "_delete",
+                'api_v1_' . $serviceData->aclPrefix . "_force_delete",
+            ]
         ];
 
         $contentChanged = false;
