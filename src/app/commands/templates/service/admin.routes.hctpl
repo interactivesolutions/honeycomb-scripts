@@ -1,0 +1,28 @@
+<?php
+
+Route::group(['prefix' => 'admin', 'middleware' => ['web', 'auth']], function ()
+{
+    Route::get('{serviceURL}', ['as' => 'admin.{controllerNameDotted}', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@adminView']);
+
+    Route::group(['prefix' => 'api/{serviceURL}'], function ()
+    {
+        Route::get('/', ['as' => 'admin.api.{controllerNameDotted}', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@listPage']);
+        Route::get('list', ['as' => 'admin.api.{controllerNameDotted}.list', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@list']);
+        Route::get('list/{timestamp}', ['as' => 'admin.api.{controllerNameDotted}.list.update', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@listUpdate']);
+        Route::get('search', ['as' => 'admin.api.{controllerNameDotted}.search', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@listSearch']);
+        Route::get('{id}', ['as' => 'admin.api.{controllerNameDotted}.single', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@getSingleRecord']);
+
+        Route::post('{id}/duplicate', ['as' => 'admin.api.{controllerNameDotted}.duplicate', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@duplicate']);
+        Route::post('restore', ['as' => 'admin.api.{controllerNameDotted}.restore', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@restore']);
+        Route::post('merge', ['as' => 'admin.api.{controllerNameDotted}.merge', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@merge']);
+        Route::post('/', ['middleware' => ['acl:{acl_prefix}_create'], 'uses' => '{controllerName}@create']);
+
+        Route::put('{id}', ['middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@update']);
+        Route::put('{id}/strict', ['as' => 'admin.api.{controllerNameDotted}.update.strict', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@updateStrict']);
+
+        Route::delete('{id}', ['middleware' => ['acl:{acl_prefix}_delete'], 'uses' => '{controllerName}@delete']);
+        Route::delete('/', ['middleware' => ['acl:{acl_prefix}_delete'], 'uses' => '{controllerName}@delete']);
+        Route::delete('{id}/force', ['as' => 'admin.api.{controllerNameDotted}.force', 'middleware' => ['acl:{acl_prefix}_force_delete'], 'uses' => '{controllerName}@forceDelete']);
+        Route::delete('force', ['as' => 'admin.api.{controllerNameDotted}.force.multi', 'middleware' => ['acl:{acl_prefix}_force_delete'], 'uses' => '{controllerName}@forceDelete']);
+    });
+});
