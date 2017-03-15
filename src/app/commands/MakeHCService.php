@@ -56,14 +56,14 @@ class MakeHCService extends HCCommand
      *
      * @return this
      */
-    public function handle ()
+    public function handle()
     {
-        $this->loadConfiguration ();
+        $this->loadConfiguration();
 
         foreach ($this->configurationData as $serviceData) {
             $this->createdFiles = [];
-            $this->createService ($serviceData);
-            $this->finalizeFile ($serviceData->file);
+            $this->createService($serviceData);
+            $this->finalizeFile($serviceData->file);
         }
     }
 
@@ -72,22 +72,23 @@ class MakeHCService extends HCCommand
      *
      * @param $serviceData
      */
-    private function createService (stdClass $serviceData)
+    private function createService(stdClass $serviceData)
     {
-        $this->comment ('');
-        $this->comment ('*************************************');
-        $this->comment ('*         Service creation          *');
-        $this->comment ('*************************************');
-        $this->comment ($serviceData->serviceName);
-        $this->comment ('*************************************');
+        $this->comment('');
+        $this->comment('*************************************');
+        $this->comment('*         Service creation          *');
+        $this->comment('*************************************');
+        $this->comment($serviceData->serviceName);
+        $this->comment('*************************************');
 
-        $this->createTranslations ($serviceData);
-        $this->createModels ($serviceData);
-        $this->createController ($serviceData);
-        $this->createFormValidator ($serviceData);
-        $this->createForm ($serviceData);
-        $this->createRoutes ($serviceData);
-        $this->updateConfiguration ($serviceData);
+        $this->createTranslations($serviceData);
+        $this->createModels($serviceData);
+        $this->createController($serviceData);
+        $this->createFormValidator($serviceData);
+        $this->createForm($serviceData);
+        $this->createRoutes($serviceData, "admin");
+        $this->createRoutes($serviceData, "api");
+        $this->updateConfiguration($serviceData);
 
     }
 
@@ -96,13 +97,13 @@ class MakeHCService extends HCCommand
      *
      * @return this
      */
-    private function loadConfiguration ()
+    private function loadConfiguration()
     {
-        $allFiles = File::allFiles ('_automate');
+        $allFiles = File::allFiles('_automate');
 
         foreach ($allFiles as $file)
-            if (strpos ((string)$file, '.done') === false && $this->validateFile ($file))
-                $this->configurationData[] = $this->optimizeData ($file);
+            if (strpos((string)$file, '.done') === false && $this->validateFile($file))
+                $this->configurationData[] = $this->optimizeData($file);
 
     }
 
@@ -112,7 +113,7 @@ class MakeHCService extends HCCommand
      * @param $file
      * @return bool
      */
-    private function validateFile (string $file)
+    private function validateFile(string $file)
     {
         //TODO validate
         return true;
@@ -122,10 +123,10 @@ class MakeHCService extends HCCommand
      * Checking package existence
      * @param $item
      */
-    private function checkPackage (stdClass $item)
+    private function checkPackage(stdClass $item)
     {
-        if (!$this->file->exists ($item->rootDirectory))
-            $this->abort ('Package ' . $item->directory . ' not existing, please create a repository and launch "php artisan make:hcpackage" command');
+        if (!$this->file->exists($item->rootDirectory))
+            $this->abort('Package ' . $item->directory . ' not existing, please create a repository and launch "php artisan make:hcpackage" command');
     }
 
     /**
@@ -133,15 +134,15 @@ class MakeHCService extends HCCommand
      * @param $file
      * @return mixed
      */
-    function optimizeData (string $file)
+    function optimizeData(string $file)
     {
-        $item = json_decode ($this->file->get ($file));
+        $item = json_decode($this->file->get($file));
 
         if ($item == null)
-            $this->abort ($file->getFilename () . ' has Invalid JSON format.');
+            $this->abort($file->getFilename() . ' has Invalid JSON format.');
 
         $item->file = $file;
-        $item->translationFilePrefix = $this->stringWithUnderscore ($item->serviceURL);
+        $item->translationFilePrefix = $this->stringWithUnderscore($item->serviceURL);
 
         if ($item->directory == '') {
             $item->directory = '';
@@ -151,22 +152,22 @@ class MakeHCService extends HCCommand
         } else {
             $item->directory .= '/';
             $item->rootDirectory = './packages/' . $item->directory . 'src/';
-            $item->translationsLocation = $this->getServiceProviderNameSpace ($item) . "::" . $item->translationFilePrefix;
+            $item->translationsLocation = $this->getServiceProviderNameSpace($item) . "::" . $item->translationFilePrefix;
             $item->pacakgeService = true;
-            $this->checkPackage ($item);
+            $this->checkPackage($item);
         }
 
         $item->controllerName = $item->serviceName . 'Controller';
 
         // creating name space from service URL
-        $item->controllerNamespace = str_replace ('/', '\\', $item->directory . 'app\http\controllers\\' . str_replace ('-', '', $item->serviceURL));
+        $item->controllerNamespace = str_replace('/', '\\', $item->directory . 'app\http\controllers\\' . str_replace('-', '', $item->serviceURL));
 
-        $item->controllerNamespace = array_filter (explode ('\\', $item->controllerNamespace));
-        array_pop ($item->controllerNamespace);
-        $item->controllerNamespace = implode ('\\', $item->controllerNamespace);
-        $item->controllerNamespace = str_replace ('-', '', $item->controllerNamespace);
+        $item->controllerNamespace = array_filter(explode('\\', $item->controllerNamespace));
+        array_pop($item->controllerNamespace);
+        $item->controllerNamespace = implode('\\', $item->controllerNamespace);
+        $item->controllerNamespace = str_replace('-', '', $item->controllerNamespace);
 
-        $routesNameSpace = str_replace ('/', '\\\\', $this->createItemDirectoryPath (str_replace ('-', '', $item->serviceURL)));
+        $routesNameSpace = str_replace('/', '\\\\', $this->createItemDirectoryPath(str_replace('-', '', $item->serviceURL)));
 
         if ($routesNameSpace == "")
             $item->controllerNameForRoutes = $item->controllerName;
@@ -174,38 +175,40 @@ class MakeHCService extends HCCommand
             $item->controllerNameForRoutes = $routesNameSpace . '\\\\' . $item->controllerName;
 
         // creating controller directory
-        $item->controllerDestination = $this->createItemDirectoryPath ($item->rootDirectory . 'app/http/controllers/' . str_replace ('-', '/', $item->serviceURL));
+        $item->controllerDestination = $this->createItemDirectoryPath($item->rootDirectory . 'app/http/controllers/' . str_replace('-', '/', $item->serviceURL));
 
         // creating models directory
-        $item->modelDirectory = str_replace ('/http/controllers', '/models', $item->controllerDestination);
-        $item->modelNamespace = str_replace ('\\http\\controllers', '\\models', $item->controllerNamespace);
+        $item->modelDirectory = str_replace('/http/controllers', '/models', $item->controllerDestination);
+        $item->modelNamespace = str_replace('\\http\\controllers', '\\models', $item->controllerNamespace);
 
         // creating form validator data
         $item->formValidationName = $item->serviceName . 'Validator';
-        $item->formValidationNameSpace = str_replace ('\\http\\controllers', '\\validators', $item->controllerNamespace);
-        $item->formValidationDestination = str_replace ('/http/controllers', '/validators', $item->controllerDestination) . '/' . $item->formValidationName . '.php';
+        $item->formValidationNameSpace = str_replace('\\http\\controllers', '\\validators', $item->controllerNamespace);
+        $item->formValidationDestination = str_replace('/http/controllers', '/validators', $item->controllerDestination) . '/' . $item->formValidationName . '.php';
 
         $item->formName = $item->serviceName . 'Form';
-        $item->formNameSpace = str_replace ('\\http\\controllers', '\\forms', $item->controllerNamespace);
-        $item->formDestination = str_replace ('/http/controllers', '/forms', $item->controllerDestination) . '/' . $item->formName . '.php';
-        $item->formID = $this->stringWithDash ($item->serviceURL);
+        $item->formNameSpace = str_replace('\\http\\controllers', '\\forms', $item->controllerNamespace);
+        $item->formDestination = str_replace('/http/controllers', '/forms', $item->controllerDestination) . '/' . $item->formName . '.php';
+        $item->formID = $this->stringWithDash($item->serviceURL);
 
         // finalizing destination
         $item->controllerDestination .= '/' . $item->controllerName . '.php';
 
         // creating routes directory
-        $item->serviceRouteName = $this->stringWithDots ($item->serviceURL);
+        $item->serviceRouteName = $this->stringWithDots($item->serviceURL);
+        $item->adminRoutesDestination = $item->rootDirectory . 'app/routes/admin/routes.' . $item->serviceRouteName . '.php';
+        $item->apiRoutesDestination = $item->rootDirectory . 'app/routes/api/routes.' . $item->serviceRouteName . '.php';
         $item->routesDestination = $item->rootDirectory . 'app/routes/routes.' . $item->serviceRouteName . '.php';
 
         // creating database information
         foreach ($item->database as $dbItem) {
-            $dbItem->columns = $this->getTableColumns ($dbItem->tableName);
+            $dbItem->columns = $this->getTableColumns($dbItem->tableName);
             $dbItem->modelLocation = $item->modelDirectory . '/' . $dbItem->modelName . '.php';
         }
 
         $item->mainModelName = $item->database[0]->modelName;
 
-        $item->aclPrefix = $this->stringWithUnderscore ($item->directory . $item->serviceRouteName);
+        $item->aclPrefix = $this->stringWithUnderscore($item->directory . $item->serviceRouteName);
 
         return $item;
     }
@@ -215,11 +218,11 @@ class MakeHCService extends HCCommand
      * @param $item
      * @return array|string
      */
-    private function createItemDirectoryPath (string $item)
+    private function createItemDirectoryPath(string $item)
     {
-        $item = array_filter (explode ('/', $item));
-        array_pop ($item);
-        $item = implode ('/', $item);
+        $item = array_filter(explode('/', $item));
+        array_pop($item);
+        $item = implode('/', $item);
 
         return $item;
     }
@@ -230,14 +233,14 @@ class MakeHCService extends HCCommand
      * @param $tableName
      * @return mixed
      */
-    private function getTableColumns (string $tableName)
+    private function getTableColumns(string $tableName)
     {
-        $columns = DB::getSchemaBuilder ()->getColumnListing ($tableName);
+        $columns = DB::getSchemaBuilder()->getColumnListing($tableName);
 
-        if (!count ($columns))
-            $this->abort ("Table not found: " . $tableName);
+        if (!count($columns))
+            $this->abort("Table not found: " . $tableName);
         else
-            $columns = DB::select (DB::raw ('SHOW COLUMNS FROM ' . $tableName));
+            $columns = DB::select(DB::raw('SHOW COLUMNS FROM ' . $tableName));
 
 
         return $columns;
@@ -248,14 +251,14 @@ class MakeHCService extends HCCommand
      *
      * @param $service
      */
-    private function createTranslations (stdClass $service)
+    private function createTranslations(stdClass $service)
     {
         //TODO integrate interactivesolutions/honeycomb-languages package
-        $this->createFileFromTemplate ([
+        $this->createFileFromTemplate([
             "destination"         => $service->rootDirectory . 'resources/lang/en/' . $service->translationFilePrefix . '.php',
             "templateDestination" => __DIR__ . '/templates/service/translations.hctpl',
             "content"             => [
-                "translations" => $this->gatherTranslations ($service),
+                "translations" => $this->gatherTranslations($service),
             ],
         ]);
 
@@ -268,22 +271,22 @@ class MakeHCService extends HCCommand
      * @param $service
      * @return string
      */
-    private function gatherTranslations (stdClass $service)
+    private function gatherTranslations(stdClass $service)
     {
         $output = '';
-        $tpl = $this->file->get (__DIR__ . '/templates/shared/array.element.hctpl');
+        $tpl = $this->file->get(__DIR__ . '/templates/shared/array.element.hctpl');
 
-        $line = str_replace ('{key}', 'page_title', $tpl);
-        $line = str_replace ('{value}', $service->serviceName, $line);
+        $line = str_replace('{key}', 'page_title', $tpl);
+        $line = str_replace('{value}', $service->serviceName, $line);
         $output .= $line;
 
         if (!empty($service->database)) {
 
             foreach ($service->database as $tableName => $model)
-                if (array_key_exists ('columns', $model) && !empty($model->columns))
+                if (array_key_exists('columns', $model) && !empty($model->columns))
                     foreach ($model->columns as $column) {
-                        $line = str_replace ('{key}', $column->Field, $tpl);
-                        $line = str_replace ('{value}', str_replace ("_", " ", ucfirst ($column->Field)), $line);
+                        $line = str_replace('{key}', $column->Field, $tpl);
+                        $line = str_replace('{value}', str_replace("_", " ", ucfirst($column->Field)), $line);
 
                         $output .= $line;
                     }
@@ -298,7 +301,7 @@ class MakeHCService extends HCCommand
      * @param $item
      * @internal param $modelData
      */
-    private function createModels (stdClass $item)
+    private function createModels(stdClass $item)
     {
         $modelData = $item->database;
         $tableList = [];
@@ -306,13 +309,13 @@ class MakeHCService extends HCCommand
         foreach ($modelData as $tableName => $model) {
             $tableList[] = $model->tableName;
 
-            $this->createFileFromTemplate ([
+            $this->createFileFromTemplate([
                 "destination"         => $model->modelLocation,
                 "templateDestination" => __DIR__ . '/templates/service/model.hctpl',
                 "content"             => [
                     "modelNameSpace"  => $item->modelNamespace,
                     "modelName"       => $model->modelName,
-                    "columnsFillable" => $this->getColumnsFillable ($model->columns),
+                    "columnsFillable" => $this->getColumnsFillable($model->columns),
                     "modelTable"      => $model->tableName,
                 ],
             ]);
@@ -321,7 +324,7 @@ class MakeHCService extends HCCommand
         }
 
         if (isset($item->generateMigrations) && $item->generateMigrations)
-            $this->call ('migrate:generate', ["--path" => $item->rootDirectory . 'database/migrations', "tables" => implode (",", $tableList)]);
+            $this->call('migrate:generate', ["--path" => $item->rootDirectory . 'database/migrations', "tables" => implode(",", $tableList)]);
     }
 
     /**
@@ -330,16 +333,16 @@ class MakeHCService extends HCCommand
      * @param $columns
      * @return string
      */
-    private function getColumnsFillable (array $columns)
+    private function getColumnsFillable(array $columns)
     {
         $names = [];
 
         foreach ($columns as $column) {
-            if (!in_array ($column->Field, $this->autoFill))
-                array_push ($names, $column->Field);
+            if (!in_array($column->Field, $this->autoFill))
+                array_push($names, $column->Field);
         }
 
-        return '[\'' . implode ('\', \'', $names) . '\']';
+        return '[\'' . implode('\', \'', $names) . '\']';
     }
 
     /**
@@ -348,7 +351,7 @@ class MakeHCService extends HCCommand
      *
      * @return this
      */
-    protected function executeAfterAbort ()
+    protected function executeAfterAbort()
     {
         /*foreach ($this->originalFiles as $value)
         {
@@ -357,8 +360,8 @@ class MakeHCService extends HCCommand
         }*/
 
         foreach ($this->createdFiles as $value) {
-            $this->file->delete ($value);
-            $this->error ('Deleted: ' . $value);
+            $this->file->delete($value);
+            $this->error('Deleted: ' . $value);
         }
     }
 
@@ -368,9 +371,9 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @internal param $item
      */
-    private function createController (stdClass $serviceData)
+    private function createController(stdClass $serviceData)
     {
-        $this->createFileFromTemplate ([
+        $this->createFileFromTemplate([
             "destination"         => $serviceData->controllerDestination,
             "templateDestination" => __DIR__ . '/templates/service/controller.hctpl',
             "content"             => [
@@ -378,19 +381,19 @@ class MakeHCService extends HCCommand
                 "controllerName"       => $serviceData->controllerName,
                 "acl_prefix"           => $serviceData->aclPrefix,
                 "translationsLocation" => $serviceData->translationsLocation,
-                "serviceNameDotted"    => $this->stringWithDash ($serviceData->translationFilePrefix),
+                "serviceNameDotted"    => $this->stringWithDash($serviceData->translationFilePrefix),
                 "controllerNameDotted" => $serviceData->serviceRouteName,
-                "adminListHeader"      => $this->getAdminListHeader ($serviceData),
+                "adminListHeader"      => $this->getAdminListHeader($serviceData),
                 "formValidationName"   => $serviceData->formValidationName,
-                "functions"            => replaceBrackets ($this->file->get (__DIR__ . '/templates/service/controller/functions.hctpl'),
+                "functions"            => replaceBrackets($this->file->get(__DIR__ . '/templates/service/controller/functions.hctpl'),
                     [
                         "modelName"      => $serviceData->mainModelName,
                         "modelNameSpace" => $serviceData->modelNamespace,
                     ]),
-                "inputData"            => $this->getInputData ($serviceData),
-                "useFiles"             => $this->getUseFiles ($serviceData),
+                "inputData"            => $this->getInputData($serviceData),
+                "useFiles"             => $this->getUseFiles($serviceData),
                 "mainModelName"        => $serviceData->mainModelName,
-                "searchableFields"     => $this->getSearchableFields ($serviceData),
+                "searchableFields"     => $this->getSearchableFields($serviceData),
             ],
         ]);
 
@@ -403,27 +406,27 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return string
      */
-    private function getAdminListHeader (stdClass $serviceData)
+    private function getAdminListHeader(stdClass $serviceData)
     {
         $output = '';
         $model = null;
 
-        $tpl = $this->file->get (__DIR__ . '/templates/service/controller/admin.list.header.hctpl');
+        $tpl = $this->file->get(__DIR__ . '/templates/service/controller/admin.list.header.hctpl');
 
-        $model = $this->getDefaultTable ($serviceData->database);
+        $model = $this->getDefaultTable($serviceData->database);
 
         if ($model == null)
-            $this->abort ('No default table for service');
+            $this->abort('No default table for service');
 
-        $skip = array_merge ($this->autoFill, ['id']);
+        $skip = array_merge($this->autoFill, ['id']);
 
-        if (array_key_exists ('columns', $model) && !empty($model->columns))
+        if (array_key_exists('columns', $model) && !empty($model->columns))
             foreach ($model->columns as $column) {
-                if (in_array ($column->Field, $skip))
+                if (in_array($column->Field, $skip))
                     continue;
 
-                $field = str_replace ('{key}', $column->Field, $tpl);
-                $field = str_replace ('{translationsLocation}', $serviceData->translationsLocation, $field);
+                $field = str_replace('{key}', $column->Field, $tpl);
+                $field = str_replace('{translationsLocation}', $serviceData->translationsLocation, $field);
 
                 $output .= $field;
             }
@@ -436,23 +439,35 @@ class MakeHCService extends HCCommand
      *
      * @param $serviceData
      */
-    private function createRoutes (stdClass $serviceData)
+    private function createRoutes(stdClass $serviceData, string $type)
     {
-        $this->createFileFromTemplate ([
-            "destination"         => $serviceData->routesDestination,
-            "templateDestination" => __DIR__ . '/templates/service/routes.hctpl',
-            "content"             => [
-                "serviceURL"           => $serviceData->serviceURL,
-                "controllerNameDotted" => $serviceData->serviceRouteName,
-                "acl_prefix"           => $serviceData->aclPrefix,
-                "controllerName"       => $serviceData->controllerNameForRoutes,
-            ],
-        ]);
+        if ($type == "api")
+            $this->createFileFromTemplate([
+                "destination"         => $serviceData->apiRoutesDestination,
+                "templateDestination" => __DIR__ . '/templates/service/' . $type . '.routes.hctpl',
+                "content"             => [
+                    "serviceURL"           => $serviceData->serviceURL,
+                    "controllerNameDotted" => $serviceData->serviceRouteName,
+                    "acl_prefix"           => $serviceData->aclPrefix,
+                    "controllerName"       => $serviceData->controllerNameForRoutes,
+                ],
+            ]);
+        elseif ($type == "admin")
+            $this->createFileFromTemplate([
+                "destination"         => $serviceData->adminRoutesDestination,
+                "templateDestination" => __DIR__ . '/templates/service/' . $type . '.routes.hctpl',
+                "content"             => [
+                    "serviceURL"           => $serviceData->serviceURL,
+                    "controllerNameDotted" => $serviceData->serviceRouteName,
+                    "acl_prefix"           => $serviceData->aclPrefix,
+                    "controllerName"       => $serviceData->controllerNameForRoutes,
+                ],
+            ]);
 
         if ($serviceData->rootDirectory != './')
-            $this->call ('hc:routes', ["directory" => $serviceData->rootDirectory]);
+            $this->call('hc:routes', ["directory" => $serviceData->rootDirectory]);
         else
-            $this->call ('hc:routes');
+            $this->call('hc:routes');
 
         $this->createdFiles[] = $serviceData->routesDestination;
     }
@@ -463,16 +478,16 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return null
      */
-    private function updateConfiguration (stdClass $serviceData)
+    private function updateConfiguration(stdClass $serviceData)
     {
-        $config = json_decode ($this->file->get ($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH));
+        $config = json_decode($this->file->get($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH));
 
-        $config = $this->updateActions ($config, $serviceData);
-        $config = $this->updateRolesActions ($config, $serviceData);
-        $config = $this->updateMenu ($config, $serviceData);
-        $config = $this->updateFormManager ($config, $serviceData);
+        $config = $this->updateActions($config, $serviceData);
+        $config = $this->updateRolesActions($config, $serviceData);
+        $config = $this->updateMenu($config, $serviceData);
+        $config = $this->updateFormManager($config, $serviceData);
 
-        $this->file->put ($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH, json_encode ($config, JSON_PRETTY_PRINT));
+        $this->file->put($serviceData->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH, json_encode($config, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -482,12 +497,12 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return null
      */
-    private function updateActions (stdClass $config, stdClass $serviceData)
+    private function updateActions(stdClass $config, stdClass $serviceData)
     {
         $servicePermissions = [
-            "name"       => "admin." . $serviceData->serviceRouteName,
-            "controller" => $serviceData->controllerNamespace . '\\' . $serviceData->controllerName,
-            "actions"    => [
+            "name"        => "admin." . $serviceData->serviceRouteName,
+            "controller"  => $serviceData->controllerNamespace . '\\' . $serviceData->controllerName,
+            "actions"     => [
                 $serviceData->aclPrefix . "_list",
                 $serviceData->aclPrefix . "_create",
                 $serviceData->aclPrefix . "_update",
@@ -507,12 +522,12 @@ class MakeHCService extends HCCommand
 
         foreach ($config->acl->permissions as &$value) {
             if ($value->name == "admin." . $serviceData->serviceRouteName) {
-                if ($this->confirm ('Duplicate ACL found ' . "admin." . $serviceData->serviceRouteName . ' Confirm override', 'no')) {
+                if ($this->confirm('Duplicate ACL found ' . "admin." . $serviceData->serviceRouteName . ' Confirm override', 'no')) {
                     $contentChanged = true;
                     $value = $servicePermissions;
                     break;
                 } else {
-                    $this->abort ('Can not override existing configuration. Aborting...');
+                    $this->abort('Can not override existing configuration. Aborting...');
 
                     return null;
                 }
@@ -520,7 +535,7 @@ class MakeHCService extends HCCommand
         }
 
         if (!$contentChanged)
-            $config->acl->permissions = array_merge ($config->acl->permissions, [$servicePermissions]);
+            $config->acl->permissions = array_merge($config->acl->permissions, [$servicePermissions]);
 
         return $config;
     }
@@ -532,7 +547,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return stdClass
      */
-    private function updateRolesActions (stdClass $config, stdClass $serviceData)
+    private function updateRolesActions(stdClass $config, stdClass $serviceData)
     {
         $rolesActions = [
             "project-admin" =>
@@ -546,7 +561,7 @@ class MakeHCService extends HCCommand
         if (empty($config->acl->rolesActions))
             $config->acl->rolesActions = $rolesActions;
         else
-            $config->acl->rolesActions->{"project-admin"} = array_unique (array_merge ($config->acl->rolesActions->{"project-admin"}, $rolesActions['project-admin']));
+            $config->acl->rolesActions->{"project-admin"} = array_unique(array_merge($config->acl->rolesActions->{"project-admin"}, $rolesActions['project-admin']));
 
         return $config;
     }
@@ -556,9 +571,9 @@ class MakeHCService extends HCCommand
      *
      * @param $file
      */
-    private function finalizeFile (string $file)
+    private function finalizeFile(string $file)
     {
-        $this->file->move ($file, $file . '.done');
+        $this->file->move($file, $file . '.done');
     }
 
     /**
@@ -567,21 +582,21 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return string
      */
-    private function getInputData (stdClass $serviceData)
+    private function getInputData(stdClass $serviceData)
     {
         $output = '';
-        $skip = array_merge ($this->autoFill, ['id']);
+        $skip = array_merge($this->autoFill, ['id']);
 
         if (!empty($serviceData->database)) {
-            $tpl = $this->file->get (__DIR__ . '/templates/service/controller/input.data.hctpl');
+            $tpl = $this->file->get(__DIR__ . '/templates/service/controller/input.data.hctpl');
 
             foreach ($serviceData->database as $tableName => $model)
-                if (array_key_exists ('columns', $model) && !empty($model->columns) && isset($model->default))
+                if (array_key_exists('columns', $model) && !empty($model->columns) && isset($model->default))
                     foreach ($model->columns as $column) {
-                        if (in_array ($column->Field, $skip))
+                        if (in_array($column->Field, $skip))
                             continue;
 
-                        $line = str_replace ('{key}', $column->Field, $tpl);
+                        $line = str_replace('{key}', $column->Field, $tpl);
                         $output .= $line;
                     }
         }
@@ -595,14 +610,14 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return string
      */
-    private function getUseFiles (stdClass $serviceData)
+    private function getUseFiles(stdClass $serviceData)
     {
         $output = '';
 
         $list = [];
         $list[] = [
             "nameSpace" => $serviceData->modelNamespace,
-            "name"      => $this->getDefaultTable ($serviceData->database)->modelName,
+            "name"      => $this->getDefaultTable($serviceData->database)->modelName,
         ];
 
         $list[] = [
@@ -621,15 +636,15 @@ class MakeHCService extends HCCommand
      *
      * @param $serviceData
      */
-    private function createFormValidator (stdClass $serviceData)
+    private function createFormValidator(stdClass $serviceData)
     {
-        $this->createFileFromTemplate ([
+        $this->createFileFromTemplate([
             "destination"         => $serviceData->formValidationDestination,
             "templateDestination" => __DIR__ . '/templates/service/validation.form.hctpl',
             "content"             => [
                 "formValidationNameSpace" => $serviceData->formValidationNameSpace,
                 "formValidationName"      => $serviceData->formValidationName,
-                "formRules"               => $this->getRules ($serviceData),
+                "formRules"               => $this->getRules($serviceData),
             ],
         ]);
 
@@ -642,23 +657,23 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return string
      */
-    private function getRules (stdClass $serviceData)
+    private function getRules(stdClass $serviceData)
     {
         $output = '';
-        $skip = array_merge ($this->autoFill, ['id']);
+        $skip = array_merge($this->autoFill, ['id']);
 
         if (!empty($serviceData->database)) {
-            $tpl = $this->file->get (__DIR__ . '/templates/shared/array.element.hctpl');
+            $tpl = $this->file->get(__DIR__ . '/templates/shared/array.element.hctpl');
 
             foreach ($serviceData->database as $tableName => $model)
-                if (array_key_exists ('columns', $model) && !empty($model->columns) && isset($model->default))
+                if (array_key_exists('columns', $model) && !empty($model->columns) && isset($model->default))
                     foreach ($model->columns as $column) {
-                        if (in_array ($column->Field, $skip))
+                        if (in_array($column->Field, $skip))
                             continue;
 
                         if ($column->Null == "NO") {
-                            $line = str_replace ('{key}', $column->Field, $tpl);
-                            $line = str_replace ('{value}', 'required', $line);
+                            $line = str_replace('{key}', $column->Field, $tpl);
+                            $line = str_replace('{value}', 'required', $line);
 
                             $output .= $line;
                         }
@@ -674,26 +689,26 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return string
      */
-    private function getSearchableFields (stdClass $serviceData)
+    private function getSearchableFields(stdClass $serviceData)
     {
         $output = '';
 
-        $model = $this->getDefaultTable ($serviceData->database);
+        $model = $this->getDefaultTable($serviceData->database);
 
-        $whereTpl = $this->file->get (__DIR__ . '/templates/shared/where.hctpl');
-        $orWhereTpl = $this->file->get (__DIR__ . '/templates/shared/or.where.hctpl');
+        $whereTpl = $this->file->get(__DIR__ . '/templates/shared/where.hctpl');
+        $orWhereTpl = $this->file->get(__DIR__ . '/templates/shared/or.where.hctpl');
 
-        if (array_key_exists ('columns', $model) && !empty($model->columns)) {
-            $skip = array_merge ($this->autoFill, ['id']);
+        if (array_key_exists('columns', $model) && !empty($model->columns)) {
+            $skip = array_merge($this->autoFill, ['id']);
 
             foreach ($model->columns as $index => $column) {
-                if (in_array ($column->Field, $skip))
+                if (in_array($column->Field, $skip))
                     continue;
 
                 if ($output == '')
-                    $output .= str_replace ('{key}', $column->Field, $whereTpl);
+                    $output .= str_replace('{key}', $column->Field, $whereTpl);
                 else
-                    $output .= str_replace ('{key}', $column->Field, $orWhereTpl);
+                    $output .= str_replace('{key}', $column->Field, $orWhereTpl);
 
             }
         }
@@ -707,7 +722,7 @@ class MakeHCService extends HCCommand
      * @param $database
      * @return mixed
      */
-    private function getDefaultTable (array $database)
+    private function getDefaultTable(array $database)
     {
         foreach ($database as $tableData) {
             if (isset($tableData->default))
@@ -724,7 +739,7 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return null
      */
-    private function updateMenu (stdClass $config, stdClass $serviceData)
+    private function updateMenu(stdClass $config, stdClass $serviceData)
     {
         $menuItem = [
             "path"          => 'admin/' . $serviceData->serviceURL,
@@ -738,12 +753,12 @@ class MakeHCService extends HCCommand
         //TODO check if adminMenu exists if not create []
         foreach ($config->adminMenu as &$existingMenuItem) {
             if ($existingMenuItem->path == $menuItem['path']) {
-                if ($this->confirm ('Duplicate Menu item found with ' . $existingMenuItem->path . ' path. Confirm override', 'no')) {
+                if ($this->confirm('Duplicate Menu item found with ' . $existingMenuItem->path . ' path. Confirm override', 'no')) {
                     $existingMenuItem = $menuItem;
                     $newMenu = false;
                     break;
                 } else {
-                    $this->abort ('Can not override existing configuration. Aborting...');
+                    $this->abort('Can not override existing configuration. Aborting...');
 
                     return null;
                 }
@@ -751,7 +766,7 @@ class MakeHCService extends HCCommand
         }
 
         if ($newMenu)
-            $config->adminMenu = array_merge ($config->adminMenu, [$menuItem]);
+            $config->adminMenu = array_merge($config->adminMenu, [$menuItem]);
 
 
         return $config;
@@ -763,9 +778,9 @@ class MakeHCService extends HCCommand
      * @param $item
      * @return mixed
      */
-    private function getServiceProviderNameSpace (stdClass $item)
+    private function getServiceProviderNameSpace(stdClass $item)
     {
-        return json_decode ($this->file->get ($item->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH))->general->serviceProviderNameSpace;
+        return json_decode($this->file->get($item->rootDirectory . 'app/' . MakeHCService::CONFIG_PATH))->general->serviceProviderNameSpace;
     }
 
     /**
@@ -773,9 +788,9 @@ class MakeHCService extends HCCommand
      *
      * @param $serviceData
      */
-    private function createForm (stdClass $serviceData)
+    private function createForm(stdClass $serviceData)
     {
-        $this->createFileFromTemplate ([
+        $this->createFileFromTemplate([
             "destination"         => $serviceData->formDestination,
             "templateDestination" => __DIR__ . '/templates/service/form.hctpl',
             "content"             => [
@@ -783,7 +798,7 @@ class MakeHCService extends HCCommand
                 "className"        => $serviceData->formName,
                 "formID"           => $serviceData->formID,
                 "multiLanguage"    => $serviceData->multiLanguage,
-                "formFields"       => $this->getFormFields ($serviceData),
+                "formFields"       => $this->getFormFields($serviceData),
                 "serviceRouteName" => $serviceData->serviceRouteName
             ],
         ]);
@@ -797,21 +812,21 @@ class MakeHCService extends HCCommand
      * @param $data
      * @return string
      */
-    private function getFormFields (stdClass $data)
+    private function getFormFields(stdClass $data)
     {
         $output = '';
-        $skip = array_merge ($this->autoFill, ['id']);
+        $skip = array_merge($this->autoFill, ['id']);
 
-        $tmp = $this->file->get (__DIR__ . '/templates/service/form/single.field.hctpl');
+        $tmp = $this->file->get(__DIR__ . '/templates/service/form/single.field.hctpl');
 
-        $model = $this->getDefaultTable ($data->database);
+        $model = $this->getDefaultTable($data->database);
 
         if (isset($model->columns))
             foreach ($model->columns as $column) {
-                if (in_array ($column->Field, $skip))
+                if (in_array($column->Field, $skip))
                     continue;
 
-                $field = replaceBrackets ($tmp, [
+                $field = replaceBrackets($tmp, [
                     "type"     => "singleLine",
                     "fieldID"  => $column->Field,
                     "label"    => $data->translationsLocation . '.' . $column->Field,
@@ -832,12 +847,12 @@ class MakeHCService extends HCCommand
      * @param $serviceData
      * @return mixed
      */
-    private function updateFormManager (stdClass $config, stdClass $serviceData)
+    private function updateFormManager(stdClass $config, stdClass $serviceData)
     {
-        $config->formData = json_decode (json_encode ($config->formData), true);
+        $config->formData = json_decode(json_encode($config->formData), true);
 
         if (isset($config->formData[$serviceData->formID]))
-            $this->abort ('Form already exists');
+            $this->abort('Form already exists');
 
         $config->formData[$serviceData->formID] = $serviceData->formNameSpace . '\\' . $serviceData->formName;
 
