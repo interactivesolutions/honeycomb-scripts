@@ -1,0 +1,26 @@
+<?php
+
+Route::group(['prefix' => 'api', 'middleware' => ['web', 'auth-apps']], function ()
+{
+    Route::group(['prefix' => 'v1/{serviceURL}'], function ()
+    {
+        Route::get('/', ['as' => 'api.v1.{controllerNameDotted}', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_list'], 'uses' => '{controllerName}@listPage']);
+        Route::get('list', ['as' => 'api.v1.{controllerNameDotted}.list', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_list'], 'uses' => '{controllerName}@list']);
+        Route::get('list/{timestamp}', ['as' => 'api.v1.{controllerNameDotted}.list.update', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@listUpdate']);
+        Route::get('search', ['as' => 'api.v1.{controllerNameDotted}.search', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_list'], 'uses' => '{controllerName}@listSearch']);
+        Route::get('{id}', ['as' => 'api.v1.{controllerNameDotted}.single', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_list'], 'uses' => '{controllerName}@getSingleRecord']);
+
+        Route::post('{id}/duplicate', ['as' => 'api.v1.{controllerNameDotted}.duplicate', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_update'], 'uses' => '{controllerName}@duplicate']);
+        Route::post('restore', ['as' => 'api.v1.{controllerNameDotted}.restore', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_update'], 'uses' => '{controllerName}@restore']);
+        Route::post('merge', ['as' => 'api.v1.{controllerNameDotted}.merge', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_update'], 'uses' => '{controllerName}@merge']);
+        Route::post('/', ['middleware' => ['acl-apps:api_v1_{acl_prefix}_create'], 'uses' => '{controllerName}@create']);
+
+        Route::put('{id}', ['middleware' => ['acl-apps:api_v1_{acl_prefix}_update'], 'uses' => '{controllerName}@update']);
+        Route::put('{id}/strict', ['as' => 'api.v1.{controllerNameDotted}.update.strict', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_update'], 'uses' => '{controllerName}@updateStrict']);
+
+        Route::delete('{id}', ['middleware' => ['acl-apps:api_v1_{acl_prefix}_delete'], 'uses' => '{controllerName}@delete']);
+        Route::delete('/', ['middleware' => ['acl-apps:api_v1_{acl_prefix}_delete'], 'uses' => '{controllerName}@delete']);
+        Route::delete('{id}/force', ['as' => 'api.v1.{controllerNameDotted}.force', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_force_delete'], 'uses' => '{controllerName}@forceDelete']);
+        Route::delete('force', ['as' => 'api.v1.{controllerNameDotted}.force.multi', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_force_delete'], 'uses' => '{controllerName}@forceDelete']);
+    });
+});
