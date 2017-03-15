@@ -38,6 +38,7 @@ class HCUpdate extends HCCommand
         $this->call('hc:permissions');
         $this->call('hc:admin-menu');
 
-        $this->call('config:cache');
+        if (app()->environment() == 'production')
+            $this->call('config:cache');
     }
 }
