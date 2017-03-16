@@ -3,7 +3,6 @@
 namespace interactivesolutions\honeycombscripts\app\providers;
 
 use interactivesolutions\honeycombcore\providers\HCBaseServiceProvider;
-use interactivesolutions\honeycombscripts\app\commands\HCDocs;
 use interactivesolutions\honeycombscripts\app\commands\HCEnv;
 use interactivesolutions\honeycombscripts\app\commands\HCUpdate;
 use interactivesolutions\honeycombscripts\app\commands\MakeHCPackage;
