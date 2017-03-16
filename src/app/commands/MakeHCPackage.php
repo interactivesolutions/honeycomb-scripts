@@ -12,14 +12,14 @@ class MakeHCPackage extends HCCommand
      *
      * @var string
      */
-    protected $signature = 'make:hcpackage';
+    protected $signature = 'hc:new-package';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Creating an empty HC package in projects packages/ directory';
+    protected $description = 'Creating an empty HC package in project packages/ directory';
 
     /**
      * Execute the console command.
@@ -28,12 +28,11 @@ class MakeHCPackage extends HCCommand
      */
     public function handle ()
     {
-        $version = substr (app ()::VERSION, 0, strrpos (app ()::VERSION, "."));
+        $configurationPath = __DIR__ . '/templates/config/package.json';
+        if (!file_exists ($configurationPath))
+            $this->abort ('Missing package configuration file');
 
-        if (!file_exists (__DIR__ . '/templates/config.' . $version . '/package.json'))
-            $this->abort ('Missing package configuration file for laravel version ' . $version);
-
-        $json = json_decode ($this->file->get (__DIR__ . '/templates/config.' . $version . '/package.json'), true);
+        $json = json_decode ($this->file->get ($configurationPath), true);
 
         $this->createDirectory ('packages');
 
@@ -66,8 +65,13 @@ class MakeHCPackage extends HCCommand
         ]);
 
         $this->createFileFromTemplate ([
+            "destination"         => $packageDirectory . '/src/.gitignore',
+            "templateDestination" => __DIR__ . '/templates/package/gitignore.hctpl',
+        ]);
+
+        $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/honeycomb/config.json',
-            "templateDestination" => __DIR__ . '/templates/config.hctpl',
+            "templateDestination" => __DIR__ . '/templates/package/config.hctpl',
             "content"             => [
                 "serviceProviderNameSpace" => $packageName
             ]
@@ -75,7 +79,7 @@ class MakeHCPackage extends HCCommand
 
         $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/composer.json',
-            "templateDestination" => __DIR__ . '/templates/composer.hctpl',
+            "templateDestination" => __DIR__ . '/templates/package/composer.hctpl',
             "content"             => [
                 "packageOfficialName" => $packageOfficialName,
                 "packagePath"         => $composerNameSpace,
@@ -84,7 +88,7 @@ class MakeHCPackage extends HCCommand
 
         $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/providers/' . $packageName . 'ServiceProvider.php',
-            "templateDestination" => __DIR__ . '/templates/service.provider.hctpl',
+            "templateDestination" => __DIR__ . '/templates/package/service.provider.hctpl',
             "content"             => [
                 "packageName"      => $packageName,
                 "nameSpace"        => $nameSpace . '\app\providers',
@@ -94,7 +98,7 @@ class MakeHCPackage extends HCCommand
 
         $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/database/seeds/HoneyCombDatabaseSeeder.php',
-            "templateDestination" => __DIR__ . '/templates/database.seeder.hctpl',
+            "templateDestination" => __DIR__ . '/templates/package/database.seeder.hctpl',
             "content"             => [
                 "nameSpace" => $nameSpace,
                 "className" => "HoneyComb"
@@ -108,7 +112,7 @@ class MakeHCPackage extends HCCommand
             $composer = json_decode ($this->file->get ('composer.json'));
 
             if (!isset($composer->autoload->{'psr-4'}->{$composerNameSpace}))
-                $composer->autoload->{'psr-4'}->{str_replace('\\\\', '\\', $composerNameSpace)} = $packageDirectory . '/src';
+                $composer->autoload->{'psr-4'}->{str_replace ('\\\\', '\\', $composerNameSpace)} = $packageDirectory . '/src';
 
             $this->file->put ('composer.json', json_encode ($composer, JSON_PRETTY_PRINT));
         }

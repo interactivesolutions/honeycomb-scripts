@@ -1,0 +1,19 @@
+<?php
+
+namespace {nameSpace};
+
+use interactivesolutions\honeycombcore\providers\HCBaseServiceProvider;
+
+class TestServiceProvider extends HCBaseServiceProvider
+{
+    protected $homeDirectory = __DIR__;
+
+    protected $commands = [];
+
+    protected $namespace = '{nameSpaceGeneral}';
+}
+
+
+
+
+
