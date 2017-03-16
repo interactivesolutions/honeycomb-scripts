@@ -19,5 +19,4 @@ class {modelName} extends HCUuidModel
      * @var array
      */
     protected $fillable = {columnsFillable};
-
 }

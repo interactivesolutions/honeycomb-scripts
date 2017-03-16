@@ -81,8 +81,8 @@ class MakeHCService extends HCCommand
         $this->comment($serviceData->serviceName);
         $this->comment('*************************************');
 
-        $this->createTranslations($serviceData);
         $this->createModels($serviceData);
+        $this->createTranslations($serviceData);
         $this->createController($serviceData);
         $this->createFormValidator($serviceData);
         $this->createForm($serviceData);
@@ -202,8 +202,17 @@ class MakeHCService extends HCCommand
 
         // creating database information
         foreach ($item->database as $dbItem) {
+
             $dbItem->columns = $this->getTableColumns($dbItem->tableName);
             $dbItem->modelLocation = $item->modelDirectory . '/' . $dbItem->modelName . '.php';
+
+            if (isset($dbItem->default) && $dbItem->default)
+                if (isset($dbItem->multiLanguage))
+                {
+                    $dbItem->multiLanguage->columns = $this->getTableColumns($dbItem->multiLanguage->tableName);
+                    $dbItem->multiLanguage->modelName = $dbItem->modelName . 'Translations';
+                    $dbItem->multiLanguage->modelLocation = $item->modelDirectory . '/' . $dbItem->modelName . 'Translations.php';
+                }
         }
 
         $item->mainModelName = $item->database[0]->modelName;
@@ -309,9 +318,29 @@ class MakeHCService extends HCCommand
         foreach ($modelData as $tableName => $model) {
             $tableList[] = $model->tableName;
 
+            $template = __DIR__ . '/templates/service/model/basic.hctpl';
+
+            if (isset($model->multiLanguage))
+            {
+                $this->createFileFromTemplate([
+                    "destination"         => $model->multiLanguage->modelLocation,
+                    "templateDestination" => $template,
+                    "content"             => [
+                        "modelNameSpace"  => $item->modelNamespace,
+                        "modelName"       => $model->multiLanguage->modelName,
+                        "columnsFillable" => $this->getColumnsFillable($model->multiLanguage->columns),
+                        "modelTable"      => $model->multiLanguage->tableName,
+                    ],
+                ]);
+
+                $this->createdFiles[] = $model->modelLocation;
+
+                $template = __DIR__ . '/templates/service/model/multiLanguage.hctpl';
+            }
+
             $this->createFileFromTemplate([
                 "destination"         => $model->modelLocation,
-                "templateDestination" => __DIR__ . '/templates/service/model.hctpl',
+                "templateDestination" => $template,
                 "content"             => [
                     "modelNameSpace"  => $item->modelNamespace,
                     "modelName"       => $model->modelName,
@@ -321,6 +350,8 @@ class MakeHCService extends HCCommand
             ]);
 
             $this->createdFiles[] = $model->modelLocation;
+
+
         }
 
         if (isset($item->generateMigrations) && $item->generateMigrations)
