@@ -2,7 +2,7 @@
 
 namespace interactivesolutions\honeycombscripts\app\providers;
 
-use Illuminate\Support\ServiceProvider;
+use interactivesolutions\honeycombcore\providers\HCBaseServiceProvider;
 use interactivesolutions\honeycombscripts\app\commands\HCDocs;
 use interactivesolutions\honeycombscripts\app\commands\HCEnv;
 use interactivesolutions\honeycombscripts\app\commands\HCUpdate;
@@ -11,14 +11,13 @@ use interactivesolutions\honeycombscripts\app\commands\MakeHCService;
 use interactivesolutions\honeycombscripts\app\commands\HCRoutes;
 use interactivesolutions\honeycombscripts\app\commands\MakeHCProject;
 use interactivesolutions\honeycombscripts\app\commands\HCSeed;
+use Way\Generators\GeneratorsServiceProvider;
+use Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider;
 
-class HCScriptsServiceProvider extends ServiceProvider
+class HCScriptsServiceProvider extends HCBaseServiceProvider
 {
-    /**
-     * Register commands
-     *
-     * @var array
-     */
+    protected $homeDirectory = __DIR__;
+
     protected $commands = [
         HCEnv::class,
         MakeHCService::class,
@@ -30,41 +29,17 @@ class HCScriptsServiceProvider extends ServiceProvider
     ];
 
     /**
-     * Bootstrap the application services.
-     */
-    public function boot()
-    {
-
-    }
-
-    /**
      * Register the application services.
      *
      * @return void
      */
-    public function register()
+    public function registerProviders()
     {
-        // register artisan commands
-        $this->commands($this->commands);
-
         if ($this->app->environment() !== 'production')
         {
-            $this->app->register(\Way\Generators\GeneratorsServiceProvider::class);
-            $this->app->register(\Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class);
+            $this->app->register(GeneratorsServiceProvider::class);
+            $this->app->register(MigrationsGeneratorServiceProvider::class);
         }
-
-        $this->registerHelpers();
-    }
-
-    /**
-     * Register helper function
-     */
-    private function registerHelpers()
-    {
-        $filePath = __DIR__ . '/../helpers/helpers.php';
-
-        if (\File::isFile($filePath))
-            require_once $filePath;
     }
 }
 
