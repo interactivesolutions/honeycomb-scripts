@@ -38,6 +38,9 @@ class HCUpdate extends HCCommand
         $this->call('hc:permissions');
         $this->call('hc:admin-menu');
 
+        $this->file->delete ('bootstrap/cache/config.php');
+        $this->file->delete ('bootstrap/cache/services.php');
+
         if (app()->environment() == 'production')
             $this->call('config:cache');
     }
