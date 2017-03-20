@@ -63,7 +63,7 @@ class HCNewService extends HCCommand
         foreach ($this->configurationData as $serviceData) {
             $this->createdFiles = [];
             $this->createService ($serviceData);
-            //$this->finalizeFile ($serviceData->file);
+            $this->finalizeFile ($serviceData->file);
         }
     }
 
@@ -137,6 +137,8 @@ class HCNewService extends HCCommand
     function optimizeData (string $file)
     {
         $item = json_decode (file_get_contents ($file));
+        $item->file = $file;
+
         if ($item == null)
             $this->abort ($file->getFilename () . ' has Invalid JSON format.');
 
@@ -280,7 +282,7 @@ class HCNewService extends HCCommand
      */
     private function finalizeFile (string $file)
     {
-    //    $this->file->move ($file, $file . '.done');
+        File::move ($file, $file . '.done');
     }
 
     /**
