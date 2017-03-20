@@ -2,6 +2,7 @@
 
 namespace interactivesolutions\honeycombscripts\app\commands;
 
+use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
 class HCRoutes extends HCCommand
@@ -34,16 +35,17 @@ class HCRoutes extends HCCommand
         else
             $rootDirectory = '';
 
-        if ($rootDirectory == '')
+        if ($rootDirectory == '') {
+
             if (app ()->environment () == 'local') {
 
                 $files = $this->getConfigFiles ();
 
                 foreach ($files as $file)
                     if (strpos ($file, '/vendor/') === false)
-                        $this->generateRoutes (realpath(implode ('/', array_slice (explode ('/', $file), 0, -3))) . '/');
+                        $this->generateRoutes (realpath (implode ('/', array_slice (explode ('/', $file), 0, -3))) . '/');
             }
-        else
+        } else
             $this->generateRoutes ($rootDirectory);
     }
 
@@ -57,18 +59,18 @@ class HCRoutes extends HCCommand
         if (!file_exists ($directory . 'app/routes/'))
             return;
 
-        $files = $this->file->allFiles ($directory . 'app/routes');
+        $files = \File::allFiles ($directory . 'app/routes');
 
         $finalContent = '<?php' . "\r\n";
 
         foreach ($files as $file) {
 
             $finalContent .= "\r\n";
-            $finalContent .= '//' . implode ('/', array_slice(explode ('/', $file), -6)) . "\r\n";
-            $finalContent .= str_replace ('<?php', '', $this->file->get ((string)$file)) . "\r\n";
+            $finalContent .= '//' . implode ('/', array_slice (explode ('/', $file), -6)) . "\r\n";
+            $finalContent .= str_replace ('<?php', '', file_get_contents ((string)$file)) . "\r\n";
         }
 
-        $this->file->put ($directory . HCRoutes::ROUTES_PATH, $finalContent);
+        file_put_contents ($directory . HCRoutes::ROUTES_PATH, $finalContent);
 
         $this->comment ($directory . HCRoutes::ROUTES_PATH . ' file generated');
     }

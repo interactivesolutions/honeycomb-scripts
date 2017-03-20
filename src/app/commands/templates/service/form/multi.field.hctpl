@@ -1,0 +1,8 @@
+[
+    "type"            => "{type}",
+    "fieldID"         => "{fieldID}",
+    "label"           => trans("{label}"),
+    "required"        => {required},
+    "requiredVisible" => {required},
+    "multiLanguage"   => 1,
+],

@@ -2,12 +2,11 @@
 
 namespace interactivesolutions\honeycombscripts\app\commands;
 
-use Illuminate\Support\Facades\Artisan;
+use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 use League\Flysystem\Exception;
-use phpDocumentor\Reflection\Types\This;
 
-class MakeHCProject extends HCCommand
+class HCNewProject extends HCCommand
 {
     /**
      * The name and signature of the console command.
@@ -46,17 +45,17 @@ class MakeHCProject extends HCCommand
             try {
                 // deleting files and folders
 
-                if (!file_exists (MakeHCProject::CONFIG))
+                if (!file_exists (HCNewProject::CONFIG))
                     $this->abort ('Missing project configuration file for laravel version');
 
-                $json = validateJSONFromPath (MakeHCProject::CONFIG);
+                $json = validateJSONFromPath (HCNewProject::CONFIG);
 
                 foreach ($json['remove_folders'] as $location)
                     $this->deleteDirectory ($location, true);
 
                 foreach ($json['remove_files'] as $location) {
                     $this->info ('Deleting file: ' . $location);
-                    $this->file->delete ($location);
+                    File::delete ($location);
                 }
 
                 foreach ($json['create_folders'] as $location) {
@@ -65,7 +64,7 @@ class MakeHCProject extends HCCommand
                 }
 
                 $this->createFileFromTemplate ([
-                    "destination"         => 'app/' . MakeHCService::CONFIG_PATH,
+                    "destination"         => 'app/' . HCNewService::CONFIG_PATH,
                     "templateDestination" => __DIR__ . '/templates/config.hctpl',
                     "content"             => [
                         "serviceProviderNameSpace" => "app",

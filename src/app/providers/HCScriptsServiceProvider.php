@@ -5,10 +5,10 @@ namespace interactivesolutions\honeycombscripts\app\providers;
 use interactivesolutions\honeycombcore\providers\HCBaseServiceProvider;
 use interactivesolutions\honeycombscripts\app\commands\HCEnv;
 use interactivesolutions\honeycombscripts\app\commands\HCUpdate;
-use interactivesolutions\honeycombscripts\app\commands\MakeHCPackage;
-use interactivesolutions\honeycombscripts\app\commands\MakeHCService;
+use interactivesolutions\honeycombscripts\app\commands\HCNewPackage;
+use interactivesolutions\honeycombscripts\app\commands\HCNewService;
 use interactivesolutions\honeycombscripts\app\commands\HCRoutes;
-use interactivesolutions\honeycombscripts\app\commands\MakeHCProject;
+use interactivesolutions\honeycombscripts\app\commands\HCNewProject;
 use interactivesolutions\honeycombscripts\app\commands\HCSeed;
 use Way\Generators\GeneratorsServiceProvider;
 use Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider;
@@ -19,9 +19,9 @@ class HCScriptsServiceProvider extends HCBaseServiceProvider
 
     protected $commands = [
         HCEnv::class,
-        MakeHCService::class,
-        MakeHCProject::class,
-        MakeHCPackage::class,
+        HCNewService::class,
+        HCNewProject::class,
+        HCNewPackage::class,
         HCRoutes::class,
         HCSeed::class,
         HCUpdate::class,

@@ -2,10 +2,11 @@
 
 namespace interactivesolutions\honeycombscripts\app\commands;
 
+use File;
 use Illuminate\Support\Facades\App;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
-class MakeHCPackage extends HCCommand
+class HCNewPackage extends HCCommand
 {
     /**
      * The name and signature of the console command.
@@ -32,14 +33,14 @@ class MakeHCPackage extends HCCommand
         if (!file_exists ($configurationPath))
             $this->abort ('Missing package configuration file');
 
-        $json = json_decode ($this->file->get ($configurationPath), true);
+        $json = json_decode (file_get_contents ($configurationPath), true);
 
         $this->createDirectory ('packages');
 
         $directoryList = [];
 
-        foreach ($this->file->directories ('packages') as $directory)
-            $directoryList = array_merge ($directoryList, $this->file->directories ($directory));
+        foreach (File::directories ('packages') as $directory)
+            $directoryList = array_merge ($directoryList, File::directories ($directory));
 
         $packageDirectory = $this->choice ('Please select package directory', $directoryList);
         $packageOfficialName = str_replace ('packages/', '', $packageDirectory);
@@ -90,7 +91,7 @@ class MakeHCPackage extends HCCommand
             "destination"         => $packageDirectory . '/src/app/providers/' . $packageName . 'ServiceProvider.php',
             "templateDestination" => __DIR__ . '/templates/package/service.provider.hctpl',
             "content"             => [
-                "packageName"      => $packageName,
+                "packageName"      => $packageName . 'ServiceProvider',
                 "nameSpace"        => $nameSpace . '\app\providers',
                 "nameSpaceGeneral" => $nameSpace . '\app\http\controllers',
             ],
@@ -109,12 +110,12 @@ class MakeHCPackage extends HCCommand
         $this->comment ('********************************************************');
 
         if (App::environment () == 'local') {
-            $composer = json_decode ($this->file->get ('composer.json'));
+            $composer = json_decode (file_get_contents ('composer.json'));
 
             if (!isset($composer->autoload->{'psr-4'}->{$composerNameSpace}))
                 $composer->autoload->{'psr-4'}->{str_replace ('\\\\', '\\', $composerNameSpace)} = $packageDirectory . '/src';
 
-            $this->file->put ('composer.json', json_encode ($composer, JSON_PRETTY_PRINT));
+            file_put_contents ('composer.json', json_encode ($composer, JSON_PRETTY_PRINT));
         }
 
         $this->comment ('Please add to config/app.php under "providers":');

@@ -33,7 +33,7 @@ class {className}
         ];
 
         if ($this->multiLanguage)
-            $form['availableLanguages'] = []; //TOTO implement honeycomb-languages package
+            $form['availableLanguages'] = getHCContentLanguages()->pluck('id');
 
         if (!$edit)
             return $form;

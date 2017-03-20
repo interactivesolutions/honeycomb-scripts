@@ -2,6 +2,7 @@
 
 namespace interactivesolutions\honeycombscripts\app\commands;
 
+use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 use Nette\Reflection\AnnotationsParser;
 
@@ -46,6 +47,6 @@ class HCSeed extends HCCommand
      */
     protected function getSeederFiles ()
     {
-        return array_merge ($this->file->glob (__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
+        return array_merge (File::glob (__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
     }
 }

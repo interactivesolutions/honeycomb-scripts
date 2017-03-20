@@ -2,8 +2,8 @@
 
 namespace interactivesolutions\honeycombscripts\app\commands;
 
+use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
-use Nette\Reflection\AnnotationsParser;
 
 class HCUpdate extends HCCommand
 {
@@ -38,8 +38,8 @@ class HCUpdate extends HCCommand
         $this->call('hc:permissions');
         $this->call('hc:admin-menu');
 
-        $this->file->delete ('bootstrap/cache/config.php');
-        $this->file->delete ('bootstrap/cache/services.php');
+       File::delete ('bootstrap/cache/config.php');
+       File::delete ('bootstrap/cache/services.php');
 
         if (app()->environment() == 'production')
             $this->call('config:cache');
