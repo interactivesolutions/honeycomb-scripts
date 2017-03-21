@@ -65,7 +65,7 @@ class HCNewProject extends HCCommand
 
                 $this->createFileFromTemplate ([
                     "destination"         => 'app/' . HCNewService::CONFIG_PATH,
-                    "templateDestination" => __DIR__ . '/templates/config.hctpl',
+                    "templateDestination" => __DIR__ . '/templates/project/config.hctpl',
                     "content"             => [
                         "serviceProviderNameSpace" => "app",
                     ],
