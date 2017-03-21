@@ -152,7 +152,7 @@ class HCServiceController extends HCBaseServiceCreation
 
         //getting parameters which are not multilanguage
         if (isset($model->multiLanguage))
-            $output .= $this->gatherHeaders ($model->multiLanguage, array_merge ($this->getAutoFill (), ['id', 'language_code', 'record_id']), $data->translationsLocation, false);
+            $output .= $this->gatherHeaders ($model->multiLanguage, array_merge ($this->getAutoFill (), ['id', 'language_code', 'record_id']), $data->translationsLocation, true);
 
         return $output;
     }
