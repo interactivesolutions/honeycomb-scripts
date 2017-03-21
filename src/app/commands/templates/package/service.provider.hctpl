@@ -11,6 +11,8 @@ class {packageName} extends HCBaseServiceProvider
     protected $commands = [];
 
     protected $namespace = '{nameSpaceGeneral}';
+
+    public $serviceProviderNameSpace = '{serviceProviderNameSpace}';
 }
 
 
