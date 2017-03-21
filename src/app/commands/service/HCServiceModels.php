@@ -7,6 +7,8 @@ use stdClass;
 
 class HCServiceModels extends HCBaseServiceCreation
 {
+    private $tableNames;
+
     public function __construct()
     {
         parent::__construct ();
@@ -72,11 +74,11 @@ class HCServiceModels extends HCBaseServiceCreation
     public function generate (stdClass $service)
     {
         $modelData = $service->database;
-        $tableList = [];
+        $this->tableNames = [];
         $files = [];
 
         foreach ($modelData as $tableName => $model) {
-            $tableList[] = $model->tableName;
+            $this->tableNames[] = $model->tableName;
 
             $template = __DIR__ . '/../templates/service/model/basic.hctpl';
 
@@ -111,9 +113,6 @@ class HCServiceModels extends HCBaseServiceCreation
             $files[] = $model->modelLocation;
         }
 
-        if (isset($service->generateMigrations) && $service->generateMigrations)
-            $this->call ('migrate:generate', ["--path" => $service->rootDirectory . 'database/migrations', "tables" => implode (",", $tableList)]);
-
         return $files;
     }
 
@@ -133,5 +132,15 @@ class HCServiceModels extends HCBaseServiceCreation
         }
 
         return '[\'' . implode ('\', \'', $names) . '\']';
+    }
+
+    /**
+     * Returning table names list for migration generation
+     *
+     * @return mixed
+     */
+    public function getTables()
+    {
+        return $this->tableNames;
     }
 }

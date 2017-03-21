@@ -111,7 +111,7 @@ class HCServiceController extends HCBaseServiceCreation
     {
         $this->createFileFromTemplate ([
             "destination"         => $data->controllerDestination,
-            "templateDestination" => __DIR__ . '/templates/service/controller/basic.hctpl',
+            "templateDestination" => __DIR__ . '/../templates/service/controller/basic.hctpl',
             "content"             => [
                 "namespace"            => $data->controllerNamespace,
                 "controllerName"       => $data->controllerName,
@@ -123,12 +123,12 @@ class HCServiceController extends HCBaseServiceCreation
                 "formValidationName"   => $data->formValidationName,
                 "functions"            => replaceBrackets (file_get_contents (__DIR__ . '/../templates/service/controller/basic/functions.hctpl'),
                     [
-                        "modelName"      => $data->mainModelName,
+                        "modelName"      => $data->mainModel->modelName,
                         "modelNameSpace" => $data->modelNamespace,
                     ]),
                 "inputData"            => $this->getInputData ($data),
                 "useFiles"             => $this->getUseFiles ($data),
-                "mainModelName"        => $data->mainModelName,
+                "mainModelName"        => $data->mainModel->modelName,
                 "searchableFields"     => $this->getSearchableFields ($data),
             ],
         ]);

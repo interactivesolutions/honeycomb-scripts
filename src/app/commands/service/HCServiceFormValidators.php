@@ -24,7 +24,7 @@ class HCServiceFormValidators extends HCBaseServiceCreation
         $data->formValidationNameSpace = str_replace ('\\http\\controllers', '\\validators', $data->controllerNamespace);
         $data->formValidationDestination = str_replace ('/http/controllers', '/validators', $data->controllerDestination) . '/' . $data->formValidationName . '.php';
 
-        if ($data->mainModel->multiLanguage) {
+        if (isset($data->mainModel->multiLanguage)) {
             $data->formTranslationsValidationName = $data->serviceName . 'TranslationsValidator';
             $data->formTranslationsValidationDestination = str_replace ('/http/controllers', '/validators', $data->controllerDestination) . '/' . $data->formTranslationsValidationName . '.php';
         }

@@ -82,26 +82,25 @@ class HCNewService extends HCCommand
         $this->comment ('*************************************');
 
         $helpersList = [
-            new HCServiceController(),
-            new HCServiceTranslations(),
-            new HCServiceModels(),
-            new HCServiceFormValidators(),
-            new HCServiceForms(),
-            new HCServiceRoutes()
+            'controller'      => new HCServiceController(),
+            'translations'    => new HCServiceTranslations(),
+            'models'          => new HCServiceModels(),
+            'form-validators' => new HCServiceFormValidators(),
+            'forms'           => new HCServiceForms(),
+            'routes'          => new HCServiceRoutes()
         ];
 
         foreach ($helpersList as $helper)
-            $serviceData = $helper->optimize($serviceData);
+            $serviceData = $helper->optimize ($serviceData);
 
         // finalizing destination
         $serviceData->controllerDestination .= '/' . $serviceData->controllerName . '.php';
 
-        foreach ($helpersList as $helper)
-        {
-            $files = $helper->generate($serviceData);
+        foreach ($helpersList as $helper) {
+            $files = $helper->generate ($serviceData);
 
-            if (is_array($files))
-                $this->createdFiles = array_merge($this->createdFiles, $files);
+            if (is_array ($files))
+                $this->createdFiles = array_merge ($this->createdFiles, $files);
             else
                 $this->createdFiles[] = $files;
         }
@@ -110,6 +109,9 @@ class HCNewService extends HCCommand
             $this->call ('hc:routes', ["directory" => $serviceData->rootDirectory]);
         else
             $this->call ('hc:routes');
+
+        if (isset($serviceData->generateMigrations) && $serviceData->generateMigrations)
+            $this->call ('migrate:generate', ["--path" => $serviceData->rootDirectory . 'database/migrations', "tables" => implode (",", $helpersList['models']->getTables())]);
 
         $this->updateConfiguration ($serviceData);
     }
@@ -187,7 +189,6 @@ class HCNewService extends HCCommand
     }
 
 
-
     /**
      * Updating configuration
      *
@@ -216,9 +217,9 @@ class HCNewService extends HCCommand
     private function updateActions (stdClass $config, stdClass $serviceData)
     {
         $servicePermissions = [
-            "name"        => "admin." . $serviceData->serviceRouteName,
-            "controller"  => $serviceData->controllerNamespace . '\\' . $serviceData->controllerName,
-            "actions"     => [
+            "name"       => "admin." . $serviceData->serviceRouteName,
+            "controller" => $serviceData->controllerNamespace . '\\' . $serviceData->controllerName,
+            "actions"    => [
                 $serviceData->aclPrefix . "_list",
                 $serviceData->aclPrefix . "_create",
                 $serviceData->aclPrefix . "_update",
@@ -323,8 +324,6 @@ class HCNewService extends HCCommand
 
         return $config;
     }
-
-
 
 
     /**
