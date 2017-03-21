@@ -2,9 +2,10 @@
 
 namespace interactivesolutions\honeycombscripts\app\commands;
 
+use Carbon\Carbon;
+use Exception;
 use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
-use League\Flysystem\Exception;
 
 class HCNewProject extends HCCommand
 {
@@ -23,12 +24,20 @@ class HCNewProject extends HCCommand
     protected $description = 'Deleting default laravel project files and creating honeycomb cms structure';
 
     /**
+     * Creating backup directory name
+     *
+     * @var string
+     */
+    protected $backupDirectory;
+
+    /**
      * Execute the console command.
      *
      * @return mixed
      */
     public function handle ()
     {
+        $this->backupDirectory = '_bak_' .$this->stringWithUnderscore(Carbon::now()->toDateTimeString());
         $this->removeDefaultStructure ();
     }
 
@@ -43,8 +52,10 @@ class HCNewProject extends HCCommand
 
         if ($confirm) {
             try {
-                // deleting files and folders
 
+                $this->makeBackup();
+
+                // deleting files and folders
                 if (!file_exists (HCNewProject::CONFIG))
                     $this->abort ('Missing project configuration file for laravel version');
 
@@ -65,7 +76,7 @@ class HCNewProject extends HCCommand
 
                 $this->createFileFromTemplate ([
                     "destination"         => 'app/' . HCNewService::CONFIG_PATH,
-                    "templateDestination" => __DIR__ . '/templates/project/config.hctpl',
+                    "templateDestination" => __DIR__ . '/templates/project/config.app.hctpl',
                     "content"             => [
                         "serviceProviderNameSpace" => "app",
                     ],
@@ -84,14 +95,13 @@ class HCNewProject extends HCCommand
                 replaceTextInFile('config/auth.php', ['=> App\User::class' => '=> interactivesolutions\honeycombacl\app\models\HCUsers::class']);
                 replaceTextInFile('config/database.php', ['utf8\'' => 'utf8mb4\'', 'utf8_' => 'utf8mb4_']);
 
-                $this->comment('Please run composer dump');
-
             } catch (Exception $e) {
-                $this->info ('Error occurred!');
-                $this->info ('Error code: ' . $e->getCode ());
-                $this->info ('Error message: ' . $e->getMessage ());
+                $this->comment ('Error occurred!');
+                $this->error ('Error code: ' . $e->getCode ());
+                $this->error ('Error message: ' . $e->getMessage ());
                 $this->info ('');
                 $this->info ('Rolling back configuration.');
+                $this->restore();
                 $this->abort ('');
             }
         }
@@ -105,9 +115,50 @@ class HCNewProject extends HCCommand
      */
     private function createProjectFile(string $source, string $destination)
     {
-        $this->createFileFromTemplate ([
-            "destination"         => $destination,
-            "templateDestination" => __DIR__ . '/templates/project/' . $source
-        ]);
+        try{
+            $this->createFileFromTemplate ([
+                "destination"         => $destination,
+                "templateDestination" => __DIR__ . '/templates/project/' . $source
+            ]);
+        } catch (Exception $e)
+        {
+        }
+    }
+
+    /**
+     * Making backup for app and bootstrap folders
+     */
+    private function makeBackup ()
+    {
+        $this->createDirectory($this->backupDirectory);
+        $this->createDirectory($this->backupDirectory . '/config');
+
+        File::copyDirectory('app', $this->backupDirectory . '/app');
+        File::copyDirectory('bootstrap', $this->backupDirectory . '/bootstrap');
+        File::copyDirectory('routes', $this->backupDirectory . '/routes');
+
+        File::copy('composer.json', $this->backupDirectory . '/composer.json');
+        File::copy('config/auth.php', $this->backupDirectory . '/config/auth.php');
+        File::copy('config/database.php', $this->backupDirectory . '/config/database.php');
+    }
+
+    private function restore()
+    {
+        $this->deleteDirectory('app');
+        $this->deleteDirectory('bootstrap');
+        $this->deleteDirectory('routes');
+
+        $this->info('Copying back App');
+        File::copyDirectory($this->backupDirectory . '/app', 'app');
+        $this->info('Copying back bootstrap');
+        File::copyDirectory($this->backupDirectory . '/bootstrap', 'bootstrap');
+        $this->info('Copying back routes');
+        File::copyDirectory($this->backupDirectory . '/routes', 'routes');
+
+        File::copy($this->backupDirectory . '/composer.json', 'composer.json');
+        File::copy($this->backupDirectory . '/config/auth.php', 'config/auth.php');
+        File::copy($this->backupDirectory . '/config/database.php', 'config/database.php');
+
+        $this->info('Backup successful');
     }
 }
