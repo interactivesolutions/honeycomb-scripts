@@ -1,6 +1,6 @@
 [
     "type"            => "{type}",
-    "fieldID"         => "{fieldID}",
+    "fieldID"         => "translations.{fieldID}",
     "label"           => trans("{label}"),
     "required"        => {required},
     "requiredVisible" => {required},
