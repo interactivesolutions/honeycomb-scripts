@@ -69,9 +69,17 @@ class {controllerName} extends HCBaseController
         $_data = request()->all();
 
         {inputData}
-        array_set ($data, 'translations', array_get ($_data, 'translations'));
+        $translations = array_get($_data, 'translations');
 
-        return $data;
+    //    foreach ($translations as &$value)
+    //    {
+    //        if (!isset($value['slug']) || $value['slug'] == "")
+    //            $value['slug'] = generateHCSlug(DEFINE FROM WHICH PARAMETERS);
+    //    }
+
+        array_set($data, 'translations', $translations);
+
+        return makeEmptyNullable($data);
     }
 
     /**
