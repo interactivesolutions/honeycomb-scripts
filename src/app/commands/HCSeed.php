@@ -13,7 +13,7 @@ class HCSeed extends HCCommand
      *
      * @var string
      */
-    protected $signature = 'hc:seed';
+    protected $signature = 'hc:seed {path?}';
 
     /**
      * The console command description.
@@ -27,15 +27,22 @@ class HCSeed extends HCCommand
      *
      * @return this
      */
-    public function handle ()
+    public function handle()
     {
         $seeders = [];
+        $path = $this->argument('path');
+        $files = [];
 
-        foreach ($this->getSeederFiles() as $filePath)
+        if ($path)
+            $files[] = base_path($path . 'src/database/seeds/HoneyCombDatabaseSeeder.php');
+        else
+            $files = $this->getSeederFiles();
+
+        foreach ($files as $filePath)
             $seeders = array_merge($seeders, array_keys(AnnotationsParser::parsePhp(file_get_contents($filePath))));
 
         foreach ($seeders as $class)
-            $this->call('db:seed',["--class" => $class]);
+            $this->call('db:seed', ["--class" => $class]);
 
         $this->call('db:seed');
     }
@@ -45,8 +52,8 @@ class HCSeed extends HCCommand
      *
      * @return array
      */
-    protected function getSeederFiles ()
+    protected function getSeederFiles()
     {
-        return array_merge (File::glob (__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
+        return array_merge(File::glob(__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
     }
 }
