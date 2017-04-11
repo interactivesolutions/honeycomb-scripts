@@ -82,14 +82,24 @@ class HCNewProject extends HCCommand
                     ],
                 ]);
 
-                foreach ($json['create_files'] as $source => $destinations) {
-
+                foreach ($json['create_files'] as $source => $destinations)
+                {
                     if (!is_array($destinations))
                         $this->createProjectFile($source, $destinations);
                     else
                         foreach ($destinations as $destination)
                             $this->createProjectFile($source, $destination);
                 }
+
+                foreach ($json['copy_folders'] as $source => $destinations)
+                {
+                    if (!is_array($destinations))
+                        File::copyDirectory(__DIR__ . "/templates/$source", base_path($destinations));
+                    else
+                        foreach ($destinations as $destination)
+                            File::copyDirectory(__DIR__ . "/templates/$source", base_path($destination));
+                }
+
 
                 replaceTextInFile('composer.json', ['"App\\\\"' => '"app\\\\"']);
                 replaceTextInFile('config/auth.php', ['=> App\User::class' => '=> interactivesolutions\honeycombacl\app\models\HCUsers::class']);
@@ -142,6 +152,11 @@ class HCNewProject extends HCCommand
         File::copy('config/database.php', $this->backupDirectory . '/config/database.php');
     }
 
+    /**
+     * Restoring on fail from backup directory
+     * @todo restore default css and js files
+     * @todo remove favicon files
+     */
     private function restore()
     {
         $this->deleteDirectory('app');

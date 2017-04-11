@@ -9,14 +9,17 @@
     "storage/framework/cache",
     "storage/framework/sessions",
     "storage/framework/views",
-    "routes"
+    "routes",
+    "public/css",
+    "public/js"
   ],
   "remove_files": [
     "app/Providers/RouteServiceProvider.php",
     "app/User.php",
     "bootstrap/app.php",
     "bootstrap/cache/config.php",
-    "bootstrap/cache/services.php"
+    "bootstrap/cache/services.php",
+    "database/factories/ModelFactory.php"
   ],
   "create_folders": [
     "app/console/commands",
@@ -35,7 +38,9 @@
     "storage/framework/cache",
     "storage/framework/sessions",
     "storage/framework/views",
-    "_automate"
+    "_automate",
+    "public/css",
+    "public/js"
   ],
   "create_files": {
     "app.console.kernel.hctpl": "app/console/Kernel.php",
@@ -51,6 +56,9 @@
     "bootstrap.app.hctpl": "bootstrap/app.php",
     "database.seeds.databaseseeder.hctpl": "database/seeds/DatabaseSeeder.php",
     "config.app.hctpl": "config/app.php",
-    "../shared/empty.hctpl": ["app/honeycomb/routes.php", "app/honeycomb/routes-custom.php"]
+    "../shared/empty.hctpl": ["app/honeycomb/routes.php", "app/honeycomb/routes-custom.php", "database/factories/ModelFactory.php"]
+  },
+  "copy_folders": {
+    "favicon":"public"
   }
 }
