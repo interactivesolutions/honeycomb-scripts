@@ -72,7 +72,7 @@ class HCNewPackage extends HCCommand
 
         $this->createFileFromTemplate ([
             "destination"         => $packageDirectory . '/src/app/honeycomb/config.json',
-            "templateDestination" => __DIR__ . '/templates/package/config.hctpl',
+            "templateDestination" => __DIR__ . '/templates/shared/hc.config.hctpl',
             "content"             => [
                 "serviceProviderNameSpace" => $packageName
             ]
