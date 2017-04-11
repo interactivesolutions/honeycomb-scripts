@@ -37,14 +37,10 @@ class HCRoutes extends HCCommand
 
         if ($rootDirectory == '') {
 
-            if (app ()->environment () == 'local') {
+            $files = $this->getConfigFiles ();
 
-                $files = $this->getConfigFiles ();
-
-                foreach ($files as $file)
-                    if (strpos ($file, '/vendor/') === false)
-                        $this->generateRoutes (realpath (implode ('/', array_slice (explode ('/', $file), 0, -3))) . '/');
-            }
+            foreach ($files as $file)
+                $this->generateRoutes (realpath (implode ('/', array_slice (explode ('/', $file), 0, -3))) . '/');
         } else
             $this->generateRoutes ($rootDirectory);
     }
