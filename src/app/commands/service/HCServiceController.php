@@ -40,7 +40,7 @@ class HCServiceController extends HCBaseServiceCreation
             $data->controllerNameForRoutes = $routesNameSpace . '\\\\' . $data->controllerName;
 
         // creating controller directory
-        $data->controllerDestination = $this->createItemDirectoryPath ($data->rootDirectory . 'app/http/controllers/' . str_replace ('-', '/', $data->serviceURL));
+        $data->controllerDestination = $this->createItemDirectoryPath ($data->rootDirectory . 'app/http/controllers/' . str_replace ('-', '', $data->serviceURL));
 
         return $data;
     }
