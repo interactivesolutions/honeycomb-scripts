@@ -34,7 +34,7 @@ class HCServiceTranslations extends HCBaseServiceCreation
      */
     private function getTranslationPrefix (stdClass $data)
     {
-        if ($data->rootDirectory == '/')
+        if ($data->rootDirectory == './')
             return '';
         else
             return $this->getServiceProviderNameSpace ($data) . "::";
