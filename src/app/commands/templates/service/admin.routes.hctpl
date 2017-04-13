@@ -2,7 +2,7 @@
 
 Route::group(['prefix' => 'admin', 'middleware' => ['web', 'auth']], function ()
 {
-    Route::get('{serviceURL}', ['as' => 'admin.{controllerNameDotted}', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@adminView']);
+    Route::get('{serviceURL}', ['as' => 'admin.{controllerNameDotted}.index', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@adminView']);
 
     Route::group(['prefix' => 'api/{serviceURL}'], function ()
     {
