@@ -83,3 +83,29 @@ if (!function_exists('http_validate'))
         return $return;
     }
 }
+
+if (!function_exists('random_str'))
+{
+    /**
+     * Origin taken from http://stackoverflow.com/a/31107425/657451
+     *
+     * Generate a random string, using a cryptographically secure
+     * pseudorandom number generator (random_int)
+     *
+     * @param int $length      How many characters do we want?
+     * @param string $keySpace A string of all possible characters
+     *                         to select from
+     * @return string
+     */
+    function random_str($length, $keySpace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    {
+        $keySpace = str_shuffle($keySpace);
+
+        $str = '';
+        $max = mb_strlen($keySpace, '8bit') - 1;
+        for ($i = 0; $i < $length; ++$i) {
+            $str .= $keySpace[random_int(0, $max)];
+        }
+        return $str;
+    }
+}
