@@ -5,8 +5,7 @@
     */
     protected function __create()
     {
-        if(is_null($data))
-            $data = $this->getInputData();
+        $data = $this->getInputData();
 
         $record = {modelName}::create(array_get($data, 'record'));
         $record->updateTranslations(array_get($data, 'translations'));
