@@ -59,3 +59,27 @@ if (!function_exists ('replaceTextInFile')) {
         file_put_contents($path, $file);
     }
 }
+
+if (!function_exists('http_validate'))
+{
+    /**
+     * Validates given url
+     *
+     * @param string $url
+     * @param bool $secure
+     * @return string
+     */
+    function http_validate(string $url, bool $secure = false) : string
+    {
+        $return = $url;
+        $protocol = 'http://';
+
+        if ($secure)
+            $protocol = 'https://';
+
+        if ((!(substr($url, 0, 7) == 'http://')) && (!(substr($url, 0, 8) == 'https://')))
+            $return = $protocol . $url;
+
+        return $return;
+    }
+}
