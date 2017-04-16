@@ -91,9 +91,10 @@ class HCNewPackage extends HCCommand
             "destination"         => $packageDirectory . '/src/app/providers/' . $packageName . 'ServiceProvider.php',
             "templateDestination" => __DIR__ . '/templates/package/service.provider.hctpl',
             "content"             => [
-                "packageName"      => $packageName . 'ServiceProvider',
-                "nameSpace"        => $nameSpace . '\app\providers',
-                "nameSpaceGeneral" => $nameSpace . '\app\http\controllers',
+                "packageName"              => $packageName . 'ServiceProvider',
+                "nameSpace"                => $nameSpace . '\app\providers',
+                "nameSpaceGeneral"         => $nameSpace . '\app\http\controllers',
+                "serviceProviderNameSpace" => $packageName,
             ],
         ]);
 
