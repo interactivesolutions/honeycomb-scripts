@@ -10,6 +10,7 @@ use interactivesolutions\honeycombscripts\app\commands\HCNewService;
 use interactivesolutions\honeycombscripts\app\commands\HCRoutes;
 use interactivesolutions\honeycombscripts\app\commands\HCNewProject;
 use interactivesolutions\honeycombscripts\app\commands\HCSeed;
+use interactivesolutions\honeycombscripts\app\commands\HCUpdateComposerDependencies;
 use Way\Generators\GeneratorsServiceProvider;
 use Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider;
 
@@ -25,6 +26,7 @@ class HCScriptsServiceProvider extends HCBaseServiceProvider
         HCRoutes::class,
         HCSeed::class,
         HCUpdate::class,
+        HCUpdateComposerDependencies::class,
     ];
 
     /**
