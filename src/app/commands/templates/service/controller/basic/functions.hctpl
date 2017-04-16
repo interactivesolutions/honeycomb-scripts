@@ -1,10 +1,9 @@
 /**
     * Create item
     *
-    * @param array|null $data
     * @return mixed
     */
-    protected function __create(array $data = null)
+    protected function __create()
     {
         if(is_null($data))
             $data = $this->getInputData();
