@@ -27,24 +27,25 @@ class HCSeed extends HCCommand
      *
      * @return this
      */
-    public function handle()
+    public function handle ()
     {
         $seeders = [];
-        $path = $this->argument('path');
-        $files = [];
+        $path    = $this->argument ('path');
+        $files   = [];
 
         if ($path)
-            $files[] = base_path($path . 'src/database/seeds/HoneyCombDatabaseSeeder.php');
+            $files[] = base_path ($path . 'src/database/seeds/HoneyCombDatabaseSeeder.php');
         else
-            $files = $this->getSeederFiles();
+            $files = $this->getSeederFiles ();
 
         foreach ($files as $filePath)
-            $seeders = array_merge($seeders, array_keys(AnnotationsParser::parsePhp(file_get_contents($filePath))));
+            $seeders = array_merge ($seeders, array_keys (AnnotationsParser::parsePhp (file_get_contents ($filePath))));
 
         foreach ($seeders as $class)
-            $this->call('db:seed', ["--class" => $class]);
+            if (class_exists ($class))
+                $this->call ('db:seed', ["--class" => $class]);
 
-        $this->call('db:seed');
+        $this->call ('db:seed');
     }
 
     /**
@@ -52,8 +53,8 @@ class HCSeed extends HCCommand
      *
      * @return array
      */
-    protected function getSeederFiles()
+    protected function getSeederFiles ()
     {
-        return array_merge(File::glob(__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
+        return array_merge (File::glob (__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
     }
 }
