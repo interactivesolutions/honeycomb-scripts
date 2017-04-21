@@ -22,7 +22,8 @@
     "php": ">=7.0.0",
     "laravel\/framework": "5.3.*",
     "nette\/reflection": "^2.4",
-    "xethron\/migrations-generator": "^2.0"
+    "xethron\/migrations-generator": "^2.0",
+    "interactivesolutions/honeycomb-languages/": "~0.1.2"
   },
   "autoload": {
     "psr-4": {
