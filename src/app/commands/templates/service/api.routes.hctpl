@@ -1,12 +1,12 @@
 <?php
 
-Route::group(['prefix' => 'api', 'middleware' => ['web', 'auth-apps']], function ()
+Route::group(['prefix' => 'api', 'middleware' => ['auth-apps']], function ()
 {
     Route::group(['prefix' => 'v1/{serviceURL}'], function ()
     {
         Route::get('/', ['as' => 'api.v1.{controllerNameDotted}', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_list'], 'uses' => '{controllerName}@listPage']);
         Route::get('list', ['as' => 'api.v1.{controllerNameDotted}.list', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_list'], 'uses' => '{controllerName}@list']);
-        Route::get('list/{timestamp}', ['as' => 'api.v1.{controllerNameDotted}.list.update', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@listUpdate']);
+        Route::get('list/{timestamp}', ['as' => 'api.v1.{controllerNameDotted}.list.update', 'middleware' => ['acl-apps:{acl_prefix}_list'], 'uses' => '{controllerName}@listUpdate']);
         Route::get('search', ['as' => 'api.v1.{controllerNameDotted}.search', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_list'], 'uses' => '{controllerName}@listSearch']);
         Route::get('{id}', ['as' => 'api.v1.{controllerNameDotted}.single', 'middleware' => ['acl-apps:api_v1_{acl_prefix}_list'], 'uses' => '{controllerName}@getSingleRecord']);
 
