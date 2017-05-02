@@ -42,6 +42,9 @@ class HCNewPackage extends HCCommand
         foreach (File::directories ('packages') as $directory)
             $directoryList = array_merge ($directoryList, File::directories ($directory));
 
+        if($directoryList == null)
+            $this->abort('You must create your package directory first');
+        
         $packageDirectory = $this->choice ('Please select package directory', $directoryList);
         $packageOfficialName = str_replace ('packages/', '', $packageDirectory);
         $nameSpace = $this->stringOnly (str_replace ('/', '\\', $packageOfficialName));
