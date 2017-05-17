@@ -24,16 +24,16 @@ class {controllerName} extends HCBaseController
             'headers'     => $this->getAdminListHeader(),
         ];
 
-        if ($this->user()->can('{acl_prefix}_create'))
+        if (auth()->user()->can('{acl_prefix}_create'))
             $config['actions'][] = 'new';
 
-        if ($this->user()->can('{acl_prefix}_update'))
+        if (auth()->user()->can('{acl_prefix}_update'))
         {
             $config['actions'][] = 'update';
             $config['actions'][] = 'restore';
         }
 
-        if ($this->user()->can('{acl_prefix}_delete'))
+        if (auth()->user()->can('{acl_prefix}_delete'))
             $config['actions'][] = 'delete';
 
         $config['actions'][] = 'search';
