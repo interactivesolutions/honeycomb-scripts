@@ -108,23 +108,16 @@
         return $list;
     }
 
-     /**
+    /**
      * List search elements
-
-     * @param $list
-     * @return mixed
+     * @param Builder $query
+     * @param string $phrase
+     * @return Builder
      */
-     protected function listSearch(Builder $list)
-     {
-         if(request()->has('q'))
-         {
-             $parameter = request()->input('q');
-
-             $list = $list->where(function ($query) use ($parameter)
-             {
+    protected function searchQuery(Builder $query, string $phrase)
+    {
+        return $query->where (function (Builder $query) use ($phrase) {
                 $query{searchableFields};
              });
-         }
-
-         return $list;
-     }
+        }
+    }

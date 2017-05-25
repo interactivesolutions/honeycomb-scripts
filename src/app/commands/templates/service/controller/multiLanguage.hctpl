@@ -92,7 +92,7 @@ class {controllerName} extends HCBaseController
     {
         $with = ['translations'];
 
-        $select = {mainModelName}::getFillableFields();
+        $select = {mainModelName}::getFillableFields(true);
 
         $record = {mainModelName}::with($with)
             ->select($select)
