@@ -337,10 +337,8 @@ class HCNewService extends HCCommand
     {
         $config->formData = json_decode (json_encode ($config->formData), true);
 
-        if (isset($config->formData[$serviceData->formID]))
-            $this->abort ('Form already exists');
-
-        $config->formData[$serviceData->formID] = $serviceData->formNameSpace . '\\' . $serviceData->formName;
+        if (!isset($config->formData[$serviceData->formID]))
+            $config->formData[$serviceData->formID] = $serviceData->formNameSpace . '\\' . $serviceData->formName;
 
         return $config;
     }
