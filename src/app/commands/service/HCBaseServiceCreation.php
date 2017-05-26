@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class HCBaseServiceCreation extends HCCommand
 {
-    private $autoFill = ['count', 'created_at', 'updated_at', 'deleted_at'];
+    private $autoFill = ['count', 'created_at', 'updated_at', 'deleted_at', 'language_code', 'record_id'];
 
     public function __construct()
     {

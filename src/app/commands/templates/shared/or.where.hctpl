@@ -1,1 +1,1 @@
-->orWhere('{key}', 'LIKE', '%' . $parameter . '%')
+->orWhere('{key}', 'LIKE', '%' . $phrase . '%')

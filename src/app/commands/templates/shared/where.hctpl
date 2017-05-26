@@ -1,1 +1,1 @@
-->where('{key}', 'LIKE', '%' . $parameter . '%')
+->where('{key}', 'LIKE', '%' . $phrase . '%')

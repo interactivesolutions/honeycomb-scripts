@@ -116,8 +116,13 @@
      */
     protected function searchQuery(Builder $query, string $phrase)
     {
-        return $query->where (function (Builder $query) use ($phrase) {
-                $query{searchableFields};
-             });
-        }
+        $r = {modelName}::getTableName();
+        $t = {modelName}Translations::getTableName();
+
+        $query->where (function (Builder $query) use ($phrase) {
+                        $query{searchableFields};
+                     });
+
+        return $query->join($t, "$r.id", "=", "$t.record_id")
+                       {searchableFieldsTranslations};
     }
