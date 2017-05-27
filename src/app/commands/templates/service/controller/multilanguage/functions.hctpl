@@ -3,7 +3,7 @@
     *
     * @return mixed
     */
-    protected function __create()
+    protected function __apiStore()
     {
         $data = $this->getInputData();
 
@@ -19,7 +19,7 @@
     * @param $id
     * @return mixed
     */
-    protected function __update(string $id)
+    protected function __apiUpdate(string $id)
     {
         $record = {modelName}::findOrFail($id);
 
@@ -37,7 +37,7 @@
     * @param string $id
     * @return mixed
     */
-    protected function __updateStrict(string $id)
+    protected function __apiUpdateStrict(string $id)
     {
         {modelName}::where('id', $id)->update(request()->all());
 
@@ -50,7 +50,7 @@
     * @param $list
     * @return mixed|void
     */
-    protected function __delete(array $list)
+    protected function __apiDestroy(array $list)
     {
         {modelName}::destroy($list);
     }
@@ -61,7 +61,7 @@
     * @param $list
     * @return mixed|void
     */
-    protected function __forceDelete(array $list)
+    protected function __apiForceDelete(array $list)
     {
         {modelName}::onlyTrashed()->whereIn('id', $list)->forceDelete();
     }
@@ -72,7 +72,7 @@
     * @param $list
     * @return mixed|void
     */
-    protected function __restore(array $list)
+    protected function __apiRestore(array $list)
     {
         {modelName}::whereIn('id', $list)->restore();
     }
