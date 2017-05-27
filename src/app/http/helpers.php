@@ -153,6 +153,7 @@ if (!function_exists ('removeDirectory')) {
     function removeDirectory (string $path)
     {
         //TODO move error to translations
+        //TODO check that deletion can happen only in p project directory
         if (!is_dir ($path))
             throw new InvalidArgumentException("$path");
 
