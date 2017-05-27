@@ -143,3 +143,30 @@ if (!function_exists ('addEnvVariable')) {
         return "/^$key={$escaped}/m";
     }
 }
+
+if (!function_exists ('removeDirectory')) {
+    /**
+     * Removes directory and its contents
+     *
+     * @param string $path Path to the directory.
+     */
+    function removeDirectory (string $path)
+    {
+        //TODO move error to translations
+        if (!is_dir ($path))
+            throw new InvalidArgumentException("$path");
+
+        if (substr ($path, strlen ($path) - 1, 1) != DIRECTORY_SEPARATOR)
+            $path .= DIRECTORY_SEPARATOR;
+
+        $files = glob ($path . '*', GLOB_MARK);
+
+        foreach ($files as $file)
+            if (is_dir ($file))
+                removeDirectory ($file);
+            else
+                unlink ($file);
+
+        rmdir ($path);
+    }
+}
