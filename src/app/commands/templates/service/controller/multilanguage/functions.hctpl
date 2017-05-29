@@ -10,7 +10,7 @@
         $record = {modelName}::create(array_get($data, 'record'));
         $record->updateTranslations(array_get($data, 'translations'));
 
-        return $this->getSingleRecord($record->id);
+        return $this->apiShow($record->id);
     }
 
     /**
@@ -28,7 +28,7 @@
         $record->update(array_get($data, 'record'));
         $record->updateTranslations(array_get($data, 'translations'));
 
-        return $this->getSingleRecord($record->id);
+        return $this->apiShow($record->id);
     }
 
     /**
@@ -41,7 +41,7 @@
     {
         {modelName}::where('id', $id)->update(request()->all());
 
-        return $this->getSingleRecord($id);
+        return $this->apiShow($id);
     }
 
     /**
