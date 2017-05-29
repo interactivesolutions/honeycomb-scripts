@@ -13,7 +13,7 @@ class {controllerName} extends HCBaseController
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function adminView()
+    public function adminIndex()
     {
         $config = [
             'title'       => trans('{translationsLocation}.page_title'),
