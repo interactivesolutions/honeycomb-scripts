@@ -10,6 +10,7 @@ Route::group(['prefix' => env('HC_ADMIN_URL'), 'middleware' => ['web', 'auth']],
         Route::post('/', ['middleware' => ['acl:{acl_prefix}_create'], 'uses' => '{controllerName}@apiStore']);
         Route::delete('/', ['middleware' => ['acl:{acl_prefix}_delete'], 'uses' => '{controllerName}@apiDestroy']);
 
+        Route::get('list', ['as' => 'admin.api.{controllerNameDotted}.list', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@apiIndex']);
         Route::post('restore', ['as' => 'admin.api.{controllerNameDotted}.restore', 'middleware' => ['acl:{acl_prefix}_update'], 'uses' => '{controllerName}@apiRestore']);
         Route::post('merge', ['as' => 'api.v1.{controllerNameDotted}.merge', 'middleware' => ['acl:{acl_prefix}_create', 'acl:{acl_prefix}_delete'], 'uses' => '{controllerName}@apiMerge']);
         Route::delete('force', ['as' => 'admin.api.{controllerNameDotted}.force', 'middleware' => ['acl:{acl_prefix}_force_delete'], 'uses' => '{controllerName}@apiForceDelete']);
