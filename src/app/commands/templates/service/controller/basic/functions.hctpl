@@ -24,7 +24,7 @@
 
         $data = $this->getInputData();
 
-        $record->update(array_get($data, 'record'));
+        $record->update(array_get($data, 'record', []));
 
         return $this->apiShow($record->id);
     }
