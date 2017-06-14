@@ -1,6 +1,6 @@
 <?php
 
-Route::group(['prefix' => env('HC_ADMIN_URL'), 'middleware' => ['web', 'auth']], function ()
+Route::group(['prefix' => config('hc.admin_url'), 'middleware' => ['web', 'auth']], function ()
 {
     Route::get('{serviceURL}', ['as' => 'admin.{controllerNameDotted}.index', 'middleware' => ['acl:{acl_prefix}_list'], 'uses' => '{controllerName}@adminIndex']);
 
