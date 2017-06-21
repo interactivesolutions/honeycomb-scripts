@@ -40,7 +40,13 @@ class HCNewPackage extends HCCommand
         $directoryList = [];
 
         foreach (File::directories ('packages') as $directory)
-            $directoryList = array_merge ($directoryList, File::directories ($directory));
+        {
+            $vendorPackages = File::directories ($directory);
+
+            foreach ($vendorPackages as $vendorPackage)
+                if (!file_exists($vendorPackage . '/src/app/honeycomb/config.json'))
+                    array_push($directoryList, $vendorPackage);
+        }
 
         if($directoryList == null)
             $this->abort('You must create your package directory first');
