@@ -65,6 +65,10 @@ class HCNewService extends HCCommand
             $this->createService ($serviceData);
             $this->finalizeFile ($serviceData->file);
         }
+
+        $this->call('hc:routes');
+        $this->call('hc:forms');
+        $this->call('hc:admin-menu');
     }
 
     /**
@@ -296,7 +300,7 @@ class HCNewService extends HCCommand
     private function updateMenu (stdClass $config, stdClass $serviceData)
     {
         $menuItem = [
-            "path"          => 'admin/' . $serviceData->serviceURL,
+            "route"         => 'admin.' . $serviceData->serviceRouteName . '.index',
             "translation"   => $serviceData->translationsLocation . '.page_title',
             "icon"          => $serviceData->serviceIcon,
             "aclPermission" => $serviceData->aclPrefix . "_list"
