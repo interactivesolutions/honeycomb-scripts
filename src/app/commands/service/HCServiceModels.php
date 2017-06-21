@@ -98,6 +98,7 @@ class HCServiceModels extends HCBaseServiceCreation
                                                ]);
 
                 $files[] = $model->multiLanguage->modelLocation;
+                $this->tableNames[] = $model->multiLanguage->tableName;
 
                 $template = __DIR__ . '/../templates/service/model/multiLanguage.hctpl';
             }
