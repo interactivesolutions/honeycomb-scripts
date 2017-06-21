@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class HCBaseServiceCreation extends HCCommand
 {
     private $autoFill = ['count', 'created_at', 'updated_at', 'deleted_at', 'language_code', 'record_id'];
+    private $translationsFill = ['count', 'created_at', 'updated_at', 'deleted_at'];
 
     public function __construct()
     {
@@ -19,6 +20,11 @@ class HCBaseServiceCreation extends HCCommand
     protected function getAutoFill()
     {
         return $this->autoFill;
+    }
+
+    protected function getTranslationsAutoFill()
+    {
+        return $this->translationsFill;
     }
 
     public function optimize(stdClass $data)

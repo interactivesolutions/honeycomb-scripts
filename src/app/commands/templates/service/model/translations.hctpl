@@ -1,0 +1,22 @@
+<?php
+
+namespace {modelNameSpace};
+
+use interactivesolutions\honeycombcore\models\HCTranslationsModel;
+
+class {modelName} extends HCTranslationsModel
+{
+    /**
+     * The database table used by the model.
+     *
+     * @var string
+     */
+    protected $table = '{modelTable}';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = {columnsFillable};
+}

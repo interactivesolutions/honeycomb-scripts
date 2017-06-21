@@ -9,7 +9,7 @@ class HCServiceModels extends HCBaseServiceCreation
 {
     private $tableNames;
 
-    public function __construct()
+    public function __construct ()
     {
         parent::__construct ();
     }
@@ -28,19 +28,19 @@ class HCServiceModels extends HCBaseServiceCreation
         $data->modelNamespace = str_replace ('\\http\\controllers', '\\models', $data->controllerNamespace);
 
         foreach ($data->database as $dbItem) {
-            $dbItem->columns = $this->getTableColumns ($dbItem->tableName);
+            $dbItem->columns       = $this->getTableColumns ($dbItem->tableName);
             $dbItem->modelLocation = $data->modelDirectory . '/' . $dbItem->modelName . '.php';
 
             if (isset($dbItem->default) && $dbItem->default)
                 if (isset($dbItem->multiLanguage)) {
-                    $dbItem->multiLanguage->columns = $this->getTableColumns ($dbItem->multiLanguage->tableName);
-                    $dbItem->multiLanguage->modelName = $dbItem->modelName . 'Translations';
+                    $dbItem->multiLanguage->columns       = $this->getTableColumns ($dbItem->multiLanguage->tableName);
+                    $dbItem->multiLanguage->modelName     = $dbItem->modelName . 'Translations';
                     $dbItem->multiLanguage->modelLocation = $data->modelDirectory . '/' . $dbItem->modelName . 'Translations.php';
                 }
         }
 
         //TODO get default model, there can be only one
-        $data->mainModel= $data->database[0];
+        $data->mainModel = $data->database[0];
 
         return $data;
     }
@@ -73,9 +73,9 @@ class HCServiceModels extends HCBaseServiceCreation
      */
     public function generate (stdClass $service)
     {
-        $modelData = $service->database;
+        $modelData        = $service->database;
         $this->tableNames = [];
-        $files = [];
+        $files            = [];
 
         foreach ($modelData as $tableName => $model) {
             $this->tableNames[] = $model->tableName;
@@ -83,16 +83,19 @@ class HCServiceModels extends HCBaseServiceCreation
             $template = __DIR__ . '/../templates/service/model/basic.hctpl';
 
             if (isset($model->multiLanguage)) {
+
+                $template = __DIR__ . '/../templates/service/model/translations.hctpl';
+
                 $this->createFileFromTemplate ([
-                    "destination"         => $model->multiLanguage->modelLocation,
-                    "templateDestination" => $template,
-                    "content"             => [
-                        "modelNameSpace"  => $service->modelNamespace,
-                        "modelName"       => $model->multiLanguage->modelName,
-                        "columnsFillable" => $this->getColumnsFillable ($model->multiLanguage->columns),
-                        "modelTable"      => $model->multiLanguage->tableName,
-                    ],
-                ]);
+                                                   "destination"         => $model->multiLanguage->modelLocation,
+                                                   "templateDestination" => $template,
+                                                   "content"             => [
+                                                       "modelNameSpace"  => $service->modelNamespace,
+                                                       "modelName"       => $model->multiLanguage->modelName,
+                                                       "columnsFillable" => $this->getColumnsFillable ($model->multiLanguage->columns, true),
+                                                       "modelTable"      => $model->multiLanguage->tableName,
+                                                   ],
+                                               ]);
 
                 $files[] = $model->multiLanguage->modelLocation;
 
@@ -100,15 +103,15 @@ class HCServiceModels extends HCBaseServiceCreation
             }
 
             $this->createFileFromTemplate ([
-                "destination"         => $model->modelLocation,
-                "templateDestination" => $template,
-                "content"             => [
-                    "modelNameSpace"  => $service->modelNamespace,
-                    "modelName"       => $model->modelName,
-                    "columnsFillable" => $this->getColumnsFillable ($model->columns),
-                    "modelTable"      => $model->tableName,
-                ],
-            ]);
+                                               "destination"         => $model->modelLocation,
+                                               "templateDestination" => $template,
+                                               "content"             => [
+                                                   "modelNameSpace"  => $service->modelNamespace,
+                                                   "modelName"       => $model->modelName,
+                                                   "columnsFillable" => $this->getColumnsFillable ($model->columns),
+                                                   "modelTable"      => $model->tableName,
+                                               ],
+                                           ]);
 
             $files[] = $model->modelLocation;
         }
@@ -119,16 +122,21 @@ class HCServiceModels extends HCBaseServiceCreation
     /**
      * Get models fillable fields
      *
-     * @param $columns
+     * @param array $columns
+     * @param bool $translations
      * @return string
      */
-    private function getColumnsFillable (array $columns)
+    private function getColumnsFillable (array $columns, bool $translations = false)
     {
         $names = [];
 
         foreach ($columns as $column) {
-            if (!in_array ($column->Field, $this->getAutoFill()))
-                array_push ($names, $column->Field);
+            if ($translations) {
+                if (!in_array ($column->Field, $this->getTranslationsAutoFill ()))
+                    array_push ($names, $column->Field);
+            } else
+                if (!in_array ($column->Field, $this->getAutoFill ()))
+                    array_push ($names, $column->Field);
         }
 
         return '[\'' . implode ('\', \'', $names) . '\']';
@@ -139,7 +147,7 @@ class HCServiceModels extends HCBaseServiceCreation
      *
      * @return mixed
      */
-    public function getTables()
+    public function getTables ()
     {
         return $this->tableNames;
     }
