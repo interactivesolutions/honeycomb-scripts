@@ -310,7 +310,7 @@ class HCNewService extends HCCommand
 
         //TODO check if adminMenu exists if not create []
         foreach ($config->adminMenu as &$existingMenuItem) {
-            if ($existingMenuItem->path == $menuItem['path']) {
+            if ($existingMenuItem->route == $menuItem['route']) {
                 if ($this->confirm ('Duplicate Menu item found with ' . $existingMenuItem->path . ' path. Confirm override', 'no')) {
                     $existingMenuItem = $menuItem;
                     $newMenu = false;
