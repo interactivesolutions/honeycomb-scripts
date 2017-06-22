@@ -4,6 +4,7 @@ namespace interactivesolutions\honeycombscripts\app\commands;
 
 use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
+use Symfony\Component\Finder\Finder;
 
 class HCRoutes extends HCCommand
 {
@@ -28,21 +29,18 @@ class HCRoutes extends HCCommand
      *
      * @return mixed
      */
-    public function handle ()
+    public function handle()
     {
-        if ($this->argument ('directory'))
-            $rootDirectory = $this->argument ('directory');
-        else
-            $rootDirectory = '';
+        $rootDirectory = $this->argument('directory') ?? '';
 
-        if ($rootDirectory == '') {
+        if( $rootDirectory == '' ) {
 
-            $files = $this->getConfigFiles ();
+            $files = $this->getConfigFiles();
 
-            foreach ($files as $file)
-                $this->generateRoutes (realpath (implode ('/', array_slice (explode ('/', $file), 0, -3))) . '/');
+            foreach ( $files as $file )
+                $this->generateRoutes(realpath(implode('/', array_slice(explode('/', $file), 0, -3))) . '/');
         } else
-            $this->generateRoutes ($rootDirectory);
+            $this->generateRoutes($rootDirectory);
     }
 
     /**
@@ -50,24 +48,35 @@ class HCRoutes extends HCCommand
      *
      * @param $directory
      */
-    private function generateRoutes ($directory)
+    private function generateRoutes($directory)
     {
-        if (!file_exists ($directory . 'app/routes/'))
+        $dirPath = $directory . 'app/routes/';
+
+        if( ! file_exists($dirPath) )
             return;
 
-        $files = \File::allFiles ($directory . 'app/routes');
+        // get all files recursively
+
+        /** @var \Iterator $iterator */
+        $iterator = Finder::create()
+            ->files()
+            ->ignoreDotFiles(true)
+            ->sortByName()
+            ->in($dirPath);
+
+        // iterate to array
+        $files = iterator_to_array($iterator, true);
 
         $finalContent = '<?php' . "\r\n";
 
-        foreach ($files as $file) {
-
+        foreach ( $files as $file ) {
             $finalContent .= "\r\n";
-            $finalContent .= '//' . implode ('/', array_slice (explode ('/', $file), -6)) . "\r\n";
-            $finalContent .= str_replace ('<?php', '', file_get_contents ((string)$file)) . "\r\n";
+            $finalContent .= '//' . implode('/', array_slice(explode('/', $file), -6)) . "\r\n";
+            $finalContent .= str_replace('<?php', '', file_get_contents((string)$file)) . "\r\n";
         }
 
-        file_put_contents ($directory . HCRoutes::ROUTES_PATH, $finalContent);
+        file_put_contents($directory . HCRoutes::ROUTES_PATH, $finalContent);
 
-        $this->comment ($directory . HCRoutes::ROUTES_PATH . ' file generated');
+        $this->comment($directory . HCRoutes::ROUTES_PATH . ' file generated');
     }
 }
