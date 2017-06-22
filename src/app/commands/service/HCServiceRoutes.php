@@ -20,7 +20,9 @@ class HCServiceRoutes extends HCBaseServiceCreation
      */
     public function optimize (stdClass $data)
     {
-        $data->serviceRouteName = $this->stringWithDots ($data->serviceURL);
+        $serviceURL = str_replace(['-', $data->dynamicSegmentName . '/'], '', $data->serviceURL);
+
+        $data->serviceRouteName = $this->stringWithDots ($serviceURL);
         $data->adminRoutesDestination = $data->rootDirectory . 'app/routes/admin/routes.' . $data->serviceRouteName . '.php';
         $data->apiRoutesDestination = $data->rootDirectory . 'app/routes/api/routes.' . $data->serviceRouteName . '.php';
         $data->routesDestination = $data->rootDirectory . 'app/routes/routes.' . $data->serviceRouteName . '.php';

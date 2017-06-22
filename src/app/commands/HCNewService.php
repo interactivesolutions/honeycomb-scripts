@@ -148,6 +148,15 @@ class HCNewService extends HCCommand
         if ($item == null)
             $this->abort ($file->getFilename () . ' has Invalid JSON format.');
 
+        // check if service has dynamic segment
+        if( preg_match('/{_(.*?)}/', $item->serviceURL, $matches) ) {
+            $item->dynamicSegmentName = $matches[0];
+            $item->dynamicSegment = true;
+        } else {
+            $item->dynamicSegmentName = '';
+            $item->dynamicSegment = false;
+        }
+
         if ($item->directory == '') {
             $item->directory = '';
             $item->rootDirectory = './';

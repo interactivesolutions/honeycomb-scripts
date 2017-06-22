@@ -20,7 +20,9 @@ class HCServiceTranslations extends HCBaseServiceCreation
      */
     public function optimize (stdClass $data)
     {
-        $data->translationFilePrefix = $this->stringWithUnderscore ($data->serviceURL);
+        $serviceURL = str_replace(['-', $data->dynamicSegmentName . '/'], '', $data->serviceURL);
+
+        $data->translationFilePrefix = $this->stringWithUnderscore ($serviceURL);
         $data->translationsLocation = $this->getTranslationPrefix ($data) . $data->translationFilePrefix;
 
         return $data;
