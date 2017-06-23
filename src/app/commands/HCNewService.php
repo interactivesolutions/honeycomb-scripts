@@ -304,6 +304,7 @@ class HCNewService extends HCCommand
             "translation"   => $serviceData->translationsLocation . '.page_title',
             "icon"          => $serviceData->serviceIcon,
             "aclPermission" => $serviceData->aclPrefix . "_list",
+            "priority"      => 10,
         ];
 
         //TODO check if adminMenu exists if not create []
