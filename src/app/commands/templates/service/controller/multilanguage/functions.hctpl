@@ -52,6 +52,7 @@
     */
     protected function __apiDestroy(array $list)
     {
+        {modelName}Translations::destroy ({modelName}Translations::whereIn ('record_id', $list)->pluck ('id')->toArray ());
         {modelName}::destroy($list);
     }
 
@@ -63,6 +64,7 @@
     */
     protected function __apiForceDelete(array $list)
     {
+        {modelName}Translations::onlyTrashed ()->whereIn ('record_id', $list)->forceDelete ();
         {modelName}::onlyTrashed()->whereIn('id', $list)->forceDelete();
     }
 
@@ -74,6 +76,7 @@
     */
     protected function __apiRestore(array $list)
     {
+        {modelName}Translations::onlyTrashed ()->whereIn ('record_id', $list)->restore ();
         {modelName}::whereIn('id', $list)->restore();
     }
 
