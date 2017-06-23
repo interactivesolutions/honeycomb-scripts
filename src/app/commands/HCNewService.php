@@ -307,11 +307,14 @@ class HCNewService extends HCCommand
             "priority"      => 10,
         ];
 
-        //TODO check if adminMenu exists if not create []
+        $newMenu = true;
+
+            //TODO check if adminMenu exists if not create []
         foreach ( $config->adminMenu as &$existingMenuItem ) {
             if( $existingMenuItem->route == $menuItem['route'] ) {
                 if( $this->confirm('Duplicate Menu item found with ' . $existingMenuItem->path . ' path. Confirm override', 'no') ) {
                     $existingMenuItem = $menuItem;
+                    $newMenu = false;
                     break;
                 } else {
                     $this->abort('Can not override existing configuration. Aborting...');
@@ -320,6 +323,9 @@ class HCNewService extends HCCommand
                 }
             }
         }
+
+        if ($newMenu)
+            $config->adminMenu = array_merge ($config->adminMenu, [$menuItem]);
 
         return $config;
     }
