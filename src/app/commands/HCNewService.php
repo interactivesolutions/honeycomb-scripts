@@ -148,15 +148,6 @@ class HCNewService extends HCCommand
         if( $item == null )
             $this->abort($file->getFilename() . ' has Invalid JSON format.');
 
-        // check if service has dynamic segment
-        if( preg_match('/{_(.*?)}/', $item->serviceURL, $matches) ) {
-            $item->dynamicSegmentName = $matches[0];
-            $item->dynamicSegment = true;
-        } else {
-            $item->dynamicSegmentName = '';
-            $item->dynamicSegment = false;
-        }
-
         if( $item->directory == '' ) {
             $item->directory = '';
             $item->rootDirectory = './';
@@ -315,14 +306,11 @@ class HCNewService extends HCCommand
             "aclPermission" => $serviceData->aclPrefix . "_list",
         ];
 
-        $newMenu = $serviceData->dynamicSegment ? false : true;
-
         //TODO check if adminMenu exists if not create []
         foreach ( $config->adminMenu as &$existingMenuItem ) {
             if( $existingMenuItem->route == $menuItem['route'] ) {
                 if( $this->confirm('Duplicate Menu item found with ' . $existingMenuItem->path . ' path. Confirm override', 'no') ) {
                     $existingMenuItem = $menuItem;
-                    $newMenu = false;
                     break;
                 } else {
                     $this->abort('Can not override existing configuration. Aborting...');
@@ -330,12 +318,6 @@ class HCNewService extends HCCommand
                     return null;
                 }
             }
-        }
-
-        if( $newMenu ) {
-            $config->adminMenu = array_merge($config->adminMenu, [$menuItem]);
-        } else {
-            $this->info(" * Admin menu not created for this service" . PHP_EOL);
         }
 
         return $config;

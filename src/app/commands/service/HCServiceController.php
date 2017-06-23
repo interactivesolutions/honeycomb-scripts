@@ -24,17 +24,15 @@ class HCServiceController extends HCBaseServiceCreation
     {
         $data->controllerName = $data->serviceName . 'Controller';
 
-        $serviceURL = str_replace(['-', $data->dynamicSegmentName . '/'], '', $data->serviceURL);
-
         // creating name space from service URL
-        $data->controllerNamespace = str_replace('/', '\\', $data->directory . 'app\http\controllers\\' . $serviceURL);
+        $data->controllerNamespace = str_replace('/', '\\', $data->directory . 'app\http\controllers\\' . str_replace('-', '', $data->serviceURL));
 
         $data->controllerNamespace = array_filter(explode('\\', $data->controllerNamespace));
         array_pop($data->controllerNamespace);
         $data->controllerNamespace = implode('\\', $data->controllerNamespace);
-        $data->controllerNamespace = str_replace(['-', $data->dynamicSegmentName . '/'], '', $data->controllerNamespace);
+        $data->controllerNamespace = str_replace('-', '', $data->controllerNamespace);
 
-        $routesNameSpace = str_replace('/', '\\\\', $this->createItemDirectoryPath($serviceURL));
+        $routesNameSpace = str_replace('/', '\\\\', $this->createItemDirectoryPath(str_replace('-', '', $data->serviceURL)));
 
         if( $routesNameSpace == "" )
             $data->controllerNameForRoutes = $data->controllerName;
@@ -42,7 +40,7 @@ class HCServiceController extends HCBaseServiceCreation
             $data->controllerNameForRoutes = $routesNameSpace . '\\\\' . $data->controllerName;
 
         // creating controller directory
-        $data->controllerDestination = $this->createItemDirectoryPath($data->rootDirectory . 'app/http/controllers/' . $serviceURL);
+        $data->controllerDestination = $this->createItemDirectoryPath($data->rootDirectory . 'app/http/controllers/' . str_replace('-', '', $data->serviceURL));
 
         return $data;
     }
