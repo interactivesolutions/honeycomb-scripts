@@ -36,7 +36,7 @@ class HCServiceController extends HCBaseServiceCreation
 
         $routesNameSpace = str_replace('/', '\\\\', $this->createItemDirectoryPath($serviceURL));
 
-        if ($routesNameSpace == "")
+        if( $routesNameSpace == "" )
             $data->controllerNameForRoutes = $data->controllerName;
         else
             $data->controllerNameForRoutes = $routesNameSpace . '\\\\' . $data->controllerName;
@@ -63,7 +63,7 @@ class HCServiceController extends HCBaseServiceCreation
 
     public function generate(stdClass $data)
     {
-        if (isset($data->mainModel->multiLanguage))
+        if( isset($data->mainModel->multiLanguage) )
             $this->createMultiLanguageController($data);
         else
             $this->createBasicController($data);
@@ -77,28 +77,28 @@ class HCServiceController extends HCBaseServiceCreation
     private function createMultiLanguageController(stdClass $data)
     {
         $this->createFileFromTemplate([
-            "destination" => $data->controllerDestination,
+            "destination"         => $data->controllerDestination,
             "templateDestination" => __DIR__ . '/../templates/service/controller/multiLanguage.hctpl',
-            "content" => [
-                "namespace" => $data->controllerNamespace,
-                "controllerName" => $data->controllerName,
-                "acl_prefix" => $data->aclPrefix,
-                "translationsLocation" => $data->translationsLocation,
-                "serviceNameDotted" => $this->stringWithDash($data->translationFilePrefix),
-                "controllerNameDotted" => $data->serviceRouteName,
-                "adminListHeader" => $this->getAdminListHeader($data),
-                "formValidationName" => $data->formValidationName,
+            "content"             => [
+                "namespace"                      => $data->controllerNamespace,
+                "controllerName"                 => $data->controllerName,
+                "acl_prefix"                     => $data->aclPrefix,
+                "translationsLocation"           => $data->translationsLocation,
+                "serviceNameDotted"              => $this->stringWithDash($data->translationFilePrefix),
+                "controllerNameDotted"           => $data->serviceRouteName,
+                "adminListHeader"                => $this->getAdminListHeader($data),
+                "formValidationName"             => $data->formValidationName,
                 "translationsFormValidationName" => $data->formTranslationsValidationName,
-                "functions" => replaceBrackets(file_get_contents(__DIR__ . '/../templates/service/controller/multilanguage/functions.hctpl'),
+                "functions"                      => replaceBrackets(file_get_contents(__DIR__ . '/../templates/service/controller/multilanguage/functions.hctpl'),
                     [
-                        "modelName" => $data->mainModel->modelName,
+                        "modelName"      => $data->mainModel->modelName,
                         "modelNameSpace" => $data->modelNamespace,
                     ]),
-                "inputData" => $this->getInputData($data),
-                "useFiles" => $this->getUseFiles($data, true),
-                "mainModelName" => $data->mainModel->modelName,
-                "searchableFields" => $this->getSearchableFields($data),
-                "searchableFieldsTranslations" => $this->getSearchableFields($data, true),
+                "inputData"                      => $this->getInputData($data),
+                "useFiles"                       => $this->getUseFiles($data, true),
+                "mainModelName"                  => $data->mainModel->modelName,
+                "searchableFields"               => $this->getSearchableFields($data),
+                "searchableFieldsTranslations"   => $this->getSearchableFields($data, true),
             ],
         ]);
 
@@ -112,27 +112,32 @@ class HCServiceController extends HCBaseServiceCreation
      */
     private function createBasicController(stdClass $data)
     {
+        $functionsPath = $data->dynamicSegment ? __DIR__ . '/../templates/service/controller/basic/sub-functions.hctpl' : __DIR__ . '/../templates/service/controller/basic/functions.hctpl';
+
         $this->createFileFromTemplate([
-            "destination" => $data->controllerDestination,
+            "destination"         => $data->controllerDestination,
             "templateDestination" => __DIR__ . '/../templates/service/controller/basic.hctpl',
-            "content" => [
-                "namespace" => $data->controllerNamespace,
-                "controllerName" => $data->controllerName,
-                "acl_prefix" => $data->aclPrefix,
+            "content"             => [
+                "namespace"            => $data->controllerNamespace,
+                "controllerName"       => $data->controllerName,
+                "acl_prefix"           => $data->aclPrefix,
+                "parentId"             => $data->dynamicSegment ? '$parentId' : '',
+                "parentListUrl"        => $data->dynamicSegment ? ', $parentId' : '',
+                "parentForm"           => $data->dynamicSegment ? ' . \'?parent_id=\' . $parentId' : '',
                 "translationsLocation" => $data->translationsLocation,
-                "serviceNameDotted" => $this->stringWithDash($data->translationFilePrefix),
+                "serviceNameDotted"    => $this->stringWithDash($data->translationFilePrefix),
                 "controllerNameDotted" => $data->serviceRouteName,
-                "adminListHeader" => $this->getAdminListHeader($data),
-                "formValidationName" => $data->formValidationName,
-                "functions" => replaceBrackets(file_get_contents(__DIR__ . '/../templates/service/controller/basic/functions.hctpl'),
+                "adminListHeader"      => $this->getAdminListHeader($data),
+                "formValidationName"   => $data->formValidationName,
+                "functions"            => replaceBrackets(file_get_contents($functionsPath),
                     [
-                        "modelName" => $data->mainModel->modelName,
+                        "modelName"      => $data->mainModel->modelName,
                         "modelNameSpace" => $data->modelNamespace,
                     ]),
-                "inputData" => $this->getInputData($data),
-                "useFiles" => $this->getUseFiles($data),
-                "mainModelName" => $data->mainModel->modelName,
-                "searchableFields" => $this->getSearchableFields($data),
+                "inputData"            => $this->getInputData($data),
+                "useFiles"             => $this->getUseFiles($data),
+                "mainModelName"        => $data->mainModel->modelName,
+                "searchableFields"     => $this->getSearchableFields($data),
             ],
         ]);
 
@@ -154,7 +159,7 @@ class HCServiceController extends HCBaseServiceCreation
         $output .= $this->gatherHeaders($model, array_merge($this->getAutoFill(), ['id']), $data->translationsLocation, false);
 
         //getting parameters which are not multilanguage
-        if (isset($model->multiLanguage))
+        if( isset($model->multiLanguage) )
             $output .= $this->gatherHeaders($model->multiLanguage, array_merge($this->getAutoFill(), ['id', 'language_code', 'record_id']), $data->translationsLocation, true);
 
         return $output;
@@ -164,14 +169,14 @@ class HCServiceController extends HCBaseServiceCreation
     {
         $output = '';
 
-        if ($multiLanguage)
+        if( $multiLanguage )
             $tpl = file_get_contents(__DIR__ . '/../templates/service/controller/multilanguage/admin.list.header.hctpl');
         else
             $tpl = file_get_contents(__DIR__ . '/../templates/service/controller/basic/admin.list.header.hctpl');
 
-        if (array_key_exists('columns', $model) && !empty($model->columns))
-            foreach ($model->columns as $column) {
-                if (in_array($column->Field, $skip))
+        if( array_key_exists('columns', $model) && ! empty($model->columns) )
+            foreach ( $model->columns as $column ) {
+                if( in_array($column->Field, $skip) )
                     continue;
 
                 $field = str_replace('{key}', $column->Field, $tpl);
@@ -194,19 +199,19 @@ class HCServiceController extends HCBaseServiceCreation
         $output = '';
         $skip = array_merge($this->getAutoFill(), ['id']);
 
-        if (!empty($data->database)) {
+        if( ! empty($data->database) ) {
 
-            if (isset($data->multiLanguage))
+            if( isset($data->multiLanguage) )
                 $path = '/templates/service/controller/multilanguage/input.data.hctpl';
             else
                 $path = '/templates/service/controller/basic/input.data.hctpl';
 
             $tpl = file_get_contents(__DIR__ . '/..' . $path);
 
-            foreach ($data->database as $tableName => $model)
-                if (array_key_exists('columns', $model) && !empty($model->columns) && isset($model->default))
-                    foreach ($model->columns as $column) {
-                        if (in_array($column->Field, $skip))
+            foreach ( $data->database as $tableName => $model )
+                if( array_key_exists('columns', $model) && ! empty($model->columns) && isset($model->default) )
+                    foreach ( $model->columns as $column ) {
+                        if( in_array($column->Field, $skip) )
                             continue;
 
                         $line = str_replace('{key}', $column->Field, $tpl);
@@ -231,29 +236,29 @@ class HCServiceController extends HCBaseServiceCreation
         $list = [];
         $list[] = [
             "nameSpace" => $data->modelNamespace,
-            "name" => $data->mainModel->modelName,
+            "name"      => $data->mainModel->modelName,
         ];
 
-        if ($multiLanguage)
+        if( $multiLanguage )
             $list[] = [
                 "nameSpace" => $data->modelNamespace,
-                "name" => $data->mainModel->modelName . 'Translations',
+                "name"      => $data->mainModel->modelName . 'Translations',
             ];
 
         $list[] = [
             "nameSpace" => $data->formValidationNameSpace,
-            "name" => $data->formValidationName,
+            "name"      => $data->formValidationName,
         ];
 
-        if (isset($data->mainModel->multiLanguage)) {
+        if( isset($data->mainModel->multiLanguage) ) {
 
             $list[] = [
                 "nameSpace" => $data->formValidationNameSpace,
-                "name" => $data->formTranslationsValidationName,
+                "name"      => $data->formTranslationsValidationName,
             ];
         }
 
-        foreach ($list as $key => $value)
+        foreach ( $list as $key => $value )
             $output .= "\r\n" . 'use ' . $value['nameSpace'] . '\\' . $value['name'] . ';';
 
         return $output;
@@ -277,28 +282,28 @@ class HCServiceController extends HCBaseServiceCreation
         $skip = array_merge($this->getAutoFill(), ['id']);
 
 
-        if ($multiLanguage) {
-            if (array_key_exists('multiLanguage', $model) && !empty($model->multiLanguage))
-                if (array_key_exists('columns', $model->multiLanguage) && !empty($model->multiLanguage->columns))
-                    foreach ($model->multiLanguage->columns as $index => $column) {
+        if( $multiLanguage ) {
+            if( array_key_exists('multiLanguage', $model) && ! empty($model->multiLanguage) )
+                if( array_key_exists('columns', $model->multiLanguage) && ! empty($model->multiLanguage->columns) )
+                    foreach ( $model->multiLanguage->columns as $index => $column ) {
 
-                        if (in_array($column->Field, $skip))
+                        if( in_array($column->Field, $skip) )
                             continue;
 
-                        if ($output == '')
+                        if( $output == '' )
                             $output .= str_replace('{key}', $column->Field, $whereTpl);
                         else
                             $output .= str_replace('{key}', $column->Field, $orWhereTpl);
 
                     }
         } else
-            if (array_key_exists('columns', $model) && !empty($model->columns)) {
+            if( array_key_exists('columns', $model) && ! empty($model->columns) ) {
 
-                foreach ($model->columns as $index => $column) {
-                    if (in_array($column->Field, $skip))
+                foreach ( $model->columns as $index => $column ) {
+                    if( in_array($column->Field, $skip) )
                         continue;
 
-                    if ($output == '')
+                    if( $output == '' )
                         $output .= str_replace('{key}', $column->Field, $whereTpl);
                     else
                         $output .= str_replace('{key}', $column->Field, $orWhereTpl);

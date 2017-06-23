@@ -1,0 +1,133 @@
+/**
+    * Create item
+    *
+    * @param null $parentId
+    * @return mixed
+    */
+    protected function __apiStore($parentId = null)
+    {
+        $data = $this->getInputData();
+
+        $record = {modelName}::create(array_get($data, 'record'));
+
+        return $this->apiShow($record->id);
+    }
+
+    /**
+    * Updates existing item based on ID
+    *
+    * @param null $parentId
+    * @param null|string $id
+    * @return mixed
+    */
+    protected function __apiUpdate($parentId = null, string $id = null)
+    {
+        $record = {modelName}::where('parent_id', $parentId)->where('id', $id)->firstOrFail($id);
+
+        $data = $this->getInputData();
+
+        $record->update(array_get($data, 'record', []));
+
+        return $this->apiShow($parentId, $record->id);
+    }
+
+    /**
+    * Updates existing specific items based on ID
+    *
+    * @param null $parentId
+    * @param string $id
+    * @return mixed
+    */
+    protected function __apiUpdateStrict($parentId = null, string $id = null)
+    {
+        {modelName}::where('parent_id', $parentId)->where('id', $id)->update(request()->all());
+
+        return $this->apiShow($parentId, $id);
+    }
+
+    /**
+    * Delete records table
+    *
+    * @param null $parentId
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __apiDestroy($parentId = null, array $list)
+    {
+        {modelName}::where('parent_id', $parentId)->whereIn('id', $list)->delete($list);
+    }
+
+    /**
+    * Delete records table
+    *
+    * @param null $parentId
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __apiForceDelete($parentId = null, array $list)
+    {
+        {modelName}::onlyTrashed()->where('parent_id', $parentId)->whereIn('id', $list)->forceDelete();
+    }
+
+    /**
+    * Restore multiple records
+    *
+    * @param null $parentId
+    * @param $list
+    * @return mixed|void
+    */
+    protected function __apiRestore($parentId = null, array $list)
+    {
+        {modelName}::where('parent_id', $parentId)->whereIn('id', $list)->restore();
+    }
+
+    /**
+     * Creating data query
+     *
+     * @param array $select
+     * @return mixed
+     */
+    protected function createQuery(array $select = null)
+    {
+        // TODO get $parentId
+        $parentId = null;
+        $with = [];
+
+        if ($select == null)
+            $select = {modelName}::getFillableFields();
+
+        $list = {modelName}::with($with)->select($select)
+        // add filters
+        ->where('parent_id', $parentId)
+        ->where(function ($query) use ($select) {
+            $query = $this->getRequestParameters($query, $select);
+        });
+
+        // enabling check for deleted
+        $list = $this->checkForDeleted($list);
+
+        // add search items
+        $list = $this->search($list);
+
+        // ordering data
+        $list = $this->orderData($list, $select);
+
+        return $list;
+    }
+
+    /**
+     * List search elements
+     *
+     * @param Builder $query
+     * @param string $phrase
+     * @return Builder
+     */
+    protected function searchQuery(Builder $query, string $phrase)
+    {
+        // TODO get $parentId
+        $parentId = null;
+
+        return $query->where (function (Builder $query) use ($phrase) {
+                $query{searchableFields};
+             })->where('parent_id', $parentId);
+    }
