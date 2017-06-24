@@ -3,6 +3,7 @@
 namespace interactivesolutions\honeycombscripts\app\commands\service;
 
 use DB;
+use FilesystemIterator;
 use stdClass;
 
 class HCServiceRoutes extends HCBaseServiceCreation
@@ -20,7 +21,10 @@ class HCServiceRoutes extends HCBaseServiceCreation
      */
     public function optimize (stdClass $data)
     {
-        $data->serviceRouteName = $this->stringWithDots ($data->serviceURL);
+        $fi = new FilesystemIterator($data->rootDirectory . 'app/routes/admin/', FilesystemIterator::SKIP_DOTS);
+        $count = str_pad(iterator_count($fi) + 1, 2, '0', STR_PAD_LEFT) . '_';
+
+        $data->serviceRouteName = $count . $this->stringWithDots ($data->serviceURL);
 
         $data->adminRoutesDestination = $data->rootDirectory . 'app/routes/admin/routes.' . $data->serviceRouteName . '.php';
         $data->apiRoutesDestination = $data->rootDirectory . 'app/routes/api/routes.' . $data->serviceRouteName . '.php';
