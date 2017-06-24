@@ -81,6 +81,7 @@ class HCServiceController extends HCBaseServiceCreation
                 "namespace"                      => $data->controllerNamespace,
                 "controllerName"                 => $data->controllerName,
                 "acl_prefix"                     => $data->aclPrefix,
+                "serviceURL"                     => $data->serviceURL,
                 "translationsLocation"           => $data->translationsLocation,
                 "serviceNameDotted"              => $this->stringWithDash($data->translationFilePrefix),
                 "controllerNameDotted"           => $data->serviceRouteName,

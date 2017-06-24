@@ -74,11 +74,9 @@ class {controllerName} extends HCBaseController
         {inputData}
         $translations = array_get($_data, 'translations');
 
-    //    foreach ($translations as &$value)
-    //    {
-    //        if (!isset($value['slug']) || $value['slug'] == "")
-    //            $value['slug'] = generateHCSlug(DEFINE FROM WHICH PARAMETERS);
-    //    }
+        foreach ($translations as &$value)
+            if (!isset($value['slug']) || $value['slug'] == "")
+                $value['slug'] = generateHCSlug("{serviceURL}", $value['label']);
 
         array_set($data, 'translations', $translations);
 

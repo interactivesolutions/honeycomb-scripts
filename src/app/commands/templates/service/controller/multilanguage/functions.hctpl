@@ -93,11 +93,11 @@
         if ($select == null)
             $select = {modelName}::getFillableFields();
 
-        $list = {modelName}::with($with)->select($select)
-        // add filters
-        ->where(function ($query) use ($select) {
-            $query = $this->getRequestParameters($query, $select);
-        });
+        $list = {modelName}::with ($with)
+                           ->select ($select)
+                           ->where (function ($query) use ($select) {
+                            $query = $this->getRequestParameters ($query, $select);
+                           });
 
         // enabling check for deleted
         $list = $this->checkForDeleted($list);
