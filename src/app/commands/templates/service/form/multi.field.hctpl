@@ -4,5 +4,6 @@
     "label"           => trans("{label}"),
     "required"        => {required},
     "requiredVisible" => {required},
+    "tabID"           => trans('HCTranslations::core.translations'),
     "multiLanguage"   => 1,
 ],
