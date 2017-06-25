@@ -46,33 +46,39 @@
     * Delete records table
     *
     * @param $list
-    * @return mixed|void
+    * @return mixed
     */
     protected function __apiDestroy(array $list)
     {
         {modelName}::destroy($list);
+
+        return hcSuccess();
     }
 
     /**
     * Delete records table
     *
     * @param $list
-    * @return mixed|void
+    * @return mixed
     */
     protected function __apiForceDelete(array $list)
     {
         {modelName}::onlyTrashed()->whereIn('id', $list)->forceDelete();
+
+        return hcSuccess();
     }
 
     /**
     * Restore multiple records
     *
     * @param $list
-    * @return mixed|void
+    * @return mixed
     */
     protected function __apiRestore(array $list)
     {
         {modelName}::whereIn('id', $list)->restore();
+
+        return hcSuccess();
     }
 
     /**

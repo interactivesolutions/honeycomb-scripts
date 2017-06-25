@@ -50,11 +50,13 @@
     *
     * @param null $parentId
     * @param $list
-    * @return mixed|void
+    * @return mixed
     */
     protected function __apiDestroy($parentId = null, array $list)
     {
         {modelName}::where('parent_id', $parentId)->whereIn('id', $list)->delete($list);
+
+        return hcSuccess();
     }
 
     /**
@@ -62,11 +64,13 @@
     *
     * @param null $parentId
     * @param $list
-    * @return mixed|void
+    * @return mixed
     */
     protected function __apiForceDelete($parentId = null, array $list)
     {
         {modelName}::onlyTrashed()->where('parent_id', $parentId)->whereIn('id', $list)->forceDelete();
+
+        return hcSuccess();
     }
 
     /**
@@ -74,11 +78,13 @@
     *
     * @param null $parentId
     * @param $list
-    * @return mixed|void
+    * @return mixed
     */
     protected function __apiRestore($parentId = null, array $list)
     {
         {modelName}::where('parent_id', $parentId)->whereIn('id', $list)->restore();
+
+        return hcSuccess();
     }
 
     /**
