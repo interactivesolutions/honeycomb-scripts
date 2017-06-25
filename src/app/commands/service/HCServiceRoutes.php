@@ -24,10 +24,10 @@ class HCServiceRoutes extends HCBaseServiceCreation
         $fi = new FilesystemIterator($data->rootDirectory . 'app/routes/admin/', FilesystemIterator::SKIP_DOTS);
         $count = str_pad(iterator_count($fi) + 1, 2, '0', STR_PAD_LEFT) . '_';
 
-        $data->serviceRouteName = $count . 'routes.' . $this->stringWithDots ($data->serviceURL);
+        $data->serviceRouteName = 'routes.' . $this->stringWithDots ($data->serviceURL);
 
-        $data->adminRoutesDestination = $data->rootDirectory . 'app/routes/admin/' . $data->serviceRouteName . '.php';
-        $data->apiRoutesDestination = $data->rootDirectory . 'app/routes/api/' . $data->serviceRouteName . '.php';
+        $data->adminRoutesDestination = $data->rootDirectory . 'app/routes/admin/' . $count . $data->serviceRouteName . '.php';
+        $data->apiRoutesDestination = $data->rootDirectory . 'app/routes/api/' . $count . $data->serviceRouteName . '.php';
 
         $data->aclPrefix = $this->stringWithUnderscore ($data->directory . $data->serviceRouteName);
 
