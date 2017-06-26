@@ -111,8 +111,6 @@ class HCServiceController extends HCBaseServiceCreation
      */
     private function createBasicController(stdClass $data)
     {
-        $functionsPath = $data->dynamicSegment ? __DIR__ . '/../templates/service/controller/basic/sub-functions.hctpl' : __DIR__ . '/../templates/service/controller/basic/functions.hctpl';
-
         $this->createFileFromTemplate([
             "destination"         => $data->controllerDestination,
             "templateDestination" => __DIR__ . '/../templates/service/controller/basic.hctpl',
@@ -120,15 +118,12 @@ class HCServiceController extends HCBaseServiceCreation
                 "namespace"            => $data->controllerNamespace,
                 "controllerName"       => $data->controllerName,
                 "acl_prefix"           => $data->aclPrefix,
-                "parentId"             => $data->dynamicSegment ? '$parentId' : '',
-                "parentListUrl"        => $data->dynamicSegment ? ', $parentId' : '',
-                "parentForm"           => $data->dynamicSegment ? ' . \'?parent_id=\' . $parentId' : '',
                 "translationsLocation" => $data->translationsLocation,
                 "serviceNameDotted"    => $this->stringWithDash($data->translationFilePrefix),
                 "controllerNameDotted" => $data->serviceRouteName,
                 "adminListHeader"      => $this->getAdminListHeader($data),
                 "formValidationName"   => $data->formValidationName,
-                "functions"            => replaceBrackets(file_get_contents($functionsPath),
+                "functions"            => replaceBrackets(file_get_contents(__DIR__ . '/../templates/service/controller/basic/functions.hctpl'),
                     [
                         "modelName"      => $data->mainModel->modelName,
                         "modelNameSpace" => $data->modelNamespace,
