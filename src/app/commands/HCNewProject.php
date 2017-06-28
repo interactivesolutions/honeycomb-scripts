@@ -103,6 +103,7 @@ class HCNewProject extends HCCommand
 
                 replaceTextInFile('composer.json', ['"App\\\\"' => '"app\\\\"']);
                 replaceTextInFile('config/auth.php', ['=> App\User::class' => '=> interactivesolutions\honeycombacl\app\models\HCUsers::class']);
+                replaceTextInFile('config/auth.php', ['password_resets' => 'hc_users_password_resets']);
                 replaceTextInFile('config/database.php', ['utf8\'' => 'utf8mb4\'', 'utf8_' => 'utf8mb4_']);
 
             } catch (Exception $e) {
