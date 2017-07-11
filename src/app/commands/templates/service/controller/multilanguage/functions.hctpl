@@ -81,7 +81,7 @@
     protected function __apiRestore(array $list)
     {
         {modelName}Translations::onlyTrashed ()->whereIn ('record_id', $list)->restore ();
-        {modelName}::whereIn('id', $list)->restore();
+        {modelName}::onlyTrashed ()->whereIn('id', $list)->restore();
 
         return hcSuccess();
     }
