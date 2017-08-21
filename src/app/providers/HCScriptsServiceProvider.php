@@ -4,6 +4,7 @@ namespace interactivesolutions\honeycombscripts\app\providers;
 
 use interactivesolutions\honeycombcore\providers\HCBaseServiceProvider;
 use interactivesolutions\honeycombscripts\app\commands\HCEnv;
+use interactivesolutions\honeycombscripts\app\commands\HCLanguages;
 use interactivesolutions\honeycombscripts\app\commands\HCUpdate;
 use interactivesolutions\honeycombscripts\app\commands\HCNewPackage;
 use interactivesolutions\honeycombscripts\app\commands\HCNewService;
@@ -27,6 +28,7 @@ class HCScriptsServiceProvider extends HCBaseServiceProvider
         HCSeed::class,
         HCUpdate::class,
         HCUpdateComposerDependencies::class,
+        HCLanguages::class,
     ];
 
     /**

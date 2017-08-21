@@ -35,8 +35,7 @@ class HCUpdate extends HCCommand
         $this->call('hc:seed');
         $this->call('hc:routes');
         $this->call('hc:forms');
-
-        //TODO before each call check if package (HCACL) is registered with the project
+        $this->call('hc:languages');
         $this->call('hc:permissions');
         $this->call('hc:admin-menu');
 
