@@ -73,7 +73,7 @@ class {controllerName} extends HCBaseController
             array_set ($data, 'record.id', array_get ($_data, 'id'));
 
         {inputData}
-        return $data;
+        return makeEmptyNullable($data);
     }
 
     /**
