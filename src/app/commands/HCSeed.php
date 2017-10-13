@@ -27,25 +27,38 @@ class HCSeed extends HCCommand
      *
      * @return this
      */
-    public function handle ()
+    public function handle()
     {
         $seeders = [];
-        $path    = $this->argument ('path');
-        $files   = [];
+        $path = $this->argument('path');
+        $files = [];
 
-        if ($path)
-            $files[] = base_path ($path . 'src/database/seeds/HoneyCombDatabaseSeeder.php');
-        else
-            $files = $this->getSeederFiles ();
+        if( $path ) {
+            $files[] = base_path($path . 'src/database/seeds/HoneyCombDatabaseSeeder.php');
+        } else {
+            $files = $this->getSeederFiles();
+        }
 
-        foreach ($files as $filePath)
-            $seeders = array_merge ($seeders, array_keys (AnnotationsParser::parsePhp (file_get_contents ($filePath))));
+        foreach ( $files as $filePath ) {
+            $seeders = array_merge($seeders, array_keys(AnnotationsParser::parsePhp(file_get_contents($filePath))));
+        }
 
-        foreach ($seeders as $class)
-            if (class_exists ($class))
-                $this->call ('db:seed', ["--class" => $class]);
+        foreach ( $seeders as $class ) {
+            if( class_exists($class) ) {
+                if( app()->environment() == 'production' ) {
+                    $this->call('db:seed', ["--class" => $class, '--force' => true]);
+                } else {
+                    $this->call('db:seed', ["--class" => $class]);
+                }
+            }
+        }
 
-        $this->call ('db:seed');
+        if( app()->environment() == 'production' ) {
+            $this->call('db:seed', ['--force' => true]);
+        } else {
+            $this->call('db:seed');
+        }
+
     }
 
     /**
@@ -53,8 +66,8 @@ class HCSeed extends HCCommand
      *
      * @return array
      */
-    protected function getSeederFiles ()
+    protected function getSeederFiles()
     {
-        return array_merge (File::glob (__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
+        return array_merge(File::glob(__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
     }
 }

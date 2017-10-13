@@ -31,7 +31,13 @@ class HCUpdate extends HCCommand
         $this->call('vendor:publish', ['--force' => true, '--tag' => "public"]);
         $this->call('vendor:publish', ['--tag' => "migrations"]);
         $this->call('vendor:publish', ['--tag' => "config"]);
-        $this->call('migrate');
+
+        if (app()->environment() == 'production') {
+            $this->call('migrate', ['--force' => true]);
+        } else {
+            $this->call('migrate');
+        }
+
         $this->call('hc:seed');
         $this->call('hc:routes');
         $this->call('hc:forms');
