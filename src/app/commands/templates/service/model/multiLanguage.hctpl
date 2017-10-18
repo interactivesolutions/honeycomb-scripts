@@ -2,7 +2,7 @@
 
 namespace {modelNameSpace};
 
-use interactivesolutions\honeycombcore\models\HCMultiLanguageModel;
+use InteractiveSolutions\HoneycombCore\Models\HCMultiLanguageModel;
 
 class {modelName} extends HCMultiLanguageModel
 {

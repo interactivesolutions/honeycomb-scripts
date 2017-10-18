@@ -7,7 +7,7 @@ namespace InteractiveSolutions\HoneycombScripts\app\commands;
 use Carbon\Carbon;
 use Exception;
 use File;
-use interactivesolutions\honeycombcore\commands\HCCommand;
+use InteractiveSolutions\HoneycombCore\Console\HCCommand;
 
 /**
  * Class HCNewProject

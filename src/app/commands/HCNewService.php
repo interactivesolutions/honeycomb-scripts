@@ -6,7 +6,7 @@ namespace InteractiveSolutions\HoneycombScripts\app\commands;
 
 use DB;
 use File;
-use interactivesolutions\honeycombcore\commands\HCCommand;
+use InteractiveSolutions\HoneycombCore\Console\HCCommand;
 use InteractiveSolutions\HoneycombScripts\app\commands\service\HCServiceController;
 use InteractiveSolutions\HoneycombScripts\app\commands\service\HCServiceFormValidators;
 use InteractiveSolutions\HoneycombScripts\app\commands\service\HCServiceModels;

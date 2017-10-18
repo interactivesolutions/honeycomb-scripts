@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace InteractiveSolutions\HoneycombScripts\app\commands\service;
 
-use interactivesolutions\honeycombcore\commands\HCCommand;
+use InteractiveSolutions\HoneycombCore\Console\HCCommand;
 use stdClass;
 use Symfony\Component\Console\Output\ConsoleOutput;
 

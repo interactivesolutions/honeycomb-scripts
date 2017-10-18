@@ -6,7 +6,7 @@ namespace InteractiveSolutions\HoneycombScripts\app\commands;
 
 use File;
 use Illuminate\Support\Facades\App;
-use interactivesolutions\honeycombcore\commands\HCCommand;
+use InteractiveSolutions\HoneycombCore\Console\HCCommand;
 
 /**
  * Class HCNewPackage

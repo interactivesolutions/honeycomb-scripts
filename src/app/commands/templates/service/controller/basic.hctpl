@@ -3,7 +3,7 @@
 namespace {namespace};
 
 use Illuminate\Database\Eloquent\Builder;
-use interactivesolutions\honeycombcore\http\controllers\HCBaseController;{useFiles}
+use InteractiveSolutions\HoneycombCore\Http\Controllers\HCBaseController;{useFiles}
 
 class {controllerName} extends HCBaseController
 {

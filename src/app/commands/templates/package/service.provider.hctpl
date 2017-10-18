@@ -2,7 +2,7 @@
 
 namespace {nameSpace};
 
-use interactivesolutions\honeycombcore\providers\HCBaseServiceProvider;
+use InteractiveSolutions\HoneycombCore\Providers\HCBaseServiceProvider;
 
 class {packageName} extends HCBaseServiceProvider
 {

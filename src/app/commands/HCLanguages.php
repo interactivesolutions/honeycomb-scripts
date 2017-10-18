@@ -4,7 +4,8 @@ declare(strict_types = 1);
 
 namespace interactivesolutions\honeycombscripts\app\commands;
 
-use interactivesolutions\honeycombcore\commands\HCCommand;
+use InteractiveSolutions\HoneycombCore\Console\HCCommand;
+
 
 /**
  * Class HCLanguages

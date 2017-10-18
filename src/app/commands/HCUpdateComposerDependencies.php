@@ -6,7 +6,7 @@ namespace InteractiveSolutions\HoneycombScripts\app\commands;
 
 
 use Illuminate\Filesystem\Filesystem;
-use interactivesolutions\honeycombcore\commands\HCCommand;
+use InteractiveSolutions\HoneycombCore\Console\HCCommand;
 
 /**
  * Class HCUpdateComposerDependencies

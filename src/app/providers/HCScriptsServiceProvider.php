@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace InteractiveSolutions\HoneycombScripts\app\providers;
 
-use interactivesolutions\honeycombcore\providers\HCBaseServiceProvider;
+use InteractiveSolutions\HoneycombCore\Providers\HCBaseServiceProvider;
 use InteractiveSolutions\HoneycombScripts\app\commands\HCEnv;
 use InteractiveSolutions\HoneycombScripts\app\commands\HCLanguages;
 use InteractiveSolutions\HoneycombScripts\app\commands\HCUpdate;
