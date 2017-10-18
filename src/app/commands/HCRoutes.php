@@ -80,8 +80,7 @@ class HCRoutes extends HCCommand
         $files = iterator_to_array($iterator, true);
 
         $finalContent = '<?php' . "\r\n";
-
-        foreach ($files as $file) {
+        foreach ($files as $file => $content) {
             $finalContent .= "\r\n";
             $finalContent .= '//' . implode('/', array_slice(explode('/', $file), -6)) . "\r\n";
             $finalContent .= str_replace('<?php', '', file_get_contents((string)$file)) . "\r\n";
