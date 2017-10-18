@@ -1,10 +1,16 @@
 <?php
 
-namespace interactivesolutions\honeycombscripts\app\commands;
+declare(strict_types = 1);
+
+namespace InteractiveSolutions\HoneycombScripts\app\commands;
 
 use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
+/**
+ * Class HCUpdate
+ * @package InteractiveSolutions\HoneycombScripts\app\commands
+ */
 class HCUpdate extends HCCommand
 {
     /**
@@ -23,10 +29,10 @@ class HCUpdate extends HCCommand
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
+     * @throws \Exception
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function handle ()
+    public function handle()
     {
         $this->call('vendor:publish', ['--force' => true, '--tag' => "public"]);
         $this->call('vendor:publish', ['--tag' => "migrations"]);
@@ -45,10 +51,11 @@ class HCUpdate extends HCCommand
         $this->call('hc:permissions');
         $this->call('hc:admin-menu');
 
-       File::delete ('bootstrap/cache/config.php');
-       File::delete ('bootstrap/cache/services.php');
+        File::delete('bootstrap/cache/config.php');
+        File::delete('bootstrap/cache/services.php');
 
-        if (app()->environment() == 'production')
+        if (app()->environment() == 'production') {
             $this->call('config:cache');
+        }
     }
 }

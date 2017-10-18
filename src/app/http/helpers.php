@@ -1,22 +1,24 @@
 <?php
 
-if (!function_exists ('replaceBrackets')) {
+declare(strict_types = 1);
+
+if (!function_exists('replaceBrackets')) {
     /**
      * @param $string
      * @param array $data
      * @return mixed
      */
-    function replaceBrackets (string $string, array $data = [])
+    function replaceBrackets(string $string, array $data = [])
     {
         foreach ($data as $key => $value) {
-            $string = str_replace ('{' . $key . '}', $value, $string);
+            $string = str_replace('{' . $key . '}', $value, $string);
         }
 
         return $string;
     }
 }
 
-if (!function_exists ('validateJSONFromPath')) {
+if (!function_exists('validateJSONFromPath')) {
 
     /**
      * Function which reads and validates json file
@@ -26,21 +28,23 @@ if (!function_exists ('validateJSONFromPath')) {
      * @return bool
      * @throws Exception
      */
-    function validateJSONFromPath (string $path, bool $response = false)
+    function validateJSONFromPath(string $path, bool $response = false)
     {
-        $json = json_decode (file_get_contents ($path), true);
+        $json = json_decode(file_get_contents($path), true);
 
-        if (!$json)
-            if ($response)
+        if (!$json) {
+            if ($response) {
                 return null;
-            else
+            } else {
                 throw new \Exception('Invalid json format - ' . $path);
+            }
+        }
 
         return $json;
     }
 }
 
-if (!function_exists ('replaceTextInFile')) {
+if (!function_exists('replaceTextInFile')) {
 
     /**
      * Function which reads and validates json file
@@ -49,18 +53,19 @@ if (!function_exists ('replaceTextInFile')) {
      * @param array $content
      * @throws Exception
      */
-    function replaceTextInFile (string $path, array $content)
+    function replaceTextInFile(string $path, array $content)
     {
-        $file = file_get_contents ($path);
+        $file = file_get_contents($path);
 
-        foreach ($content as $replace => $subject)
-            $file = str_replace ($replace, $subject, $file);
+        foreach ($content as $replace => $subject) {
+            $file = str_replace($replace, $subject, $file);
+        }
 
-        file_put_contents ($path, $file);
+        file_put_contents($path, $file);
     }
 }
 
-if (!function_exists ('http_validate')) {
+if (!function_exists('http_validate')) {
     /**
      * Validates given url
      *
@@ -68,22 +73,24 @@ if (!function_exists ('http_validate')) {
      * @param bool $secure
      * @return string
      */
-    function http_validate (string $url, bool $secure = false) : string
+    function http_validate(string $url, bool $secure = false): string
     {
-        $return   = $url;
+        $return = $url;
         $protocol = 'http://';
 
-        if ($secure)
+        if ($secure) {
             $protocol = 'https://';
+        }
 
-        if ((!(substr ($url, 0, 7) == 'http://')) && (!(substr ($url, 0, 8) == 'https://')))
+        if ((!(substr($url, 0, 7) == 'http://')) && (!(substr($url, 0, 8) == 'https://'))) {
             $return = $protocol . $url;
+        }
 
         return $return;
     }
 }
 
-if (!function_exists ('random_str')) {
+if (!function_exists('random_str')) {
     /**
      * Origin taken from http://stackoverflow.com/a/31107425/657451
      *
@@ -95,21 +102,21 @@ if (!function_exists ('random_str')) {
      *                         to select from
      * @return string
      */
-    function random_str ($length, $keySpace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    function random_str($length, $keySpace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
     {
-        $keySpace = str_shuffle ($keySpace);
+        $keySpace = str_shuffle($keySpace);
 
         $str = '';
-        $max = mb_strlen ($keySpace, '8bit') - 1;
+        $max = mb_strlen($keySpace, '8bit') - 1;
         for ($i = 0; $i < $length; ++$i) {
-            $str .= $keySpace[random_int (0, $max)];
+            $str .= $keySpace[random_int(0, $max)];
         }
 
         return $str;
     }
 }
 
-if (!function_exists ('addEnvVariable')) {
+if (!function_exists('addEnvVariable')) {
     /**
      * Adding environmental variable to .env file
      *
@@ -117,15 +124,16 @@ if (!function_exists ('addEnvVariable')) {
      * @param string $value
      * @return bool
      */
-    function addEnvVariable (string $key, string $value)
+    function addEnvVariable(string $key, string $value)
     {
-        $envPath     = '.env';
-        $fileContent = file_get_contents ($envPath);
+        $envPath = '.env';
+        $fileContent = file_get_contents($envPath);
 
-        if (strpos ($fileContent, $key) === false)
-            file_put_contents ($envPath, $fileContent . "\r\n" . $key . '=' . $value);
-        else
-            file_put_contents ($envPath, preg_replace (___keyReplacementPattern ($key), "$key={$value}", $fileContent));
+        if (strpos($fileContent, $key) === false) {
+            file_put_contents($envPath, $fileContent . "\r\n" . $key . '=' . $value);
+        } else {
+            file_put_contents($envPath, preg_replace(___keyReplacementPattern($key), "$key={$value}", $fileContent));
+        }
 
         return true;
     }
@@ -136,38 +144,42 @@ if (!function_exists ('addEnvVariable')) {
      * @param string $key
      * @return string
      */
-    function ___keyReplacementPattern (string $key)
+    function ___keyReplacementPattern(string $key)
     {
-        $escaped = preg_quote (env ($key), '/');
+        $escaped = preg_quote(env($key), '/');
 
         return "/^$key={$escaped}/m";
     }
 }
 
-if (!function_exists ('removeDirectory')) {
+if (!function_exists('removeDirectory')) {
     /**
      * Removes directory and its contents
      *
      * @param string $path Path to the directory.
      */
-    function removeDirectory (string $path)
+    function removeDirectory(string $path)
     {
         //TODO move error to translations
         //TODO check that deletion can happen only in p project directory
-        if (!is_dir ($path))
+        if (!is_dir($path)) {
             throw new InvalidArgumentException("$path");
+        }
 
-        if (substr ($path, strlen ($path) - 1, 1) != DIRECTORY_SEPARATOR)
+        if (substr($path, strlen($path) - 1, 1) != DIRECTORY_SEPARATOR) {
             $path .= DIRECTORY_SEPARATOR;
+        }
 
-        $files = glob ($path . '*', GLOB_MARK);
+        $files = glob($path . '*', GLOB_MARK);
 
-        foreach ($files as $file)
-            if (is_dir ($file))
-                removeDirectory ($file);
-            else
-                unlink ($file);
+        foreach ($files as $file) {
+            if (is_dir($file)) {
+                removeDirectory($file);
+            } else {
+                unlink($file);
+            }
+        }
 
-        rmdir ($path);
+        rmdir($path);
     }
 }

@@ -1,15 +1,24 @@
 <?php
 
-namespace interactivesolutions\honeycombscripts\app\commands\service;
+declare(strict_types = 1);
+
+namespace InteractiveSolutions\HoneycombScripts\app\commands\service;
 
 use DB;
 use stdClass;
 
+/**
+ * Class HCServiceFormValidators
+ * @package InteractiveSolutions\HoneycombScripts\app\commands\service
+ */
 class HCServiceFormValidators extends HCBaseServiceCreation
 {
-    public function __construct ()
+    /**
+     * HCServiceFormValidators constructor.
+     */
+    public function __construct()
     {
-        parent::__construct ();
+        parent::__construct();
     }
 
     /**
@@ -18,15 +27,17 @@ class HCServiceFormValidators extends HCBaseServiceCreation
      * @param stdClass $data
      * @return stdClass
      */
-    public function optimize (stdClass $data)
+    public function optimize(stdClass $data)
     {
         $data->formValidationName = $data->serviceName . 'Validator';
-        $data->formValidationNameSpace = str_replace ('\\http\\controllers', '\\validators', $data->controllerNamespace);
-        $data->formValidationDestination = str_replace ('/http/controllers', '/validators', $data->controllerDestination) . '/' . $data->formValidationName . '.php';
+        $data->formValidationNameSpace = str_replace('\\http\\controllers', '\\validators', $data->controllerNamespace);
+        $data->formValidationDestination = str_replace('/http/controllers', '/validators',
+                $data->controllerDestination) . '/' . $data->formValidationName . '.php';
 
         if (isset($data->mainModel->multiLanguage)) {
             $data->formTranslationsValidationName = $data->serviceName . 'TranslationsValidator';
-            $data->formTranslationsValidationDestination = str_replace ('/http/controllers', '/validators', $data->controllerDestination) . '/' . $data->formTranslationsValidationName . '.php';
+            $data->formTranslationsValidationDestination = str_replace('/http/controllers', '/validators',
+                    $data->controllerDestination) . '/' . $data->formTranslationsValidationName . '.php';
         }
 
         return $data;
@@ -38,17 +49,17 @@ class HCServiceFormValidators extends HCBaseServiceCreation
      * @param stdClass $data
      * @return array
      */
-    public function generate (stdClass $data)
+    public function generate(stdClass $data)
     {
         $files = [];
 
-        $this->createFileFromTemplate ([
-            "destination"         => $data->formValidationDestination,
+        $this->createFileFromTemplate([
+            "destination" => $data->formValidationDestination,
             "templateDestination" => __DIR__ . '/../templates/service/validator.hctpl',
-            "content"             => [
+            "content" => [
                 "formValidationNameSpace" => $data->formValidationNameSpace,
-                "formValidationName"      => $data->formValidationName,
-                "formRules"               => $this->getRules ($data->mainModel, array_merge ($this->getAutoFill (), ['id']), false),
+                "formValidationName" => $data->formValidationName,
+                "formRules" => $this->getRules($data->mainModel, array_merge($this->getAutoFill(), ['id']), false),
             ],
         ]);
 
@@ -56,13 +67,14 @@ class HCServiceFormValidators extends HCBaseServiceCreation
 
         if (isset($data->mainModel->multiLanguage)) {
 
-            $this->createFileFromTemplate ([
-                "destination"         => $data->formTranslationsValidationDestination,
+            $this->createFileFromTemplate([
+                "destination" => $data->formTranslationsValidationDestination,
                 "templateDestination" => __DIR__ . '/../templates/service/validator.hctpl',
-                "content"             => [
+                "content" => [
                     "formValidationNameSpace" => $data->formValidationNameSpace,
-                    "formValidationName"      => $data->formTranslationsValidationName,
-                    "formRules"               => $this->getRules ($data->mainModel->multiLanguage, array_merge ($this->getAutoFill (), ['id', 'record_id', 'language_id']), true),
+                    "formValidationName" => $data->formTranslationsValidationName,
+                    "formRules" => $this->getRules($data->mainModel->multiLanguage,
+                        array_merge($this->getAutoFill(), ['id', 'record_id', 'language_id']), true),
                 ],
             ]);
 
@@ -81,25 +93,27 @@ class HCServiceFormValidators extends HCBaseServiceCreation
      * @param bool $multiLanguage
      * @return string
      */
-    private function getRules (stdClass $model, array $skip, bool $multiLanguage)
+    private function getRules(stdClass $model, array $skip, bool $multiLanguage)
     {
         $output = '';
 
         if (!empty($model)) {
-            $tpl = file_get_contents (__DIR__ . '/../templates/shared/array.element.hctpl');
+            $tpl = file_get_contents(__DIR__ . '/../templates/shared/array.element.hctpl');
 
             foreach ($model->columns as $column) {
-                if (in_array ($column->Field, $skip))
+                if (in_array($column->Field, $skip)) {
                     continue;
+                }
 
                 $key = $column->Field;
 
-                if ($multiLanguage)
+                if ($multiLanguage) {
                     $key = 'translations.*.' . $key;
+                }
 
                 if ($column->Null == "NO") {
-                    $line = str_replace ('{key}', $key, $tpl);
-                    $line = str_replace ('{value}', 'required', $line);
+                    $line = str_replace('{key}', $key, $tpl);
+                    $line = str_replace('{value}', 'required', $line);
 
                     $output .= $line;
                 }

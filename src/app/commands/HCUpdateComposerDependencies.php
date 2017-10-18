@@ -1,17 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jevge
- * Date: 2017-04-16
- * Time: 07:29
- */
 
-namespace interactivesolutions\honeycombscripts\app\commands;
+declare(strict_types = 1);
+
+namespace InteractiveSolutions\HoneycombScripts\app\commands;
 
 
 use Illuminate\Filesystem\Filesystem;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
+/**
+ * Class HCUpdateComposerDependencies
+ * @package InteractiveSolutions\HoneycombScripts\app\commands
+ */
 class HCUpdateComposerDependencies extends HCCommand
 {
     /**
@@ -28,22 +28,26 @@ class HCUpdateComposerDependencies extends HCCommand
      */
     protected $description = 'When in development of the packages, read the packages/ directory and update main composer.json file with dependencies';
 
-    public function handle ()
+    /**
+     * @throws \Exception
+     */
+    public function handle(): void
     {
-        if (app()->environment() != 'local')
+        if (app()->environment() != 'local') {
             return;
-
-        $list         = $this->getComposerFiles ();
-        $mainComposer = validateJSONFromPath (base_path ('composer.json'));
-
-        foreach ($list as $value) {
-            $content = validateJSONFromPath ($value);
-
-            $mainComposer = $this->updateMainComposer ($mainComposer, $content, 'require');
-            $mainComposer = $this->updateMainComposer ($mainComposer, $content, 'require-dev');
         }
 
-        file_put_contents(base_path ('composer.json'), json_encode($mainComposer, JSON_PRETTY_PRINT));
+        $list = $this->getComposerFiles();
+        $mainComposer = validateJSONFromPath(base_path('composer.json'));
+
+        foreach ($list as $value) {
+            $content = validateJSONFromPath($value);
+
+            $mainComposer = $this->updateMainComposer($mainComposer, $content, 'require');
+            $mainComposer = $this->updateMainComposer($mainComposer, $content, 'require-dev');
+        }
+
+        file_put_contents(base_path('composer.json'), json_encode($mainComposer, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -51,11 +55,11 @@ class HCUpdateComposerDependencies extends HCCommand
      *
      * @return array
      */
-    protected function getComposerFiles () : array
+    protected function getComposerFiles(): array
     {
         $file = new Filesystem();
 
-        return $file->glob (base_path ('packages') . '/*/*/composer.json');
+        return $file->glob(base_path('packages') . '/*/*/composer.json');
     }
 
     /**
@@ -66,16 +70,19 @@ class HCUpdateComposerDependencies extends HCCommand
      * @param string $composerKey
      * @return array
      */
-    private function updateMainComposer (array $mainComposer, array $content, string $composerKey) : array
+    private function updateMainComposer(array $mainComposer, array $content, string $composerKey): array
     {
-        if (!isset($content[$composerKey]))
+        if (!isset($content[$composerKey])) {
             return $mainComposer;
+        }
 
         $content = $content[$composerKey];
 
-        foreach ($content as $key => $value)
-            if (strpos ($key, 'interactivesolutions/honeycomb') === false && !isset($mainComposer[$composerKey][$key]))
+        foreach ($content as $key => $value) {
+            if (strpos($key, 'interactivesolutions/honeycomb') === false && !isset($mainComposer[$composerKey][$key])) {
                 $mainComposer[$composerKey][$key] = $value;
+            }
+        }
 
         return $mainComposer;
     }

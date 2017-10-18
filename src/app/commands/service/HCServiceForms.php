@@ -1,15 +1,24 @@
 <?php
 
-namespace interactivesolutions\honeycombscripts\app\commands\service;
+declare(strict_types = 1);
+
+namespace InteractiveSolutions\HoneycombScripts\app\commands\service;
 
 use DB;
 use stdClass;
 
+/**
+ * Class HCServiceForms
+ * @package InteractiveSolutions\HoneycombScripts\app\commands\service
+ */
 class HCServiceForms extends HCBaseServiceCreation
 {
+    /**
+     * HCServiceForms constructor.
+     */
     public function __construct()
     {
-        parent::__construct ();
+        parent::__construct();
     }
 
     /**
@@ -20,12 +29,13 @@ class HCServiceForms extends HCBaseServiceCreation
      * @internal param $modelData
      * @return stdClass
      */
-    public function optimize (stdClass $data)
+    public function optimize(stdClass $data)
     {
         $data->formName = $data->serviceName . 'Form';
-        $data->formNameSpace = str_replace ('\\http\\controllers', '\\forms', $data->controllerNamespace);
-        $data->formDestination = str_replace ('/http/controllers', '/forms', $data->controllerDestination) . '/' . $data->formName . '.php';
-        $data->formID = $this->stringWithDash ($data->serviceURL);
+        $data->formNameSpace = str_replace('\\http\\controllers', '\\forms', $data->controllerNamespace);
+        $data->formDestination = str_replace('/http/controllers', '/forms',
+                $data->controllerDestination) . '/' . $data->formName . '.php';
+        $data->formID = $this->stringWithDash($data->serviceURL);
 
         return $data;
     }
@@ -36,18 +46,18 @@ class HCServiceForms extends HCBaseServiceCreation
      * @param $serviceData
      * @return string
      */
-    public function generate (stdClass $serviceData)
+    public function generate(stdClass $serviceData)
     {
-        $this->createFileFromTemplate ([
-            "destination"         => $serviceData->formDestination,
+        $this->createFileFromTemplate([
+            "destination" => $serviceData->formDestination,
             "templateDestination" => __DIR__ . '/../templates/service/form.hctpl',
-            "content"             => [
-                "nameSpace"        => $serviceData->formNameSpace,
-                "className"        => $serviceData->formName,
-                "formID"           => $serviceData->formID,
-                "multiLanguage"    => $serviceData->multiLanguage,
-                "formFields"       => $this->getFormFields ($serviceData),
-                "serviceRouteName" => $serviceData->serviceRouteName
+            "content" => [
+                "nameSpace" => $serviceData->formNameSpace,
+                "className" => $serviceData->formName,
+                "formID" => $serviceData->formID,
+                "multiLanguage" => $serviceData->multiLanguage,
+                "formFields" => $this->getFormFields($serviceData),
+                "serviceRouteName" => $serviceData->serviceRouteName,
             ],
         ]);
 
@@ -60,22 +70,23 @@ class HCServiceForms extends HCBaseServiceCreation
      * @param $data
      * @return string
      */
-    private function getFormFields (stdClass $data)
+    private function getFormFields(stdClass $data)
     {
         $output = '';
 
         $output .= $this->getFields(
             $data->mainModel,
             $data->translationsLocation,
-            array_merge ($this->getAutoFill(), ['id']),
+            array_merge($this->getAutoFill(), ['id']),
             file_get_contents(__DIR__ . '/../templates/service/form/basic.field.hctpl'));
 
-        if (isset($data->mainModel->multiLanguage))
+        if (isset($data->mainModel->multiLanguage)) {
             $output .= $this->getFields(
                 $data->mainModel->multiLanguage,
                 $data->translationsLocation,
-                array_merge ($this->getAutoFill(), ['id', 'record_id', 'language_code']),
+                array_merge($this->getAutoFill(), ['id', 'record_id', 'language_code']),
                 file_get_contents(__DIR__ . '/../templates/service/form/multi.field.hctpl'));
+        }
 
         return $output;
     }
@@ -87,24 +98,26 @@ class HCServiceForms extends HCBaseServiceCreation
      * @param string $template
      * @return string
      */
-    private function getFields (stdClass $model, string $translationsLocation, array $skip, string $template)
+    private function getFields(stdClass $model, string $translationsLocation, array $skip, string $template)
     {
         $output = '';
 
-        if (isset($model->columns))
+        if (isset($model->columns)) {
             foreach ($model->columns as $column) {
-                if (in_array ($column->Field, $skip))
+                if (in_array($column->Field, $skip)) {
                     continue;
+                }
 
-                $field = replaceBrackets ($template, [
-                    "type"     => "singleLine",
-                    "fieldID"  => $column->Field,
-                    "label"    => $translationsLocation . '.' . $column->Field,
+                $field = replaceBrackets($template, [
+                    "type" => "singleLine",
+                    "fieldID" => $column->Field,
+                    "label" => $translationsLocation . '.' . $column->Field,
                     "required" => $column->Null == "YES" ? 0 : 1,
                 ]);
 
                 $output .= $field;
             }
+        }
 
         return $output;
     }

@@ -1,17 +1,26 @@
 <?php
 
-namespace interactivesolutions\honeycombscripts\app\commands\service;
+declare(strict_types = 1);
+
+namespace InteractiveSolutions\HoneycombScripts\app\commands\service;
 
 use DB;
 use File;
 use FilesystemIterator;
 use stdClass;
 
+/**
+ * Class HCServiceRoutes
+ * @package InteractiveSolutions\HoneycombScripts\app\commands\service
+ */
 class HCServiceRoutes extends HCBaseServiceCreation
 {
-    public function __construct ()
+    /**
+     * HCServiceRoutes constructor.
+     */
+    public function __construct()
     {
-        parent::__construct ();
+        parent::__construct();
     }
 
     /**
@@ -20,19 +29,19 @@ class HCServiceRoutes extends HCBaseServiceCreation
      * @param $data
      * @return stdClass
      */
-    public function optimize (stdClass $data)
+    public function optimize(stdClass $data)
     {
         $this->createRouteFolders($data);
 
         $fi = new FilesystemIterator($data->rootDirectory . 'app/routes/admin/', FilesystemIterator::SKIP_DOTS);
         $count = str_pad(iterator_count($fi) + 1, 2, '0', STR_PAD_LEFT) . '_';
 
-        $data->serviceRouteName = 'routes.' . $this->stringWithDots ($data->serviceURL);
+        $data->serviceRouteName = 'routes.' . $this->stringWithDots($data->serviceURL);
 
         $data->adminRoutesDestination = $data->rootDirectory . 'app/routes/admin/' . $count . $data->serviceRouteName . '.php';
         $data->apiRoutesDestination = $data->rootDirectory . 'app/routes/api/' . $count . $data->serviceRouteName . '.php';
 
-        $data->aclPrefix = $this->stringWithUnderscore ($data->directory . $data->serviceRouteName);
+        $data->aclPrefix = $this->stringWithUnderscore($data->directory . $data->serviceRouteName);
 
         return $data;
     }
@@ -43,11 +52,11 @@ class HCServiceRoutes extends HCBaseServiceCreation
      * @param stdClass $serviceData
      * @return array
      */
-    public function generate (stdClass $serviceData)
+    public function generate(stdClass $serviceData)
     {
         $files = [];
-        $files[] = $this->generateRoutes ($serviceData, 'admin');
-        $files[] = $this->generateRoutes ($serviceData, 'api');
+        $files[] = $this->generateRoutes($serviceData, 'admin');
+        $files[] = $this->generateRoutes($serviceData, 'api');
 
         return $files;
     }
@@ -59,7 +68,7 @@ class HCServiceRoutes extends HCBaseServiceCreation
      * @param string $type
      * @return string
      */
-    private function generateRoutes (stdClass $service, string $type)
+    private function generateRoutes(stdClass $service, string $type)
     {
         switch ($type) {
             case 'api' :
@@ -76,14 +85,14 @@ class HCServiceRoutes extends HCBaseServiceCreation
                 return '';
         }
 
-        $this->createFileFromTemplate ([
-            "destination"         => $destination,
+        $this->createFileFromTemplate([
+            "destination" => $destination,
             "templateDestination" => __DIR__ . '/../templates/service/' . $type . '.routes.hctpl',
-            "content"             => [
-                "serviceURL"           => $service->serviceURL,
+            "content" => [
+                "serviceURL" => $service->serviceURL,
                 "controllerNameDotted" => $service->serviceRouteName,
-                "acl_prefix"           => $service->aclPrefix,
-                "controllerName"       => $service->controllerNameForRoutes,
+                "acl_prefix" => $service->aclPrefix,
+                "controllerName" => $service->controllerNameForRoutes,
             ],
         ]);
 
@@ -95,11 +104,11 @@ class HCServiceRoutes extends HCBaseServiceCreation
      */
     protected function createRouteFolders(stdClass $data)
     {
-        if( ! File::exists($data->rootDirectory . 'app/routes/admin') ) {
+        if (!File::exists($data->rootDirectory . 'app/routes/admin')) {
             $this->createDirectory($data->rootDirectory . 'app/routes/admin');
         }
 
-        if( ! File::exists($data->rootDirectory . 'app/routes/api') ) {
+        if (!File::exists($data->rootDirectory . 'app/routes/api')) {
             $this->createDirectory($data->rootDirectory . 'app/routes/api');
         }
     }

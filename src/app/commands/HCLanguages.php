@@ -1,9 +1,15 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace interactivesolutions\honeycombscripts\app\commands;
 
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
+/**
+ * Class HCLanguages
+ * @package interactivesolutions\honeycombscripts\app\commands
+ */
 class HCLanguages extends HCCommand
 {
     /**
@@ -22,11 +28,12 @@ class HCLanguages extends HCCommand
 
     /**
      * Execute the console command.
-     *
      * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    public function handle ()
+    public function handle()
     {
-        \interactivesolutions\honeycomblanguages\app\models\HCLanguages::where('iso_639_1', app()->getLocale())->update(['content' => 1, 'front_end' => 1, 'back_end' => 1]);
+        \interactivesolutions\honeycomblanguages\app\models\HCLanguages::where('iso_639_1',
+            app()->getLocale())->update(['content' => 1, 'front_end' => 1, 'back_end' => 1]);
     }
 }

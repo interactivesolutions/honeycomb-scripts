@@ -1,13 +1,22 @@
 <?php
 
-namespace interactivesolutions\honeycombscripts\app\commands;
+declare(strict_types = 1);
+
+namespace InteractiveSolutions\HoneycombScripts\app\commands;
 
 use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Class HCRoutes
+ * @package InteractiveSolutions\HoneycombScripts\app\commands
+ */
 class HCRoutes extends HCCommand
 {
+    /**
+     *
+     */
     const ROUTES_PATH = 'app/honeycomb/routes.php';
 
     /**
@@ -33,14 +42,16 @@ class HCRoutes extends HCCommand
     {
         $rootDirectory = $this->argument('directory') ?? '';
 
-        if( $rootDirectory == '' ) {
+        if ($rootDirectory == '') {
 
             $files = $this->getConfigFiles();
 
-            foreach ( $files as $file )
+            foreach ($files as $file) {
                 $this->generateRoutes(realpath(implode('/', array_slice(explode('/', $file), 0, -3))) . '/');
-        } else
+            }
+        } else {
             $this->generateRoutes($rootDirectory);
+        }
     }
 
     /**
@@ -52,8 +63,9 @@ class HCRoutes extends HCCommand
     {
         $dirPath = $directory . 'app/routes/';
 
-        if( ! file_exists($dirPath) )
+        if (!file_exists($dirPath)) {
             return;
+        }
 
         // get all files recursively
 
@@ -69,7 +81,7 @@ class HCRoutes extends HCCommand
 
         $finalContent = '<?php' . "\r\n";
 
-        foreach ( $files as $file ) {
+        foreach ($files as $file) {
             $finalContent .= "\r\n";
             $finalContent .= '//' . implode('/', array_slice(explode('/', $file), -6)) . "\r\n";
             $finalContent .= str_replace('<?php', '', file_get_contents((string)$file)) . "\r\n";

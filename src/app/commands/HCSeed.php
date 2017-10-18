@@ -1,11 +1,17 @@
 <?php
 
-namespace interactivesolutions\honeycombscripts\app\commands;
+declare(strict_types = 1);
+
+namespace InteractiveSolutions\HoneycombScripts\app\commands;
 
 use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 use Nette\Reflection\AnnotationsParser;
 
+/**
+ * Class HCSeed
+ * @package InteractiveSolutions\HoneycombScripts\app\commands
+ */
 class HCSeed extends HCCommand
 {
     /**
@@ -24,8 +30,9 @@ class HCSeed extends HCCommand
 
     /**
      * Execute the console command.
-     *
-     * @return this
+     * @throws \Exception
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \Nette\Utils\RegexpException
      */
     public function handle()
     {
@@ -33,19 +40,20 @@ class HCSeed extends HCCommand
         $path = $this->argument('path');
         $files = [];
 
-        if( $path ) {
+        if ($path) {
             $files[] = base_path($path . 'src/database/seeds/HoneyCombDatabaseSeeder.php');
+            $files[] = base_path($path . 'src/Database/Seeds/HoneyCombDatabaseSeeder.php');
         } else {
             $files = $this->getSeederFiles();
         }
 
-        foreach ( $files as $filePath ) {
+        foreach ($files as $filePath) {
             $seeders = array_merge($seeders, array_keys(AnnotationsParser::parsePhp(file_get_contents($filePath))));
         }
 
-        foreach ( $seeders as $class ) {
-            if( class_exists($class) ) {
-                if( app()->environment() == 'production' ) {
+        foreach ($seeders as $class) {
+            if (class_exists($class)) {
+                if (app()->environment() == 'production') {
                     $this->call('db:seed', ["--class" => $class, '--force' => true]);
                 } else {
                     $this->call('db:seed', ["--class" => $class]);
@@ -53,7 +61,7 @@ class HCSeed extends HCCommand
             }
         }
 
-        if( app()->environment() == 'production' ) {
+        if (app()->environment() == 'production') {
             $this->call('db:seed', ['--force' => true]);
         } else {
             $this->call('db:seed');
@@ -68,6 +76,9 @@ class HCSeed extends HCCommand
      */
     protected function getSeederFiles()
     {
-        return array_merge(File::glob(__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'));
+        return array_merge(
+            File::glob(__DIR__ . '/../../../../../*/*/*/database/seeds/HoneyCombDatabaseSeeder.php'),
+            File::glob(__DIR__ . '/../../../../../*/*/*/Database/Seeds/HoneyCombDatabaseSeeder.php')
+        );
     }
 }

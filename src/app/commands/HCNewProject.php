@@ -1,12 +1,18 @@
 <?php
 
-namespace interactivesolutions\honeycombscripts\app\commands;
+declare(strict_types = 1);
+
+namespace InteractiveSolutions\HoneycombScripts\app\commands;
 
 use Carbon\Carbon;
 use Exception;
 use File;
 use interactivesolutions\honeycombcore\commands\HCCommand;
 
+/**
+ * Class HCNewProject
+ * @package InteractiveSolutions\HoneycombScripts\app\commands
+ */
 class HCNewProject extends HCCommand
 {
     /**
@@ -35,20 +41,23 @@ class HCNewProject extends HCCommand
      *
      * @return mixed
      */
-    public function handle ()
+    public function handle()
     {
-        $this->backupDirectory = '_bak_' .$this->stringWithUnderscore(Carbon::now()->toDateTimeString());
-        $this->removeDefaultStructure ();
+        $this->backupDirectory = '_bak_' . $this->stringWithUnderscore(Carbon::now()->toDateTimeString());
+        $this->removeDefaultStructure();
     }
 
+    /**
+     *
+     */
     const CONFIG = __DIR__ . '/templates/project/config.json';
 
     /**
      * Removing default structure of application
      */
-    private function removeDefaultStructure ()
+    private function removeDefaultStructure()
     {
-        $confirm = $this->confirm ('Are you sure? It will delete some directories with all files in them.)');
+        $confirm = $this->confirm('Are you sure? It will delete some directories with all files in them.)');
 
         if ($confirm) {
             try {
@@ -56,64 +65,69 @@ class HCNewProject extends HCCommand
                 $this->makeBackup();
 
                 // deleting files and folders
-                if (!file_exists (HCNewProject::CONFIG))
-                    $this->abort ('Missing project configuration file for laravel version');
+                if (!file_exists(HCNewProject::CONFIG)) {
+                    $this->abort('Missing project configuration file for laravel version');
+                }
 
-                $json = validateJSONFromPath (HCNewProject::CONFIG);
+                $json = validateJSONFromPath(HCNewProject::CONFIG);
 
-                foreach ($json['remove_folders'] as $location)
-                    $this->deleteDirectory ($location, true);
+                foreach ($json['remove_folders'] as $location) {
+                    $this->deleteDirectory($location, true);
+                }
 
                 foreach ($json['remove_files'] as $location) {
-                    $this->info ('Deleting file: ' . $location);
-                    File::delete ($location);
+                    $this->info('Deleting file: ' . $location);
+                    File::delete($location);
                 }
 
                 foreach ($json['create_folders'] as $location) {
-                    $this->info ('Creating folder: ' . $location);
-                    $this->createDirectory ($location);
+                    $this->info('Creating folder: ' . $location);
+                    $this->createDirectory($location);
                 }
 
-                $this->createFileFromTemplate ([
-                    "destination"         => 'app/' . HCNewService::CONFIG_PATH,
+                $this->createFileFromTemplate([
+                    "destination" => 'app/' . HCNewService::CONFIG_PATH,
                     "templateDestination" => __DIR__ . '/templates/shared/hc.config.hctpl',
-                    "content"             => [
+                    "content" => [
                         "serviceProviderNameSpace" => "app",
                     ],
                 ]);
 
-                foreach ($json['create_files'] as $source => $destinations)
-                {
-                    if (!is_array($destinations))
+                foreach ($json['create_files'] as $source => $destinations) {
+                    if (!is_array($destinations)) {
                         $this->createProjectFile($source, $destinations);
-                    else
-                        foreach ($destinations as $destination)
+                    } else {
+                        foreach ($destinations as $destination) {
                             $this->createProjectFile($source, $destination);
+                        }
+                    }
                 }
 
-                foreach ($json['copy_folders'] as $source => $destinations)
-                {
-                    if (!is_array($destinations))
+                foreach ($json['copy_folders'] as $source => $destinations) {
+                    if (!is_array($destinations)) {
                         File::copyDirectory(__DIR__ . "/templates/$source", base_path($destinations));
-                    else
-                        foreach ($destinations as $destination)
+                    } else {
+                        foreach ($destinations as $destination) {
                             File::copyDirectory(__DIR__ . "/templates/$source", base_path($destination));
+                        }
+                    }
                 }
 
 
                 replaceTextInFile('composer.json', ['"App\\\\"' => '"app\\\\"']);
-                replaceTextInFile('config/auth.php', ['=> App\User::class' => '=> interactivesolutions\honeycombacl\app\models\HCUsers::class']);
+                replaceTextInFile('config/auth.php',
+                    ['=> App\User::class' => '=> InteractiveSolutions\HoneycombAcl\Models\HCUsers::class']);
                 replaceTextInFile('config/auth.php', ['password_resets' => 'hc_users_password_resets']);
                 replaceTextInFile('config/database.php', ['utf8\'' => 'utf8mb4\'', 'utf8_' => 'utf8mb4_']);
 
             } catch (Exception $e) {
-                $this->comment ('Error occurred!');
-                $this->error ('Error code: ' . $e->getCode ());
-                $this->error ('Error message: ' . $e->getMessage ());
-                $this->info ('');
-                $this->info ('Rolling back configuration.');
+                $this->comment('Error occurred!');
+                $this->error('Error code: ' . $e->getCode());
+                $this->error('Error message: ' . $e->getMessage());
+                $this->info('');
+                $this->info('Rolling back configuration.');
                 $this->restore();
-                $this->abort ('');
+                $this->abort('');
             }
         }
     }
@@ -126,20 +140,19 @@ class HCNewProject extends HCCommand
      */
     private function createProjectFile(string $source, string $destination)
     {
-        try{
-            $this->createFileFromTemplate ([
-                "destination"         => $destination,
-                "templateDestination" => __DIR__ . '/templates/project/' . $source
+        try {
+            $this->createFileFromTemplate([
+                "destination" => $destination,
+                "templateDestination" => __DIR__ . '/templates/project/' . $source,
             ]);
-        } catch (Exception $e)
-        {
+        } catch (Exception $e) {
         }
     }
 
     /**
      * Making backup for app and bootstrap folders
      */
-    private function makeBackup ()
+    private function makeBackup()
     {
         $this->createDirectory($this->backupDirectory);
         $this->createDirectory($this->backupDirectory . '/config');
