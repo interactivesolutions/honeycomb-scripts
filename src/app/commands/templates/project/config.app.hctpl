@@ -167,7 +167,7 @@ return [
          * Package Service Providers...
          */
 
-        interactivesolutions\honeycombcms\app\providers\HCCMSServiceProvider::class,
+        InteractiveSolutions\HoneycombCms\app\providers\HCCMSServiceProvider::class,
 
         /*
          * Application Service Providers...
