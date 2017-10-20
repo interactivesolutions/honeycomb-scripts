@@ -137,7 +137,7 @@ class HCNewService extends HCCommand
 
         foreach ($allFiles as $file) {
             if (strpos((string)$file, '.done') === false) {
-                $this->configurationData[] = $this->optimizeData($file);
+                $this->configurationData[] = $this->optimizeData((string)$file);
             }
         }
 

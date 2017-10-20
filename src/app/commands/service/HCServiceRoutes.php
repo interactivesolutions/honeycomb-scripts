@@ -34,7 +34,7 @@ class HCServiceRoutes extends HCBaseServiceCreation
         $this->createRouteFolders($data);
 
         $fi = new FilesystemIterator($data->rootDirectory . 'app/routes/admin/', FilesystemIterator::SKIP_DOTS);
-        $count = str_pad(iterator_count($fi) + 1, 2, '0', STR_PAD_LEFT) . '_';
+        $count = str_pad((string)(iterator_count($fi) + 1), 2, '0', STR_PAD_LEFT) . '_';
 
         $data->serviceRouteName = 'routes.' . $this->stringWithDots($data->serviceURL);
 
