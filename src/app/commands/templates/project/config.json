@@ -1,63 +1,22 @@
 {
   "remove_folders": [
-    "app",
-    "database/seeds",
-    "database/migrations",
-    "storage/app/cache",
-    "storage/app/public",
-    "storage/app/uploads",
-    "storage/framework/cache",
-    "storage/framework/sessions",
-    "storage/framework/views",
-    "routes",
-    "public/css",
-    "public/js"
+    "database/migrations"
   ],
   "remove_files": [
     "app/Providers/RouteServiceProvider.php",
     "app/User.php",
-    "bootstrap/app.php",
     "bootstrap/cache/config.php",
-    "bootstrap/cache/services.php",
-    "database/factories/ModelFactory.php"
+    "bootstrap/cache/services.php"
   ],
   "create_folders": [
-    "app/console/commands",
-    "app/exceptions",
-    "app/http/middleware",
-    "app/http/controllers",
-    "app/providers",
-    "app/honeycomb",
-    "app/models",
-    "app/routes",
     "database/migrations",
-    "database/seed",
-    "storage/app/cache",
-    "storage/app/public",
-    "storage/app/uploads",
     "storage/app/video-previews",
-    "storage/framework/cache",
-    "storage/framework/sessions",
-    "storage/framework/views",
-    "_automate",
-    "public/css",
-    "public/js"
+    "_automate"
   ],
   "create_files": {
-    "app.console.kernel.hctpl": "app/console/Kernel.php",
-    "app.exceptions.handler.hctpl": "app/exceptions/Handler.php",
-    "app.http.kernel.hctpl": "app/http/Kernel.php",
-    "app.http.middleware.encryptcookies.hctpl": "app/http/middleware/EncryptCookies.php",
-    "app.http.middleware.verifycsrftoken.hctpl": "app/http/middleware/VerifyCsrfToken.php",
-    "app.http.middleware.redirectifauthenticated.hctpl": "app/http/middleware/RedirectIfAuthenticated.php",
-    "app.providers.broadcastserviceprovider.hctpl": "app/providers/BroadcastServiceProvider.php",
-    "app.providers.eventserviceprovider.hctpl": "app/providers/EventServiceProvider.php",
     "app.providers.routeserviceprovider.hctpl": "app/providers/RouteServiceProvider.php",
     "automate.config.hctpl": "_automate/config.json",
-    "bootstrap.app.hctpl": "bootstrap/app.php",
-    "database.seeds.databaseseeder.hctpl": "database/seeds/DatabaseSeeder.php",
-    "config.app.hctpl": "config/app.php",
-    "../shared/empty.hctpl": ["app/honeycomb/routes.php", "app/honeycomb/routes-custom.php", "database/factories/ModelFactory.php"]
+    "../shared/empty.hctpl": ["app/honeycomb/routes.php", "app/honeycomb/routes-custom.php"]
   },
   "copy_folders": {
     "favicon":"public"

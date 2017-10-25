@@ -43,8 +43,13 @@ class HCNewProject extends HCCommand
      */
     public function handle()
     {
-        $this->backupDirectory = '_bak_' . $this->stringWithUnderscore(Carbon::now()->toDateTimeString());
-        $this->removeDefaultStructure();
+        try {
+            $this->backupDirectory = '_bak_' . $this->stringWithUnderscore(Carbon::now()->toDateTimeString());
+            $this->removeDefaultStructure();
+            return $this->info('Success!');
+        }catch (Exception $exception) {
+            return $this->error($exception->getMessage());
+        }
     }
 
     /**
@@ -89,7 +94,7 @@ class HCNewProject extends HCCommand
                     "destination" => 'app/' . HCNewService::CONFIG_PATH,
                     "templateDestination" => __DIR__ . '/templates/shared/hc.config.hctpl',
                     "content" => [
-                        "serviceProviderNameSpace" => "app",
+                        "serviceProviderNameSpace" => "App",
                     ],
                 ]);
 
@@ -113,12 +118,13 @@ class HCNewProject extends HCCommand
                     }
                 }
 
-
-                replaceTextInFile('composer.json', ['"App\\\\"' => '"app\\\\"']);
-                replaceTextInFile('config/auth.php',
-                    ['=> App\User::class' => '=> InteractiveSolutions\HoneycombAcl\Models\HCUsers::class']);
+                replaceTextInFile('app/Http/Middleware/RedirectIfAuthenticated.php', ['/home' => '/']);
+                replaceTextInFile('config/app.php', ['UTC' => 'Europe/Vilnius']);
+                replaceTextInFile('config/auth.php', [
+                        'App\User::class' => 'InteractiveSolutions\HoneycombAcl\Models\HCUsers::class',
+                    ]
+                );
                 replaceTextInFile('config/auth.php', ['password_resets' => 'hc_users_password_resets']);
-                replaceTextInFile('config/database.php', ['utf8\'' => 'utf8mb4\'', 'utf8_' => 'utf8mb4_']);
 
             } catch (Exception $e) {
                 $this->comment('Error occurred!');
