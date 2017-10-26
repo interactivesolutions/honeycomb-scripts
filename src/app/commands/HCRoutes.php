@@ -69,10 +69,7 @@ class HCRoutes extends HCCommand
 
         $laravelRouteFolder = base_path() . '/routes';
 
-
         if (!file_exists($dirPath) || $laravelRouteFolder == strtolower($dirPath)) {
-            $this->error($dirPath);
-
             return;
         }
 
