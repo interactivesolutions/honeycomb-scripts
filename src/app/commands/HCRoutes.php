@@ -50,6 +50,7 @@ class HCRoutes extends HCCommand
                 // TODO change all package route folder location to src/Routes, than fix this
                 $packageRootDirectory = realpath(implode('/', array_slice(explode('/', $file), 0, -3))) . '/';
                 $this->generateRoutes($packageRootDirectory);
+                $this->generateRoutes($packageRootDirectory, 'app/Routes');
                 $this->generateRoutes($packageRootDirectory, 'Routes');
             }
         } else {
@@ -68,6 +69,10 @@ class HCRoutes extends HCCommand
         $dirPath = $directory . $appPath;
 
         $laravelRouteFolder = base_path() . '/routes';
+
+        if ($laravelRouteFolder == strtolower($dirPath)) {
+            return;
+        }
 
         if (!file_exists($dirPath) || $laravelRouteFolder == strtolower($dirPath)) {
             return;
