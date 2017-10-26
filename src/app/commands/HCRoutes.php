@@ -47,7 +47,10 @@ class HCRoutes extends HCCommand
             $files = $this->getConfigFiles();
 
             foreach ($files as $file) {
-                $this->generateRoutes(realpath(implode('/', array_slice(explode('/', $file), 0, -3))) . '/');
+                // TODO change all package route folder location to src/Routes, than fix this
+                $packageRootDirectory = realpath(implode('/', array_slice(explode('/', $file), 0, -3))) . '/';
+                $this->generateRoutes($packageRootDirectory);
+                $this->generateRoutes($packageRootDirectory, 'Routes');
             }
         } else {
             $this->generateRoutes($rootDirectory);
@@ -58,12 +61,18 @@ class HCRoutes extends HCCommand
      * Generating final routes file for package
      *
      * @param $directory
+     * @param string $appPath
      */
-    private function generateRoutes($directory)
+    private function generateRoutes($directory, $appPath = 'app/routes/')
     {
-        $dirPath = $directory . 'app/routes/';
+        $dirPath = $directory . $appPath;
 
-        if (!file_exists($dirPath)) {
+        $laravelRouteFolder = base_path() . '/routes';
+
+
+        if (!file_exists($dirPath) || $laravelRouteFolder == strtolower($dirPath)) {
+            $this->error($dirPath);
+
             return;
         }
 
@@ -80,10 +89,15 @@ class HCRoutes extends HCCommand
         $files = iterator_to_array($iterator, true);
 
         $finalContent = '<?php' . "\r\n";
+
         foreach ($files as $file => $content) {
             $finalContent .= "\r\n";
             $finalContent .= '//' . implode('/', array_slice(explode('/', $file), -6)) . "\r\n";
-            $finalContent .= str_replace('<?php', '', file_get_contents((string)$file)) . "\r\n";
+
+            $routeFileContent = file_get_contents((string)$file);
+
+            $routeFileContent = str_replace('<?php', '', $routeFileContent) . "\r\n";
+            $finalContent .= str_replace('declare(strict_types = 1);', '', $routeFileContent) . "\r\n";
         }
 
         file_put_contents($directory . HCRoutes::ROUTES_PATH, $finalContent);
