@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace InteractiveSolutions\HoneycombScripts\app\commands;
 
 use File;
-use Illuminate\Support\Facades\App;
 use InteractiveSolutions\HoneycombCore\Console\HCCommand;
 
 /**
@@ -36,16 +35,19 @@ class HCNewPackage extends HCCommand
     public function handle()
     {
         $configurationPath = __DIR__ . '/templates/config/package.json';
+
         if (!file_exists($configurationPath)) {
             $this->abort('Missing package configuration file');
         }
 
+        // get create folder list
         $json = json_decode(file_get_contents($configurationPath), true);
 
         $this->createDirectory('packages');
 
         $directoryList = [];
 
+        // get packages list without /src/app/honeycomb/config.json file
         foreach (File::directories('packages') as $directory) {
             $vendorPackages = File::directories($directory);
 
@@ -57,7 +59,7 @@ class HCNewPackage extends HCCommand
         }
 
         if ($directoryList == null) {
-            $this->abort('You must create your package directory first');
+            $this->abort('You must create your package directory first. .i.e.: interactivesolutions/honeycomb-newpackage');
         }
 
         $packageDirectory = $this->choice('Please select package directory', $directoryList);
@@ -73,11 +75,7 @@ class HCNewPackage extends HCCommand
             $this->createDirectory($packageDirectory . '/' . $location);
         }
 
-        $this->createFileFromTemplate([
-            "destination" => $packageDirectory . '/src/app/http/helpers.php',
-            "templateDestination" => __DIR__ . '/templates/shared/empty.hctpl',
-        ]);
-
+        // TODO change from app
         $this->createFileFromTemplate([
             "destination" => $packageDirectory . '/src/app/honeycomb/routes.php',
             "templateDestination" => __DIR__ . '/templates/shared/empty.hctpl',
@@ -106,12 +104,12 @@ class HCNewPackage extends HCCommand
         ]);
 
         $this->createFileFromTemplate([
-            "destination" => $packageDirectory . '/src/app/providers/' . $packageName . 'ServiceProvider.php',
+            "destination" => $packageDirectory . '/src/Providers/' . $packageName . 'ServiceProvider.php',
             "templateDestination" => __DIR__ . '/templates/package/service.provider.hctpl',
             "content" => [
                 "packageName" => $packageName . 'ServiceProvider',
-                "nameSpace" => $nameSpace . '\app\providers',
-                "nameSpaceGeneral" => $nameSpace . '\app\http\controllers',
+                "nameSpace" => $nameSpace . '\Providers',
+                "nameSpaceGeneral" => $nameSpace . '\Http\Controllers',
                 "serviceProviderNameSpace" => $packageName,
             ],
         ]);
@@ -128,7 +126,7 @@ class HCNewPackage extends HCCommand
         $this->comment('');
         $this->comment('********************************************************');
 
-        if (App::environment() == 'local') {
+        if (app()->environment() == 'local') {
             $composer = json_decode(file_get_contents('composer.json'));
 
             if (!isset($composer->autoload->{'psr-4'}->{$composerNameSpace})) {
@@ -140,10 +138,8 @@ class HCNewPackage extends HCCommand
         }
 
         $this->comment('Please add to config/app.php under "providers":');
-        $this->info($nameSpace . '\app\providers\\' . $packageName . 'ServiceProvider::class');
+        $this->info($nameSpace . '\Providers\\' . $packageName . 'ServiceProvider::class');
 
         $this->comment('********************************************************');
-
-
     }
 }
