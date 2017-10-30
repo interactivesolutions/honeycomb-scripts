@@ -36,8 +36,8 @@ class HCServiceModels extends HCBaseServiceCreation
      */
     public function optimize(stdClass $data)
     {
-        $data->modelDirectory = str_replace('/http/controllers', '/models', $data->controllerDestination);
-        $data->modelNamespace = str_replace('\\http\\controllers', '\\models', $data->controllerNamespace);
+        $data->modelDirectory = str_replace('/Http/Controllers', '/Models', $data->controllerDestination);
+        $data->modelNamespace = str_replace('\\Http\\Controllers', '\\Models', $data->controllerNamespace);
 
         foreach ($data->database as $dbItem) {
             $dbItem->columns = $this->getTableColumns($dbItem->tableName);

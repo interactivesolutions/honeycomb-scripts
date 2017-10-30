@@ -1,4 +1,4 @@
-/**
+    /**
     * Create item
     *
     * @return mixed
@@ -123,7 +123,7 @@
      * @param string $phrase
      * @return Builder
      */
-    protected function searchQuery(Builder $query, string $phrase)
+    protected function searchQuery(Builder $query, string $phrase): Builder
     {
         $r = {modelName}::getTableName();
         $t = {modelName}Translations::getTableName();

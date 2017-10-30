@@ -33,15 +33,21 @@ class HCServiceRoutes extends HCBaseServiceCreation
     {
         $this->createRouteFolders($data);
 
-        $fi = new FilesystemIterator($data->rootDirectory . 'app/routes/admin/', FilesystemIterator::SKIP_DOTS);
+        if ($data->directory == "") {
+            $basePath = 'app/Routes/';
+        } else {
+            $basePath = 'Routes/';
+        }
+
+        $fi = new FilesystemIterator($data->rootDirectory . $basePath .'Admin/', FilesystemIterator::SKIP_DOTS);
         $count = str_pad((string)(iterator_count($fi) + 1), 2, '0', STR_PAD_LEFT) . '_';
 
-        $data->serviceRouteName = 'routes.' . $this->stringWithDots($data->serviceURL);
+        $data->serviceRouteName = 'routes.' . $this->stringWithDots(strtolower($data->serviceURL));
 
-        $data->adminRoutesDestination = $data->rootDirectory . 'app/routes/admin/' . $count . $data->serviceRouteName . '.php';
-        $data->apiRoutesDestination = $data->rootDirectory . 'app/routes/api/' . $count . $data->serviceRouteName . '.php';
+        $data->adminRoutesDestination = $data->rootDirectory . $basePath . 'Admin/' . $count . $data->serviceRouteName . '.php';
+        $data->apiRoutesDestination = $data->rootDirectory .  $basePath .'Api/' . $count . $data->serviceRouteName . '.php';
 
-        $data->aclPrefix = $this->stringWithUnderscore($data->directory . $data->serviceRouteName);
+        $data->aclPrefix = $this->stringWithUnderscore(strtolower($data->directory . $data->serviceRouteName));
 
         return $data;
     }
@@ -89,7 +95,7 @@ class HCServiceRoutes extends HCBaseServiceCreation
             "destination" => $destination,
             "templateDestination" => __DIR__ . '/../templates/service/' . $type . '.routes.hctpl',
             "content" => [
-                "serviceURL" => $service->serviceURL,
+                "serviceURL" => strtolower($service->serviceURL),
                 "controllerNameDotted" => $service->serviceRouteName,
                 "acl_prefix" => $service->aclPrefix,
                 "controllerName" => $service->controllerNameForRoutes,
@@ -104,12 +110,18 @@ class HCServiceRoutes extends HCBaseServiceCreation
      */
     protected function createRouteFolders(stdClass $data)
     {
-        if (!File::exists($data->rootDirectory . 'app/routes/admin')) {
-            $this->createDirectory($data->rootDirectory . 'app/routes/admin');
+        if ($data->directory == "") {
+            $basePath = 'app/Routes/';
+        } else {
+            $basePath = 'Routes/';
         }
 
-        if (!File::exists($data->rootDirectory . 'app/routes/api')) {
-            $this->createDirectory($data->rootDirectory . 'app/routes/api');
+        if (!File::exists($data->rootDirectory . $basePath. 'Admin')) {
+            $this->createDirectory($data->rootDirectory . $basePath. 'Admin');
+        }
+
+        if (!File::exists($data->rootDirectory . $basePath. 'Api')) {
+            $this->createDirectory($data->rootDirectory . $basePath. 'Api');
         }
     }
 }

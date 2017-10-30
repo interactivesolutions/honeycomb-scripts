@@ -32,10 +32,10 @@ class HCServiceForms extends HCBaseServiceCreation
     public function optimize(stdClass $data)
     {
         $data->formName = $data->serviceName . 'Form';
-        $data->formNameSpace = str_replace('\\http\\controllers', '\\forms', $data->controllerNamespace);
-        $data->formDestination = str_replace('/http/controllers', '/forms',
+        $data->formNameSpace = str_replace('\\Http\\Controllers', '\\Forms', $data->controllerNamespace);
+        $data->formDestination = str_replace('/Http/Controllers', '/Forms',
                 $data->controllerDestination) . '/' . $data->formName . '.php';
-        $data->formID = $this->stringWithDash($data->serviceURL);
+        $data->formID = $this->stringWithDash(strtolower($data->serviceURL));
 
         return $data;
     }

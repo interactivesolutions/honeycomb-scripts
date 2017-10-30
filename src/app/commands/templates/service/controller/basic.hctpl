@@ -1,13 +1,45 @@
 <?php
 
+/**
+ * @copyright 2017 interactivesolutions
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * Contact InteractiveSolutions:
+ * E-mail: hello@interactivesolutions.lt
+ * http://www.interactivesolutions.lt
+ */
+
+declare(strict_types = 1);
+
 namespace {namespace};
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\View\View;
 use InteractiveSolutions\HoneycombCore\Http\Controllers\HCBaseController;{useFiles}
 
+/**
+ * Class {controllerName}
+ * @package {namespace}
+ */
 class {controllerName} extends HCBaseController
 {
-
     //TODO recordsPerPage setting
 
     /**
@@ -15,7 +47,7 @@ class {controllerName} extends HCBaseController
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function adminIndex()
+    public function adminIndex(): View
     {
         $config = [
             'title'       => trans('{translationsLocation}.page_title'),
@@ -26,17 +58,18 @@ class {controllerName} extends HCBaseController
             'headers'     => $this->getAdminListHeader(),
         ];
 
-        if (auth()->user()->can('{acl_prefix}_create'))
+        if (auth()->user()->can('{acl_prefix}_create')) {
             $config['actions'][] = 'new';
+        }
 
-        if (auth()->user()->can('{acl_prefix}_update'))
-        {
+        if (auth()->user()->can('{acl_prefix}_update')) {
             $config['actions'][] = 'update';
             $config['actions'][] = 'restore';
         }
 
-        if (auth()->user()->can('{acl_prefix}_delete'))
+        if (auth()->user()->can('{acl_prefix}_delete')) {
             $config['actions'][] = 'delete';
+        }
 
         $config['actions'][] = 'search';
         $config['filters'] = $this->getFilters ();
@@ -49,31 +82,11 @@ class {controllerName} extends HCBaseController
      *
      * @return array
      */
-    public function getAdminListHeader()
+    public function getAdminListHeader(): array
     {
         return [
             {adminListHeader}
         ];
-    }
-
-    {functions}
-
-    /**
-     * Getting user data on POST call
-     *
-     * @return mixed
-     */
-    protected function getInputData()
-    {
-        (new {formValidationName}())->validateForm();
-
-        $_data = request()->all();
-
-        if (array_has($_data, 'id'))
-            array_set ($data, 'record.id', array_get ($_data, 'id'));
-
-        {inputData}
-        return makeEmptyNullable($data);
     }
 
     /**
@@ -101,10 +114,31 @@ class {controllerName} extends HCBaseController
      *
      * @return array
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         $filters = [];
 
         return $filters;
     }
+
+    /**
+     * Getting user data on POST call
+     *
+     * @return mixed
+     */
+    protected function getInputData(): array
+    {
+        (new {formValidationName}())->validateForm();
+
+        $_data = request()->all();
+
+        if (array_has($_data, 'id'))
+            array_set ($data, 'record.id', array_get ($_data, 'id'));
+
+        {inputData}
+        return makeEmptyNullable($data);
+    }
+
+    {functions}
+
 }

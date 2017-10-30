@@ -32,9 +32,18 @@ class HCServiceController extends HCBaseServiceCreation
     {
         $data->controllerName = $data->serviceName . 'Controller';
 
+        if ($data->directory == "") {
+            $baseNamespace = 'App\Http\Controllers\\';
+            $basePath = 'app/Http/Controllers/';
+        } else {
+            $baseNamespace = 'Http\Controllers\\';
+            $basePath = 'Http/Controllers/';
+        }
+
         // creating name space from service URL
         $data->controllerNamespace = str_replace('/', '\\',
-            $data->directory . 'app\http\controllers\\' . str_replace('-', '', $data->serviceURL));
+            $data->directory . $baseNamespace . str_replace('-', '', ucfirst($data->serviceURL))
+        );
 
         $data->controllerNamespace = array_filter(explode('\\', $data->controllerNamespace));
         array_pop($data->controllerNamespace);
@@ -42,7 +51,7 @@ class HCServiceController extends HCBaseServiceCreation
         $data->controllerNamespace = str_replace('-', '', $data->controllerNamespace);
 
         $routesNameSpace = str_replace('/', '\\\\',
-            $this->createItemDirectoryPath(str_replace('-', '', $data->serviceURL)));
+            $this->createItemDirectoryPath(str_replace('-', '', ucfirst($data->serviceURL))));
 
         if ($routesNameSpace == "") {
             $data->controllerNameForRoutes = $data->controllerName;
@@ -51,8 +60,8 @@ class HCServiceController extends HCBaseServiceCreation
         }
 
         // creating controller directory
-        $data->controllerDestination = $this->createItemDirectoryPath($data->rootDirectory . 'app/http/controllers/' . str_replace('-',
-                '', $data->serviceURL));
+        $data->controllerDestination = $this->createItemDirectoryPath($data->rootDirectory . $basePath . str_replace('-',
+                '', ucfirst($data->serviceURL)));
 
         return $data;
     }
@@ -100,7 +109,7 @@ class HCServiceController extends HCBaseServiceCreation
                 "acl_prefix" => $data->aclPrefix,
                 "serviceURL" => $data->serviceURL,
                 "translationsLocation" => $data->translationsLocation,
-                "serviceNameDotted" => $this->stringWithDash($data->translationFilePrefix),
+                "serviceNameDotted" => $this->stringWithDash(strtolower($data->translationFilePrefix)),
                 "controllerNameDotted" => $data->serviceRouteName,
                 "adminListHeader" => $this->getAdminListHeader($data),
                 "formValidationName" => $data->formValidationName,

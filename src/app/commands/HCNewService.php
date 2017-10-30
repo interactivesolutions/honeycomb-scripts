@@ -7,12 +7,9 @@ namespace InteractiveSolutions\HoneycombScripts\app\commands;
 use DB;
 use File;
 use InteractiveSolutions\HoneycombCore\Console\HCCommand;
-use InteractiveSolutions\HoneycombScripts\app\commands\service\HCServiceController;
-use InteractiveSolutions\HoneycombScripts\app\commands\service\HCServiceFormValidators;
-use InteractiveSolutions\HoneycombScripts\app\commands\service\HCServiceModels;
-use InteractiveSolutions\HoneycombScripts\app\commands\service\HCServiceTranslations;
-use InteractiveSolutions\HoneycombScripts\app\commands\service\HCServiceForms;
-use InteractiveSolutions\HoneycombScripts\app\commands\service\HCServiceRoutes;
+use InteractiveSolutions\HoneycombScripts\app\commands\service\{
+    HCServiceController, HCServiceFormValidators, HCServiceModels, HCServiceTranslations, HCServiceForms, HCServiceRoutes
+};
 use stdClass;
 
 /**
@@ -277,7 +274,7 @@ class HCNewService extends HCCommand
                 ],
         ];
 
-        if (empty($config->acl->rolesActions)) {
+        if (empty((array)$config->acl->rolesActions)) {
             $config->acl->rolesActions = $rolesActions;
         } else {
             $config->acl->rolesActions->{"project-admin"} = array_unique(array_merge($config->acl->rolesActions->{"project-admin"},
