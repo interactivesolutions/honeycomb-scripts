@@ -1,7 +1,7 @@
 {
     "directory":"",
     "serviceURL":"",
-    "serviceIcon":"square-o",
+    "serviceIcon":"fa-square-o",
     "serviceName":"",
     "generateMigrations":1,
     "multiLanguage":0,
