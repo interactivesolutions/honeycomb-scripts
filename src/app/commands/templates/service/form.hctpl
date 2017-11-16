@@ -42,6 +42,7 @@ class {className}
      *
      * @param bool $edit
      * @return array
+     * @throws \Illuminate\Container\EntryNotFoundException
      */
     public function createForm(bool $edit = false): array
     {

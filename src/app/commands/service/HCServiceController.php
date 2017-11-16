@@ -42,16 +42,23 @@ class HCServiceController extends HCBaseServiceCreation
 
         // creating name space from service URL
         $data->controllerNamespace = str_replace('/', '\\',
-            $data->directory . $baseNamespace . str_replace('-', '', ucfirst($data->serviceURL))
+            $data->directory . $baseNamespace . $this->upperCaseFirstLetterOfSegment($data->serviceURL)
         );
 
         $data->controllerNamespace = array_filter(explode('\\', $data->controllerNamespace));
         array_pop($data->controllerNamespace);
+
+        // convert to first letter uppercase
+        $data->controllerNamespace = array_map('ucfirst', $data->controllerNamespace);
+
         $data->controllerNamespace = implode('\\', $data->controllerNamespace);
         $data->controllerNamespace = str_replace('-', '', $data->controllerNamespace);
 
         $routesNameSpace = str_replace('/', '\\\\',
-            $this->createItemDirectoryPath(str_replace('-', '', ucfirst($data->serviceURL))));
+            $this->createItemDirectoryPath(
+                $this->upperCaseFirstLetterOfSegment($data->serviceURL)
+            )
+        );
 
         if ($routesNameSpace == "") {
             $data->controllerNameForRoutes = $data->controllerName;
@@ -60,8 +67,9 @@ class HCServiceController extends HCBaseServiceCreation
         }
 
         // creating controller directory
-        $data->controllerDestination = $this->createItemDirectoryPath($data->rootDirectory . $basePath . str_replace('-',
-                '', ucfirst($data->serviceURL)));
+        $data->controllerDestination = $this->createItemDirectoryPath(
+            $data->rootDirectory . $basePath . $this->upperCaseFirstLetterOfSegment($data->serviceURL)
+        );
 
         return $data;
     }
@@ -359,5 +367,17 @@ class HCServiceController extends HCBaseServiceCreation
         }
 
         return $output;
+    }
+
+    private function upperCaseFirstLetterOfSegment($serviceURL)
+    {
+        $serviceURL = str_replace('-', '', $serviceURL);
+
+        $segments = explode('/', $serviceURL);
+        $segments = array_map('ucfirst', $segments);
+
+        $serviceURL = implode('/', $segments);
+
+        return $serviceURL;
     }
 }

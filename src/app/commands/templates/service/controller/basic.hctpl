@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @copyright 2017 interactivesolutions
  *
@@ -45,7 +44,8 @@ class {controllerName} extends HCBaseController
     /**
      * Returning configured admin view
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return View
+     * @throws \Illuminate\Container\EntryNotFoundException
      */
     public function adminIndex(): View
     {

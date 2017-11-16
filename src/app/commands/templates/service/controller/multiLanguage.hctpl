@@ -45,6 +45,7 @@ class {controllerName} extends HCBaseController
      * Returning configured admin view
      *
      * @return View
+     * @throws \Illuminate\Container\EntryNotFoundException
      */
     public function adminIndex(): View
     {
@@ -94,6 +95,7 @@ class {controllerName} extends HCBaseController
      * Getting user data on POST call
      *
      * @return array
+     * @throws \Exception
      */
     protected function getInputData(): array
     {

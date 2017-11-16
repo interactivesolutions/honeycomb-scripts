@@ -1,8 +1,9 @@
     /**
-    * Create item
-    *
-    * @return mixed
-    */
+     * Create item
+     *
+     * @return mixed
+     * @throws \Exception
+     */
     protected function __apiStore()
     {
         $data = $this->getInputData();
@@ -13,11 +14,12 @@
     }
 
     /**
-    * Updates existing item based on ID
-    *
-    * @param $id
-    * @return mixed
-    */
+     * Updates existing item based on ID
+     *
+     * @param string $id
+     * @return mixed
+     * @throws \Exception
+     */
     protected function __apiUpdate(string $id)
     {
         $record = {modelName}::findOrFail($id);
@@ -30,11 +32,11 @@
     }
 
     /**
-    * Updates existing specific items based on ID
-    *
-    * @param string $id
-    * @return mixed
-    */
+     * Updates existing specific items based on ID
+     *
+     * @param string $id
+     * @return mixed
+     */
     protected function __apiUpdateStrict(string $id)
     {
         {modelName}::where('id', $id)->update(request()->all());
@@ -43,11 +45,11 @@
     }
 
     /**
-    * Delete records table
-    *
-    * @param $list
-    * @return mixed
-    */
+     * Delete records table
+     *
+     * @param $list
+     * @return mixed
+     */
     protected function __apiDestroy(array $list)
     {
         {modelName}::destroy($list);
@@ -56,11 +58,11 @@
     }
 
     /**
-    * Delete records table
-    *
-    * @param $list
-    * @return mixed
-    */
+     * Delete records table
+     *
+     * @param $list
+     * @return mixed
+     */
     protected function __apiForceDelete(array $list)
     {
         {modelName}::onlyTrashed()->whereIn('id', $list)->forceDelete();
@@ -69,11 +71,11 @@
     }
 
     /**
-    * Restore multiple records
-    *
-    * @param $list
-    * @return mixed
-    */
+     * Restore multiple records
+     *
+     * @param $list
+     * @return mixed
+     */
     protected function __apiRestore(array $list)
     {
         {modelName}::whereIn('id', $list)->restore();
