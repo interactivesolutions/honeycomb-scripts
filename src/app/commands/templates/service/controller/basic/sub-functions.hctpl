@@ -128,7 +128,7 @@
      * @param string $phrase
      * @return Builder
      */
-    protected function searchQuery(Builder $query, string $phrase)
+    protected function searchQuery(Builder $query, string $phrase): Builder
     {
         // TODO get $parentId
         $parentId = null;
