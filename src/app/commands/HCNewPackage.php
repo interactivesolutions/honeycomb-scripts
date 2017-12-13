@@ -64,9 +64,10 @@ class HCNewPackage extends HCCommand
 
         $packageDirectory = $this->choice('Please select package directory', $directoryList);
         $packageOfficialName = str_replace('packages/', '', $packageDirectory);
-        $nameSpace = $this->stringOnly(str_replace('/', '\\', $packageOfficialName));
-        $composerNameSpace = str_replace(['\\', '/'], '\\\\', $packageOfficialName . '\\');
-        $composerNameSpace = str_replace('-', '', $composerNameSpace);
+        $nameSpace = $this->getNameSpace($packageDirectory);
+
+        $composerNameSpace = str_replace(['\\'], '\\\\', $nameSpace);
+        $composerNameSpace = $composerNameSpace . '\\\\';
 
         $packageName = $this->ask('Please enter package name');
 
@@ -141,5 +142,30 @@ class HCNewPackage extends HCCommand
         $this->info($nameSpace . '\Providers\\' . $packageName . 'ServiceProvider::class');
 
         $this->comment('********************************************************');
+    }
+
+    /**
+     * @param $packageDirectory
+     * @return mixed|string
+     */
+    private function getNameSpace($packageDirectory)
+    {
+        $nameSpace = str_replace('packages/', '', $packageDirectory);
+
+        if (str_contains($nameSpace, 'interactivesolutions/honeycomb')) {
+            $nameSpace = str_replace('interactivesolutions/honeycomb', '', $nameSpace);
+            $nameSpace = str_replace('-', '', ucwords($nameSpace, '-'));
+            $nameSpace = 'InteractiveSolutions\Honeycomb' . $nameSpace;
+        } else {
+            if (str_contains($nameSpace, 'interactivesolutions/')) {
+                $nameSpace = str_replace('interactivesolutions/', '', $nameSpace);
+                $nameSpace = str_replace('-', '', ucwords($nameSpace, '-'));
+                $nameSpace = 'InteractiveSolutions\\' . $nameSpace;
+            }
+        }
+
+        $nameSpace = str_replace('/', '\\', $nameSpace);
+
+        return $nameSpace;
     }
 }
