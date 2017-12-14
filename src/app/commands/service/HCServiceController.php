@@ -40,23 +40,11 @@ class HCServiceController extends HCBaseServiceCreation
             $basePath = 'Http/Controllers/';
         }
 
-        // creating name space from service URL
-        $data->controllerNamespace = str_replace('/', '\\',
-            $data->directory . $baseNamespace . $this->upperCaseFirstLetterOfSegment($data->serviceURL)
-        );
-
-        $data->controllerNamespace = array_filter(explode('\\', $data->controllerNamespace));
-        array_pop($data->controllerNamespace);
-
-        // convert to first letter uppercase
-        $data->controllerNamespace = array_map('ucfirst', $data->controllerNamespace);
-
-        $data->controllerNamespace = implode('\\', $data->controllerNamespace);
-        $data->controllerNamespace = str_replace('-', '', $data->controllerNamespace);
+        $data->controllerNamespace = $this->getNameSpace($data, $baseNamespace);
 
         $routesNameSpace = str_replace('/', '\\\\',
             $this->createItemDirectoryPath(
-                $this->upperCaseFirstLetterOfSegment($data->serviceURL)
+                $this->convertToUpperCase($data->serviceURL)
             )
         );
 
@@ -68,7 +56,7 @@ class HCServiceController extends HCBaseServiceCreation
 
         // creating controller directory
         $data->controllerDestination = $this->createItemDirectoryPath(
-            $data->rootDirectory . $basePath . $this->upperCaseFirstLetterOfSegment($data->serviceURL)
+            $data->rootDirectory . $basePath . $this->convertToUpperCase($data->serviceURL)
         );
 
         return $data;
@@ -105,8 +93,9 @@ class HCServiceController extends HCBaseServiceCreation
      * Creating multi language controller
      *
      * @param stdClass $data
+     * @return stdClass
      */
-    private function createMultiLanguageController(stdClass $data)
+    private function createMultiLanguageController(stdClass $data): stdClass
     {
         $this->createFileFromTemplate([
             "destination" => $data->controllerDestination,
@@ -369,15 +358,43 @@ class HCServiceController extends HCBaseServiceCreation
         return $output;
     }
 
-    private function upperCaseFirstLetterOfSegment($serviceURL)
+    /**
+     * @param string $serviceURL
+     * @return string
+     */
+    public function convertToUpperCase(string $serviceURL): string
     {
-        $serviceURL = str_replace('-', '', $serviceURL);
+        return str_replace('-', '', ucwords($serviceURL, '-/\\'));
+    }
 
-        $segments = explode('/', $serviceURL);
-        $segments = array_map('ucfirst', $segments);
+    /**
+     * @param stdClass $data
+     * @param string $baseNamespace
+     * @return string
+     */
+    private function getNameSpace(stdClass $data, string $baseNamespace): string
+    {
+        $directory = $data->directory;
 
-        $serviceURL = implode('/', $segments);
+        if (str_contains($directory, 'interactivesolutions')) {
+            $directory = str_replace('interactivesolutions', 'InteractiveSolutions', $directory);
+        }
 
-        return $serviceURL;
+        if (str_contains($directory, 'honeycomb')) {
+            $directory = str_replace('honeycomb', 'Honeycomb', $directory);
+        }
+
+        // creating name space from service URL
+        $namespace = str_replace('/', '\\',
+            $this->convertToUpperCase($directory . $baseNamespace . $data->serviceURL)
+        );
+
+        $namespace = array_filter(explode('\\', $namespace));
+
+        array_pop($namespace);
+
+        $namespace = implode('\\', $namespace);
+
+        return $namespace;
     }
 }
